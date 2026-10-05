@@ -1,0 +1,28 @@
+User-agent: GPTBot
+Disallow: /
+User-agent: ChatGPT-User
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+User-agent: CCBot
+Disallow: /
+User-agent: Googlebot
+Disallow: /private/
+
+User-agent: Bingbot
+Disallow: /tmp/
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: Yandex
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: Mediapartners-Google
+Disallow: /
