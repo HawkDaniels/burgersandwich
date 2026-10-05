@@ -1,0 +1,11 @@
+# HTTrack Website Copier Cookie File
+# This file format is compatible with Netscape cookies
+.paypal.com	TRUE	/	FALSE	1999999999	x-cdn	akamai
+www.paypal.com	TRUE	/	FALSE	1999999999	akavpau_ppsd	1596171371~id=11d97dd1760b73959f024d05bb835df5
+www.paypal.com	TRUE	/	FALSE	1999999999	SameSite	None
+.statcounter.com	TRUE	/	FALSE	1999999999	__cfduid	dd7beb179f2bf535a7ad51a35a145afdf1596171108
+www.statcounter.com	TRUE	/	FALSE	1999999999	SameSite	Lax
+www.truckitrecords.com	TRUE	/	FALSE	1999999999	PHPSESSID	79heepv4u3ena3cdec0a4mfp84
+truckitrecords.com	TRUE	/	FALSE	1999999999	PHPSESSID	n5jt6670191l732i2mjtqpf307
+www.macalive.com	TRUE	/	FALSE	1999999999	SRV	lander04|XyPZS|XyPZS
+

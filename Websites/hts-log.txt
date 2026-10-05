@@ -1,0 +1,160 @@
+HTTrack3.49-2+htsswf+htsjava launched on Thu, 30 Jul 2020 23:37:21 at http://www.cw-mccall.com http://www.rclague.net/ http://www.narrowgauge.org/ http://www.convoytm.com/ http://www.thinkingrockpress.com/ http://www.macshare.com/ http://www.urbaneagle.com/ +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar +*.gif +*.jpg +*.jpeg +*.png +*.tif +*.bmp +*.zip +*.tar +*.tgz +*.gz +*.rar +*.z +*.exe +*.mov +*.mpg +*.mpeg +*.avi +*.asf +*.mp3 +*.mp2 +*.rm +*.wav +*.vob +*.qt +*.vid +*.ac3 +*.wma +*.wmv
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" http://www.cw-mccall.com http://www.rclague.net/ http://www.narrowgauge.org/ http://www.convoytm.com/ http://www.thinkingrockpress.com/ http://www.macshare.com/ http://www.urbaneagle.com/ -O1 "C:\Users\End User\Desktop\CWMcMaster\Websites\Websites" +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar +*.gif +*.jpg +*.jpeg +*.png +*.tif +*.bmp +*.zip +*.tar +*.tgz +*.gz +*.rar +*.z +*.exe +*.mov +*.mpg +*.mpeg +*.avi +*.asf +*.mp3 +*.mp2 +*.rm +*.wav +*.vob +*.qt +*.vid +*.ac3 +*.wma +*.wmv )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+23:37:22	Warning: 	Note: due to www.cw-mccall.com remote robots.txt rules, links beginning with these path will be forbidden: /aem/, /audio/, /common/, /fm/, /images/, /manager/, /plugins/, /random/, /users/, /vdsbackup/, /video/, /wordpress/ (see in the options to disable this)
+23:37:25	Warning: 	Moved Permanently for www.rclague.net/robots.txt
+23:37:25	Warning: 	Redirected link is identical because of 'URL Hack' option: www.rclague.net/robots.txt and https://www.rclague.net/robots.txt
+23:37:25	Warning: 	Warning moved treated for www.rclague.net/robots.txt (real one is https://www.rclague.net/robots.txt)
+23:37:25	Warning: 	Moved Permanently for www.rclague.net/
+23:37:25	Warning: 	Redirected link is identical because of 'URL Hack' option: www.rclague.net/ and https://www.rclague.net/
+23:37:25	Warning: 	File has moved from www.rclague.net/ to https://www.rclague.net/
+23:41:03	Warning: 	file not stored in cache due to bogus state (broken size, expected 4759963 got 1297647): www.convoytm.com/ConvoyMovieVersion.mp3
+23:43:26	Warning: 	file not stored in cache due to bogus state (broken size, expected 979315 got 902891): www.cw-mccall.com/movie/convoy_radio_spot_1.mp3
+23:52:38	Error: 	"Not Found" (404) at link www.convoytm.com/CB_Trucker_Page.html (from www.convoytm.com/)
+23:53:22	Warning: 	Retry after error -4 (Incorrect length (1297647 Bytes, 4759963 expected)) at link www.convoytm.com/ConvoyMovieVersion.mp3 (from www.convoytm.com/)
+23:53:31	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/trp32.html (from www.thinkingrockpress.com/)
+23:53:31	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/source.htm (from www.thinkingrockpress.com/)
+23:53:32	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/summer.htm (from www.thinkingrockpress.com/)
+23:53:46	Warning: 	File not parsed, looks like binary: www.macshare.com/tips.html
+23:53:46	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/tips.html
+23:53:52	Error: 	"Not Found" (404) at link www.urbaneagle.com/herbco/index.html (from www.urbaneagle.com/)
+23:55:40	Warning: 	Retry after error -4 (Incorrect length (902891 Bytes, 979315 expected)) at link www.cw-mccall.com/movie/convoy_radio_spot_1.mp3 (from www.cw-mccall.com/movie/)
+23:55:42	Warning: 	file not stored in cache due to bogus state (broken size, expected 4759963 got 2460035): www.convoytm.com/ConvoyMovieVersion.mp3
+00:00:29	Warning: 	file not stored in cache due to bogus state (broken size, expected 1667217 got 889343): www.cw-mccall.com/news/2011/greatest_wheeling_songb.jpg
+00:00:47	Warning: 	file not stored in cache due to bogus state (broken size, expected 988487 got 735238): www.cw-mccall.com/news/external_articles/LimeWire Music Blog 2010-05-06.pdf
+00:06:33	Error: 	"Not Found" (404) at link www.cw-mccall.com/index.php (from www.cw-mccall.com/emporium/)
+00:11:52	Error: 	"Not Found" (404) at link www.narrowgauge.org/ncmap/whatsnew.html (from www.narrowgauge.org/ngc/html/whatsnew/whatsnew.html)
+00:11:52	Error: 	"Not Found" (404) at link www.narrowgauge.org/ncmap/ted/www.bayside.net/users/evans/ncmap/ted/final.html (from www.narrowgauge.org/ncmap/ted/final.html)
+02:09:13	Error: 	"Not Found" (404) at link www.narrowgauge.org/ngc/graphics/whatsnew/nnewedge.jpg (from www.narrowgauge.org/ngc/html/excursion8/excursion8.html)
+02:16:54	Warning: 	Retry after error -5 (Unable to get server's address: This is usually a temporary error during hostnam) at link www.titosantana.net/Tito_I.jpg (from www.convoytm.com/About_Me.html)
+02:17:05	Warning: 	Retry after error -5 (Unable to get server's address: No such host is known. ) at link fans.ghostdetectives.tv/wp-content/uploads/2011/08/newgd-photo.jpg (from www.convoytm.com/About_Me.html)
+02:17:16	Error: 	"Not Found" (404) at link www.convoytm.com/chan_cw.png (from www.convoytm.com/About_Me.html)
+02:17:16	Error: 	"Not Found" (404) at link www.convoytm.com/chan_fox56.png (from www.convoytm.com/About_Me.html)
+02:17:16	Error: 	"Not Found" (404) at link www.convoytm.com/Convoy_DVD_FC.jpg (from www.convoytm.com/Kino_Lorber_DVD_Review.html)
+02:17:25	Error: 	"Not Found" (404) at link www.convoytm.com/TimeMagazine_1977 (from www.convoytm.com/The_Movie.html)
+02:17:25	Error: 	"Not Found" (404) at link www.convoytm.com/Mannheim_Steamroller.gif (from www.convoytm.com/The_Music.html)
+02:17:26	Warning: 	Retry after error -4 (Incorrect length (2460035 Bytes, 4759963 expected)) at link www.convoytm.com/ConvoyMovieVersion.mp3 (from www.convoytm.com/)
+02:18:44	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/trp1092.html (from www.thinkingrockpress.com/trp31.html)
+02:18:44	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/trp755.html (from www.thinkingrockpress.com/trp31.html)
+02:18:44	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/trp857.html (from www.thinkingrockpress.com/trp31.html)
+02:18:44	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/trp691.html (from www.thinkingrockpress.com/trp31.html)
+02:19:29	Error: 	"Not Found" (404) at link www.thinkingrockpress.com/trp883.html (from www.thinkingrockpress.com/trp31.html)
+02:19:29	Error: 	"Not Found" (404) at link www.macshare.com/index.html (from www.macshare.com/sftwre-to.html)
+02:19:57	Warning: 	File not parsed, looks like binary: www.macshare.com/graphic-to.html
+02:19:57	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/graphic-to.html
+02:20:14	Error: 	"Not Found" (404) at link www.macshare.com/~tfrazier/ (from www.macshare.com/sftwre-to.html)
+02:20:14	Error: 	"Not Found" (404) at link www.macshare.com/~jay/ (from www.macshare.com/sftwre-to.html)
+02:20:14	Error: 	"Not Found" (404) at link meadows-success.com/TECHNOmac/files/images/TECHNOaward3.GIF (from www.macshare.com/welcome.html)
+02:20:14	Error: 	"Forbidden" (403) at link www.coolcentral.com/art/awards/csoth_anim.gif (from www.macshare.com/welcome.html)
+02:20:22	Warning: 	file not stored in cache due to bogus state (broken size, expected 4759963 got 3395314): www.convoytm.com/ConvoyMovieVersion.mp3
+02:20:25	Error: 	"Not Found" (404) at link www.macshare.com/search.gif (from www.macshare.com/search.html)
+02:20:25	Error: 	"Not Found" (404) at link www.gbar.dtu.dk/~c938448/TheMacOSfinder_small.gif (from www.macshare.com/search.html)
+02:20:25	Error: 	"Not Found" (404) at link www.macshare.com/award (from www.macshare.com/search.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2016/20151224.html (from www.cw-mccall.com/news/2016/20160606.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2015/20160606.html (from www.cw-mccall.com/news/2015/20151224.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2015/20141224.html (from www.cw-mccall.com/news/2015/20150330.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2014/20131224.html (from www.cw-mccall.com/news/2014/20141224.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2014/20150330.html (from www.cw-mccall.com/news/2014/20141224.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2013/20141224.html (from www.cw-mccall.com/news/2013/20131224.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2013/20130429.html (from www.cw-mccall.com/news/2013/20130304.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2012/20130304.html (from www.cw-mccall.com/news/2012/20121225.html)
+02:21:32	Error: 	"Not Found" (404) at link www.cw-mccall.com/news/2012/QTMimeType.pntg (from www.cw-mccall.com/news/2012/20120109.html)
+02:21:32	Warning: 	Retry after error -4 (Incorrect length (889343 Bytes, 1667217 expected)) at link www.cw-mccall.com/news/2011/greatest_wheeling_songb.jpg (from www.cw-mccall.com/news/2011/20110713.html)
+02:21:32	Warning: 	Retry after error -4 (Incorrect length (735238 Bytes, 988487 expected)) at link www.cw-mccall.com/news/external_articles/LimeWire Music Blog 2010-05-06.pdf (from www.cw-mccall.com/news/2010/20100511.html)
+02:21:41	Error: 	"Not Found" (404) at link truckitrecords.com/stv1.wav (from www.cw-mccall.com/news/2004/20040619.html)
+02:21:42	Warning: 	Retry after error -4 (Connect Error) at link 24.3.241.94/sanguinary/video/CF002-a.rm (from www.cw-mccall.com/news/2000/20000103.html)
+02:21:53	Warning: 	Retry after error -4 (Connect Error) at link 24.3.241.94/sanguinary/video/CF013.rm (from www.cw-mccall.com/news/2000/20000103.html)
+02:22:02	Warning: 	Retry after error -5 (Unable to get server's address: No such host is known. ) at link content.ubl.com/help/linking/images/ubl_black91x60.gif (from www.cw-mccall.com/news/1999/19991213.html)
+02:22:13	Warning: 	Retry after error -5 (Unable to get server's address: No such host is known. ) at link www.grammy.net/rubberduck1.jpg (from www.cw-mccall.com/news/1999/19991129.html)
+02:22:24	Error: 	"Not Found" (404) at link narrowgauge.org/images/mark/Ouray-PC-2.jpg (from www.cw-mccall.com/news/1999/19991101.html)
+02:22:24	Error: 	"Not Found" (404) at link www.narrowgauge.org/4x4/HTML/autumn.html (from www.cw-mccall.com/news/1999/19990704.html)
+02:22:26	Error: 	"Not Found" (404) at link www.cw-mccall.com/drive-in/QTMimeType.pntg (from www.cw-mccall.com/drive-in/my_name_is_earl.html)
+02:53:57	Error: 	"Not Found" (404) at link www.narrowgauge.org/ngc/html/tkierscey/friends/www.bayside.net/users/evans/ncmap/ted/final.html (from www.narrowgauge.org/ngc/html/tkierscey/friends/tkierscey-friends.html)
+02:53:57	Error: 	"Not Found" (404) at link www.narrowgauge.org/4x4/html/www.tcd.net/~mevans19/ncmap/sil_af.html (from www.narrowgauge.org/4x4/html/sil_af.html)
+02:53:57	Warning: 	Retry after error -4 (Connect Error) at link www.narrowgauge.org/4x4/images/box_factory/tnails/tn_jx001.jpg (from www.narrowgauge.org/4x4/html/bfptrip.html)
+03:02:18	Error: 	"Not Found" (404) at link www.narrowgauge.org/ncmap/www.tcd.net/~mevans19/ncmap/placrvil.html (from www.narrowgauge.org/ncmap/excur1_placrvil.html)
+03:02:18	Error: 	"Not Found" (404) at link www.narrowgauge.org/ngc/html/excursion1/www.tcd.net/~mevans19/ncmap/mancos.html (from www.narrowgauge.org/ngc/html/excursion1/excursion1-mancos.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/m0017.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/tnails/s0017.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/m00105.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/tnails/s00105.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/m00138.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/tnails/s00138.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/m0049.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:12:01	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/tnails/s0049.jpg (from www.narrowgauge.org/ncmap/excursion4_croffut_DSPP.html)
+03:15:46	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/m0056.jpg (from www.narrowgauge.org/ncmap/excursion7_silverton_branch.html)
+03:15:46	Error: 	"Not Found" (404) at link www.narrowgauge.org/images/tkcok/m0058.jpg (from www.narrowgauge.org/ncmap/excursion7_silverton_branch.html)
+03:16:38	Error: 	"Not Found" (404) at link www.convoytm.com/statcounter.com/localstorage/ (from www.statcounter.com/counter/counter.js)
+03:16:38	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.titosantana.net/Tito_I.jpg (from www.convoytm.com/About_Me.html)
+03:16:50	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link fans.ghostdetectives.tv/wp-content/uploads/2011/08/newgd-photo.jpg (from www.convoytm.com/About_Me.html)
+03:17:01	Error: 	"Not Found" (404) at link www.convoytm.com/images/notebook.bmp (from www.convoytm.com/MOVIES_A-Z.html)
+03:17:01	Error: 	"Incorrect length (3395314 Bytes, 4759963 expected)" (-4) after 2 retries at link www.convoytm.com/ConvoyMovieVersion.mp3 (from www.convoytm.com/)
+03:17:01	Warning: 	Retry after error -5 (Unable to get server's address: No such host is known. ) at link sm3.sitemeter.com/js/counter.js?site=sm3jchess10 (from www.thinkingrockpress.com/trp1526.html)
+03:17:12	Warning: 	Retry after error -5 (Unable to get server's address: No such host is known. ) at link s41.sitemeter.com/js/counter.js?site=s41darwindarwin (from www.thinkingrockpress.com/trp1526.html)
+03:17:23	Warning: 	File not parsed, looks like binary: www.macshare.com/game_all-to.html
+03:17:23	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/game_all-to.html
+03:17:23	Error: 	"Not Found" (404) at link www.macshare.com/~tfrazier/arashi_1.1.1.sit.hqx (from www.macshare.com/game-to.html)
+03:17:24	Error: 	"Not Found" (404) at link www.macshare.com/~tfrazier/macshare/CarCare.sit (from www.macshare.com/other-to.html)
+03:17:34	Warning: 	File not parsed, looks like binary: www.macshare.com/other-nav.html
+03:17:34	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/other-nav.html
+03:17:35	Warning: 	File not parsed, looks like binary: www.macshare.com/graphic3.html
+03:17:35	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/graphic3.html
+03:18:21	Warning: 	Retry after error -4 (Connect Error) at link 24.3.241.94/sanguinary/video/CF002-a.rm (from www.cw-mccall.com/news/2000/20000103.html)
+03:18:21	Warning: 	Retry after error -4 (Connect Error) at link 24.3.241.94/sanguinary/video/CF013.rm (from www.cw-mccall.com/news/2000/20000103.html)
+03:18:21	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link content.ubl.com/help/linking/images/ubl_black91x60.gif (from www.cw-mccall.com/news/1999/19991213.html)
+03:18:32	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.grammy.net/rubberduck1.jpg (from www.cw-mccall.com/news/1999/19991129.html)
+03:23:15	Error: 	"Not Found" (404) at link www.urbaneagle.com/annie/ (from www.urbaneagle.com/slim/etwnc.html)
+03:23:21	Error: 	"Not Found" (404) at link www.accurail.com/tm.exe?opt=S&cmdtext=ebt+drawing&output=3&sort=d (from www.urbaneagle.com/slim/ebt.html)
+03:23:38	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.index.mrmag.com/robots.txt (from www.urbaneagle.com/slim/nn3links.html)
+03:23:38	Warning: 	Retry after error -5 (Unable to get server's address: No such host is known. ) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=sp%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:23:38	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=etwnc%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:23:38	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=ebt%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:24:24	Error: 	"Not Found" (404) at link www.urbaneagle.com/orin-sp/O18TENDER1.JPG (from www.urbaneagle.com/orin-sp/orin-index.html)
+03:37:37	Error: 	"Not Found" (404) at link www.narrowgauge.org/ncmap/ted/excursion7.html (from www.narrowgauge.org/ncmap/ted/drg_other.html)
+03:41:22	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.titosantana.net/Tito_I.jpg (from www.convoytm.com/About_Me.html)
+03:41:22	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link fans.ghostdetectives.tv/wp-content/uploads/2011/08/newgd-photo.jpg (from www.convoytm.com/About_Me.html)
+03:41:22	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link sm3.sitemeter.com/js/counter.js?site=sm3jchess10 (from www.thinkingrockpress.com/trp1526.html)
+03:41:33	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link s41.sitemeter.com/js/counter.js?site=s41darwindarwin (from www.thinkingrockpress.com/trp1526.html)
+03:41:44	Error: 	"Not Found" (404) at link www.macshare.com/index-to.html (from www.macshare.com/heartmod-to.html)
+03:41:47	Warning: 	File not parsed, looks like binary: www.macshare.com/game_all.html
+03:41:47	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/game_all.html
+03:41:51	Error: 	"Not Found" (404) at link www.urbaneagle.com/ue/sw/sioux-wisdomrB.jpg (from www.urbaneagle.com/ue/ue-gallery2.html)
+03:41:51	Error: 	"Not Found" (404) at link www.urbaneagle.com/ue/+ue-wk0823b-natdyes.html (from www.urbaneagle.com/ue/ue-gallery3.html)
+03:41:51	Error: 	"Not Found" (404) at link www.convoytm.com/css/main.css (from www.convoytm.com/convoy_crossword.html)
+03:41:51	Error: 	"Not Found" (404) at link www.convoytm.com/private/ (from www.convoytm.com/convoy_crossword.html)
+03:41:51	Error: 	"Not Found" (404) at link www.convoytm.com/images/noclick.gif (from www.convoytm.com/convoy_crossword.html)
+03:41:51	Error: 	"Connect Error" (-4) after 2 retries at link 24.3.241.94/sanguinary/video/CF002-a.rm (from www.cw-mccall.com/news/2000/20000103.html)
+03:41:51	Error: 	"Connect Error" (-4) after 2 retries at link 24.3.241.94/sanguinary/video/CF013.rm (from www.cw-mccall.com/news/2000/20000103.html)
+03:41:51	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link content.ubl.com/help/linking/images/ubl_black91x60.gif (from www.cw-mccall.com/news/1999/19991213.html)
+03:41:52	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.grammy.net/rubberduck1.jpg (from www.cw-mccall.com/news/1999/19991129.html)
+03:41:52	Error: 	"Not Found" (404) at link www.urbaneagle.com/ue/ADhome.html (from www.urbaneagle.com/pers/r-k.html)
+03:41:53	Warning: 	Retry after error -4 (Connect Error) at link espanola.com/chamber/City map/espmap.gif (from www.urbaneagle.com/pers/r-k.html)
+03:43:52	Error: 	"Not Found" (404) at link www.urbaneagle.com/pers/..rsrc/dot_clear.gif (from www.urbaneagle.com/pers/art/RRetch.html)
+03:43:52	Error: 	"Not Found" (404) at link www.urbaneagle.com/datrains/xx.gif (from www.urbaneagle.com/datrains/pdl.html)
+03:43:58	Error: 	"Not Found" (404) at link www.urbaneagle.com/slim/sp9lamp.jpg (from www.urbaneagle.com/slim/tender.html)
+03:44:02	Error: 	"Not Found" (404) at link www.urbaneagle.com/slim/SPNGS-index_files/filelist.xml (from www.urbaneagle.com/slim/SPNGS-index.html)
+03:44:02	Error: 	"Not Found" (404) at link www.urbaneagle.com/slim/SPNGS-index_files/editdata.mso (from www.urbaneagle.com/slim/SPNGS-index.html)
+03:44:27	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=DRAWING+NGSL (from www.urbaneagle.com/slim/NGSLGplanlist.html)
+03:44:38	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=sp%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:44:38	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=etwnc%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:44:38	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=ebt%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:44:38	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link sm3.sitemeter.com/js/counter.js?site=sm3jchess10 (from www.thinkingrockpress.com/trp1526.html)
+03:44:38	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link s41.sitemeter.com/js/counter.js?site=s41darwindarwin (from www.thinkingrockpress.com/trp1526.html)
+03:44:40	Warning: 	File not parsed, looks like binary: www.macshare.com/waresources-nav.html
+03:44:40	Warning: 	Warning: store application/octet-stream without scan: C:/Users/End User/Desktop/CWMcMaster/Websites/Websites/www.macshare.com/waresources-nav.html
+03:45:12	Warning: 	Retry after error -4 (Connect Error) at link espanola.com/chamber/City map/espmap.gif (from www.urbaneagle.com/pers/r-k.html)
+03:45:14	Warning: 	Retry after error -5 (Unable to get server's address: unknown error) at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=DRAWING+NGSL (from www.urbaneagle.com/slim/NGSLGplanlist.html)
+03:45:25	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=sp%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:45:25	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=etwnc%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:45:25	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=ebt%2Bnarrowgauge%2Bdrawing&output=3&sort=d (from www.urbaneagle.com/slim/nn3links.html)
+03:45:49	Error: 	"Connect Error" (-4) after 2 retries at link espanola.com/chamber/City map/espmap.gif (from www.urbaneagle.com/pers/r-k.html)
+03:45:49	Error: 	"Not Found" (404) at link www.urbaneagle.com/sp/dot_dlorange.gif (from www.urbaneagle.com/sp/sp-daylightcolors.html)
+03:45:49	Error: 	"Unable to get server's address: unknown error" (-5) after 2 retries at link www.index.mrmag.com/tm.exe?opt=S&cmdtext=DRAWING+NGSL (from www.urbaneagle.com/slim/NGSLGplanlist.html)
+
+HTTrack Website Copier/3.49-2 mirror complete in 4 hours 8 minutes 28 seconds : 6820 links scanned, 6688 files written (357695080 bytes overall) [359720224 bytes received at 24129 bytes/sec], 4829243 bytes transferred using HTTP compression in 509 files, ratio 33%, 2.1 requests per connection
+(90 errors, 59 warnings, 0 messages)

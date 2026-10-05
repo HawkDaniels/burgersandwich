@@ -1,0 +1,31 @@
+Alco GE 1000-HP SWITCHER
+115 Tons on Drivers     One GT-553 Generator, Four GE-731 Motors
+60 MPH Maximum Speed    75:16 Gear Ratio; 40 in. Wheels
+
+                        TRAILING TONS* IT WILL HAUL SAFELY
+Speed   Tractive Time                    GRADE-COMPENSATED FOR CURVATURE
+ MPH     Effort  Limit  Level   0.5%    1.0%    1.5%    2.0%    2.5%    3.0%
+ 5.0    50000    4 min.   -     3325    1925    1335    1010     805     660
+ 7.5    36500   90 min.   -     2385    1370     940     705     555     450
+10.0    28000   90 min. 5765    1790    1020     695     514     400     320
+15.0    19800    Cont.  3805    1210     680     455     328     248     190
+20.0    15000    Cont.  2640     864     480     310     218     158     115
+25.0    12000    Cont.  1905     644     350     220     149     100      69
+30.0    10000    Cont.  1435     495     266     160     100      63
+35.0     8100    Cont.  1030     360     185     104      58
+40.0     6600    Cont.   730     255     120      59
+*Based on Davis train resistance formulae for standard 4-axle cars 
+ with an average weight per car of 40 tons
+
+                        40 TON CARS IT WILL HAUL SAFELY
+Speed   Tractive Time                    GRADE-COMPENSATED FOR CURVATURE
+ MPH     Effort  Limit  Level   0.5%    1.0%    1.5%    2.0%    2.5%    3.0%
+ 5.0    50000    4 min.   -       83      48      33      25      20      16
+ 7.5    36500   90 min.   -       59      34      23      17      13      11
+10.0    28000   90 min. 144       44      25      17      12      10       8
+15.0    19800    Cont.   95       30      17      11       8       6       4
+20.0    15000    Cont.   66       21      12       7       5       3       2
+25.0    12000    Cont.   47       16       8       5       3       2       1
+30.0    10000    Cont.   35       12       6       4       2       1
+35.0     8100    Cont.   25        9       4       2       1
+40.0     6600    Cont.   18        6       3       1
