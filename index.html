@@ -31,6 +31,32 @@
 
 <h1 style="font-size:60px;">Welcome to burgersandwich.jp!!</h1>
 <p>This website will soon feature all of your favorite burgersandwich content!</p>
+
+<h1 style="font-size:20px;">Please click the button below if this is your first time at burgersandwich.jp!!</h1>
+<button id="clickBtn">I visited burgersandwich.jp!</button>
+<span id="count">...</span>
+
+<script>
+var API = "https://click-counter.oksohi.workers.dev/";
+
+function show(n) {
+  document.getElementById("count").textContent = n + " burgersandwiches";
+}
+
+fetch(API)
+  .then(function (r) { return r.json(); })
+  .then(function (d) { show(d.count); });
+
+document.getElementById("clickBtn").onclick = function () {
+  fetch(API, { method: "POST" })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { show(d.count); });
+};
+</script>
+
+<br>
+<p>Please be honest and click only once!!</p>
+<p>Button code was assisted by AI.</p>
 <br>
 <audio controls autoplay>
     <source src="assets/ramranch.mp3" type="audio/mp3">
