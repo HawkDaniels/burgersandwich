@@ -2,6 +2,11 @@
 
 <!-- Mirrored from https://abehiroshi.la.coocan.jp/prof/prof.htm by HTTrack Website Copier/3.x [XR&CO], Wed, 07 Oct 2026 11:30:38 GMT -->
 <head>
+<style>
+  body {
+    font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  }
+</style>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <meta name="GENERATOR" content="JustSystems Homepage Builder Version 23.0.2.0 for Windows">
@@ -13,14 +18,62 @@
 
 <CENTER>
 </CENTER><BR>
-<TABLE width="752" align="center">
-  <TR> 
-    <TD width="120" ALIGN="LEFT">RN<br>
-      <br>
-    </TD>
-    <TD ALIGN="LEFT">Under construction T-T<br>
-    <br></TD>
-  </TR>
+<table align="center" id="data-table"></table>
+
+<style>
+  #data-table {
+    border-collapse: collapse;
+  }
+  #data-table th,
+  #data-table td {
+    border: 1px solid #999;
+    padding: 12px 18px;
+    text-align: left;
+  }
+  #data-table th {
+    background: #f4f4f4;
+  }
+</style>
+
+<script>
+  const columns = ["Rank", "Name", "Reasoning", "Date Watched"];
+  const rows = [
+    ["#1", "Btooom!!", "It's clearly the best piece of media ever created, and it has a very good story and characters.", "2023-10-01"],
+    ["#2", "The Last of Us", "The story is very good, and the characters are very well developed.", "2023-10-02"],
+    ["#3", "The Last of Us Part II", "The story is very good, and the characters are very well developed.", "2023-10-03"],
+    ["#4", "The Last of Us Part I", "The story is very good, and the characters are very well developed.", "2023-10-04"],
+    ["#5", "The Last of Us Part III", "The story is very good, and the characters are very well developed.", "2023-10-05"],
+    ["#6", "The Last of Us Part IV", "The story is very good, and the characters are very well developed.", "2023-10-06"],
+    ["#7", "The Last of Us Part V", "The story is very good, and the characters are very well developed.", "2023-10-07"],
+    ["#8", "The Last of Us Part VI", "The story is very good, and the characters are very well developed.", "2023-10-08"],
+    ["#9", "The Last of Us Part VII", "The story is very good, and the characters are very well developed.", "2023-10-09"],
+    ["#10", "The Last of Us Part VIII", "The story is very good, and the characters are very well developed.", "2023-10-10"],
+    ["#11", "The Last of Us Part IX", "The story is very good, and the characters are very well developed.", "2023-10-11"],
+    ["#12", "The Last of Us Part X", "The story is very good, and the characters are very well developed.", "2023-10-12"],
+    ["#13", "The Last of Us Part XI", "The story is very good, and the characters are very well developed.", "2023-10-13"],
+    ["#14", "The Last of Us Part XII", "The story is very good, and the characters are very well developed.", "2023-10-14"],
+    ["#15", "The Last of Us Part XIII", "The story is very good, and the characters are very well developed.", "2023-10-15"],
+    ["#16", "The Last of Us Part XIV", "The story is very good, and the characters are very well developed.", "2023-10-16"],
+    ["#17", "The Last of Us Part XV", "The story is very good, and the characters are very well developed.", "2023-10-17"],
+    ["#18", "The Last of Us Part XVI", "The story is very good, and the characters are very well developed.", "2023-10-18"],
+    ["#19", "The Last of Us Part XVII", "The story is very good, and the characters are very well developed.", "2023-10-19"],
+    ["#20", "The Last of Us Part XVIII", "The story is very good, and the characters are very well developed.", "2023-10-20"],
+    ["#21", "The Last of Us Part XIX", "The story is very good, and the characters are very well developed.", "2023-10-21"],
+    ["#22", "The Last of Us Part XX", "The story is very good, and the characters are very well developed.", "2023-10-22"],
+    ["#23", "The Last of Us Part XXI", "The story is very good, and the characters are very well developed.", "2023-10-23"],
+    ["#24", "The Last of Us Part XXII", "The story is very good, and the characters are very well developed.", "2023-10-24"],
+    ["#25", "The Last of Us Part XXIII", "The story is very good, and the characters are very well developed.", "2023-10-25"],
+    ["Ben", "Developer", "ben@example.com"],
+    // add new rows here
+  ];
+
+  const table = document.getElementById("data-table");
+  table.innerHTML =
+    "<thead><tr>" + columns.map(c => `<th>${c}</th>`).join("") + "</tr></thead>" +
+    "<tbody>" +
+    rows.map(r => "<tr>" + r.map(v => `<td>${v}</td>`).join("") + "</tr>").join("") +
+    "</tbody>";
+</script>
   
 
 
