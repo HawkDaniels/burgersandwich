@@ -22,7 +22,7 @@
 <a href="gambia.html">Gambia, The</a>
 <a href="movie.html">Movies</a>
 <a href="captainslog.html">The Captain's Log</a>
-<a href="404.html">404</a>
+<a href="example404.html">404</a>
 <br>
 <span class="space"></span>
 
@@ -33,11 +33,12 @@
 <p>This website will soon feature all of your favorite burgersandwich content!</p>
 
 <h1 style="font-size:20px;">Please click the button below if this is your first time at burgersandwich.jp!!</h1>
-<button id="clickBtn">I visited burgersandwich.jp!</button>
+<button id="clickBtn">I visited burgersandwich.jp!!</button>
 <span id="count">...</span>
 
 <script>
 var API = "https://click-counter.oksohi.workers.dev/";
+var clicks = 0;
 
 function show(n) {
   document.getElementById("count").textContent = n + " burgersandwiches";
@@ -48,9 +49,17 @@ fetch(API)
   .then(function (d) { show(d.count); });
 
 document.getElementById("clickBtn").onclick = function () {
-  fetch(API, { method: "POST" })
-    .then(function (r) { return r.json(); })
-    .then(function (d) { show(d.count); });
+  clicks++;
+
+  if (clicks === 1) {
+    fetch(API, { method: "POST" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { show(d.count); });
+  } else if (clicks === 2) {
+    alert("Please do not artifically inflate our visitor count :,(");
+  } else {
+    window.top.location.href = "banned.html";
+  }
 };
 </script>
 
