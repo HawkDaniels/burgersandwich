@@ -17,7 +17,7 @@
 <a href="chriscorner.html">
     <img src="chriscorner/image/chris.jpg" alt="Chris Corner" style="width: auto; height: 50px;">
 </a>
-<a href="barak domain.html">Barak's Domain</a>
+<a href="barakdomain.html">Barak's Domain</a>
 <a href="websitetutorial.html">Website Tutorial</a>
 <a href="gambia.html">Gambia, The</a>
 <a href="movie.html">Movies</a>
@@ -25,6 +25,19 @@
 <a href="example404.html">404</a>
 <br>
 <span class="space"></span>
+
+<span id="rate" style="position: fixed; top: 5px; right: 10px; font-weight: bold; font-size: 24px;">...</span>
+
+<script>
+fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=JPY")
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    document.getElementById("rate").textContent = "1 USD = " + d.rates.JPY + " JPY";
+  })
+  .catch(function () {
+    document.getElementById("rate").textContent = "rate unavailable";
+  });
+</script>
 
 
 <BODY ALIGN="Center" BGCOLOR="#EDD5AF" TEXT="#317F7F" LINK="#316563" VLINK="#00080" ALINK="#6330FF">
