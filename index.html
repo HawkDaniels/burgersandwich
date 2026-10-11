@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+  body {
+    font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  }
+</style>
 <title>burgersandwich website</title>
 </head>
 <body>
@@ -30,36 +35,6 @@
 
 <span id="rate" style="position: fixed; top: 5px; right: 10px; font-weight: bold; font-size: 24px;">...</span>
 
-<iframe
-  id="site-chat"
-  src="https://chat.burgersandwich.jp/"
-  title="Burger Sandwich chat"
-  allow="clipboard-write"></iframe>
-
-<style>
-  #site-chat {
-    position: fixed;
-    top: 48px;           /* just below the rate text */
-    right: 10px;
-    width: 600px;
-    height: 520px;
-    max-height: calc(100vh - 60px);
-    border: 0;
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-  }
-
-  /* On narrow screens, use the full width */
-  @media (max-width: 300px) {
-    #site-chat {
-      left: 10px;
-      width: auto;
-    }
-  }
-</style>
-
 <script>
 fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=JPY")
   .then(function (r) { return r.json(); })
@@ -78,8 +53,15 @@ fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=JPY")
 <p>This website will soon feature all of your favorite burgersandwich content!</p>
 
 <h1 style="font-size:20px;">Please click the button below if this is your first time at burgersandwich.jp!!</h1>
-<button id="clickBtn">I visited burgersandwich.jp!!</button>
+<button id="clickBtn" style="width: 250px; height: 60px; font-size: 18px;">I visited burgersandwich.jp!!</button>
 <span id="count">...</span>
+
+<style>
+  #count {
+    font-size: 22px;
+    font-weight: bold;
+  }
+</style>
 
 <script>
 var API = "https://click-counter.oksohi.workers.dev/";
@@ -112,6 +94,32 @@ document.getElementById("clickBtn").onclick = function () {
 <p>Please be honest and click only once!!</p>
 <p>Button code was assisted by AI.</p>
 <br>
+
+   <iframe src="https://talk.burgersandwich.jp/" style="width:40%;height:500px;border:0"></iframe>
+
+<style>
+  #site-chat {
+    width: 40%;
+    height: 520px;
+    max-height: calc(100vh - 60px);
+    border: 0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+  }
+
+  /* On narrow screens, use the full width */
+  @media (max-width: 300px) {
+    #site-chat {
+      left: 10px;
+      width: auto;
+    }
+  }
+</style>
+
+<br>
+
 <audio controls autoplay>
     <source src="assets/ramranch.mp3" type="audio/mp3">
     Your browser does not support the audio element.
