@@ -3,6 +3,27 @@
 <!-- Mirrored from https://abehiroshi.la.coocan.jp/prof/prof.htm by HTTrack Website Copier/3.x [XR&CO], Wed, 07 Oct 2026 11:30:38 GMT -->
 <head>
 <style>
+  .photo {
+    border: 3px solid #ffffff;
+    cursor: pointer;
+  }
+  #overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+  }
+  #overlay img {
+    max-width: 95%;
+    max-height: 95%;
+  }
   body {
     font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
   }
@@ -12,120 +33,200 @@
 <meta name="GENERATOR" content="JustSystems Homepage Builder Version 23.0.2.0 for Windows">
 <title>Chrisの旅行</TITLE>
 </HEAD>
+<div id="overlay"><img id="big" src="" alt=""></div>
+
+<script>
+var overlay = document.getElementById("overlay");
+var big = document.getElementById("big");
+
+document.addEventListener("click", function (e) {
+  if (e.target.classList && e.target.classList.contains("photo")) {
+    big.src = e.target.getAttribute("data-full") || e.target.src;
+    overlay.style.display = "flex";
+  } else if (e.target === overlay || e.target === big) {
+    overlay.style.display = "none";
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    overlay.style.display = "none";
+  }
+});
+</script>
 <BODY BACKGROUND="image/trips.jpg">
 <br>  
 <h2 align="center">Chrisの旅行</h2>
 
 <TABLE width="95%" align="center" border="1" cellpadding="6" cellspacing="0">
   <TR>
-    <TH width=auto>Name</TH>
-    <TH width=auto>Date</TH>
-    <TH width=auto>Description</TH>
-    <TH width=auto">Photos</TH>
+    <TH width="10%" nowrap>Name</TH>
+    <TH width="1%" nowrap>Date</TH>
+    <TH width="20%" nowrap>Description</TH>
+    <TH width="100%">Photos</TH>
   </TR>
 
   <TR>
     <TD valign="top">Japan 1</TD>
     <TD valign="top">2023/12/08-22</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">Barak and I went to Japan and it was fricken sweet!</TD>
     <TD valign="top">
-      <img src="images/PHOTO1.jpg" width=auto height=200px style="object-fit: cover;" alt="">
+      <img class="photo" src="image/trips/nara.JPG" height="200" alt="">
+      <img class="photo" src="image/trips/firewatch.JPG" height="200" alt="">
+      <img class="photo" src="image/trips/kirin1.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/nara2.JPG" height="200" alt="">
+      <img class="photo" src="image/trips/nara3.JPG" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">St. Lous Solar Eclipse</TD>
     <TD valign="top">2024/04/05-09</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">The day of the black sun.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/arch.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/eclipse.jpg" height="200" alt="">
     </TD>
   </TR>
 
     <TR>
     <TD valign="top">Paris</TD>
     <TD valign="top">2024/06/29-07/07</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">I'm basically Parisian.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/parisfood.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/louve.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/parisnight.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">Montreal</TD>
     <TD valign="top">2024/08/09-17</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">This trip was sponsored by Greenfield Ethanol!! I spent half of it sick and the other half playing frisbee.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/montreal1.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/montreal2.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">San Francisco</TD>
     <TD valign="top">2024/08/30-09/03</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">Ain't nobody got toes like Mr. Santiago!</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/cocktower.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/sfcity.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/sfskyline.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/spread.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/windowcat.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">Japan 2</TD>
     <TD valign="top">2024/12/27-2025/01/12</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">I went to Japan again.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/sawayaka.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/gangsta.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/jiyuunomegami.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/shrine.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/kyobashi.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/mitake.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/tunnel.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">Vietnam</TD>
     <TD valign="top">2025/03/08-17</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">I like durian.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/baho.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/vinpearl.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/vndock.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">San Francisco</TD>
     <TD valign="top">2025/05/16-19</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">Dillon got scared when I asked the Uber driver where he was "really" from.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/swag.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/faded.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/art.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/bird.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/fire.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/cat2.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">Sabbatical</TD>
     <TD valign="top">2025/07/02-11/04</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">I quit my job and went to a couple countries.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/russia.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/bench.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/sofia.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/greece.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/greekcat.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/bike.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/taxim.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/shinsekai.JPG" height="200" alt="">
+      <img class="photo" src="image/trips/nagesen.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/kirin2.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">Oklahoma Salt Flats</TD>
     <TD valign="top">2026/06/27</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">Koki and Faro's first salt flat! :3</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/saltcrystal.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/saltscape.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">El Salvador</TD>
     <TD valign="top">2026/07/05-11</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">Barak experienced an explosion and severe burns prior to this trip.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/elfood.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/drank.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/palace.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/lake.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/elskyline.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">Colorado</TD>
     <TD valign="top">2026/08/07-11</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">The Silverton is definitely worth the price.</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/stars.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/creature.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/trail.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/steamtrain.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/beakfast.jpg" height="200" alt="">
     </TD>
   </TR>
 
   <TR>
     <TD valign="top">California</TD>
     <TD valign="top">2026/08/28-09/01</TD>
-    <TD valign="top">N/A</TD>
+    <TD valign="top">This trip was sponsored by Edeniq labs!!</TD>
     <TD valign="top">
+      <img class="photo" src="image/trips/lasky.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/sunset1.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/pier.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/7eleven.jpg" height="200" alt="">
+      <img class="photo" src="image/trips/sunset2.jpg" height="200" alt="">
     </TD>
   </TR>
   
