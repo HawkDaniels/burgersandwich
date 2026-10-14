@@ -18,6 +18,51 @@
 
 <h1 style="font-size:60px;">Chris's Official Captain's Log</h1>
 <p>if you know you know</p>
+<p style="font-size:30px;">Latest entry:
+
+<span id="elapsed">...</span>
+
+<script>
+var STATUS_URL = "https://click-counter.oksohi.workers.dev/status";
+var ts = 0;
+
+function unit(n, name) {
+  return n + " " + name + (n === 1 ? "" : "s");
+}
+
+function render() {
+  var el = document.getElementById("elapsed");
+  if (!ts) {
+    el.textContent = "NO-DATA TEXT";
+    return;
+  }
+  var s = Math.max(0, Math.floor(Date.now() / 1000) - ts);
+  var d = Math.floor(s / 86400);
+  var h = Math.floor((s % 86400) / 3600);
+  var m = Math.floor((s % 3600) / 60);
+  var sec = s % 60;
+
+  var parts = [];
+  if (d > 0) parts.push(unit(d, "day"));
+  if (d > 0 || h > 0) parts.push(unit(h, "hour"));
+  if (d > 0 || h > 0 || m > 0) parts.push(unit(m, "minute"));
+  parts.push(unit(sec, "second"));
+
+  el.textContent = parts.join(", ") + " ago";
+}
+
+fetch(STATUS_URL)
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    ts = d.ts;
+    render();
+    setInterval(render, 1000);
+  })
+  .catch(function () {
+    document.getElementById("elapsed").textContent = "UNAVAILABLE TEXT";
+  });
+</script>
+</p>
 
 <h1 style="font-size:30px;">Data Summary</h1>
 <table id="data-table"></table>
