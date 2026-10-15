@@ -1,0 +1,34 @@
+ <!DOCTYPE html>
+<html>
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<style>
+  body {
+    font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  }
+</style>
+<title>downloadables</title>
+</head>
+<body>
+
+
+
+<a href="/">
+ <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
+</a>
+<BODY ALIGN="Center" BGCOLOR="#EDD5AF" TEXT="#317F7F" LINK="#316563" VLINK="#00080" ALINK="#6330FF">
+
+<h1 style="font-size:60px;">BurgerSandwich Free Downloads</h1>
+<h2 style="font-size:20px;">Ringtones</h2>
+<p>
+  • <a href="downloads/LUFFYYYYYY.mp3" download>Luffy Acapella</a>
+  <br>more ringtones coming soon!
+</p>
+<h2 style="font-size:20px;">Desktop Wallpapers</h2>
+<p>Under Construction</p>
+<h2 style="font-size:20px;">Mobile Wallpapers</h2>
+<p>Under Construction</p>
+<h2 style="font-size:20px;">Printables</h2>
+<p>Under Construction</p>
+</body>
+</html> 

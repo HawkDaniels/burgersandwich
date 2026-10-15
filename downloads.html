@@ -1,34 +1,86 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-<link rel="icon" type="image/png" href="/favicon.png">
 <head>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<title>downloadables</title>
 <style>
   body {
     font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
   }
 </style>
-<title>downloadables</title>
 </head>
-<body>
-
-
+<body align="center" bgcolor="#EDD5AF" text="#317F7F" link="#316563" vlink="#00080" alink="#6330FF">
 
 <a href="/">
  <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
 </a>
-<BODY ALIGN="Center" BGCOLOR="#EDD5AF" TEXT="#317F7F" LINK="#316563" VLINK="#00080" ALINK="#6330FF">
 
 <h1 style="font-size:60px;">BurgerSandwich Free Downloads</h1>
+
 <h2 style="font-size:20px;">Ringtones</h2>
 <p>
-  ● <a href="downloads/LUFFYYYYYY.mp3" download>Luffy Acapella</a>
+  • <a href="downloads/LUFFYYYYYY.mp3" download data-download-id="luffy-acapella">Luffy Acapella</a>
+    <span class="dl-meta"></span>
   <br>more ringtones coming soon!
 </p>
+
 <h2 style="font-size:20px;">Desktop Wallpapers</h2>
 <p>Under Construction</p>
 <h2 style="font-size:20px;">Mobile Wallpapers</h2>
 <p>Under Construction</p>
 <h2 style="font-size:20px;">Printables</h2>
 <p>Under Construction</p>
+
+<script>
+(function () {
+  const links = document.querySelectorAll('a[data-download-id]');
+  const state = {}; // id -> { size, count, el }
+
+  function render(id) {
+    const s = state[id];
+    const size = s.size != null ? '(' + s.size + ' MB)' : '';
+    const count = s.count != null ? s.count : '…';
+    s.el.textContent = size + ' Downloads: ' + count;
+  }
+
+  links.forEach(function (link) {
+    const id = link.dataset.downloadId;
+    state[id] = { size: null, count: null, el: link.nextElementSibling };
+    render(id);
+
+    // File size from the Content-Length header, so it never needs updating by hand
+    fetch(link.href, { method: 'HEAD' })
+      .then(function (r) {
+        const bytes = Number(r.headers.get('Content-Length'));
+        if (bytes) {
+          state[id].size = (bytes / 1048576).toFixed(2);
+          render(id);
+        }
+      })
+      .catch(function () {});
+
+    // Count the download; sendBeacon still fires even as the download starts
+    link.addEventListener('click', function () {
+      navigator.sendBeacon('/api/downloads', JSON.stringify({ id: id }));
+      if (state[id].count != null) {
+        state[id].count += 1;
+        render(id);
+      }
+    });
+  });
+
+  // Load all counts in one request
+  fetch('/api/downloads', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (counts) {
+      Object.keys(state).forEach(function (id) {
+        state[id].count = counts[id] || 0;
+        render(id);
+      });
+    })
+    .catch(function () {});
+})();
+</script>
 </body>
-</html> 
+</html>
