@@ -34,6 +34,10 @@
 
 <script>
 (function () {
+  // Address of the click-counter Worker's /downloads route.
+  // Replace CLICK-COUNTER-ADDRESS with the same domain your other counter's fetch uses.
+  const API = 'https://click-counter.oksohi.workers.dev/downloads';
+
   const links = document.querySelectorAll('a[data-download-id]');
   const state = {}; // id -> { size, count, el }
 
@@ -60,9 +64,17 @@
       })
       .catch(function () {});
 
-    // Count the download; sendBeacon still fires even as the download starts
+    // Count the download. Uses fetch rather than sendBeacon, which ad blockers
+    // such as uBlock Origin block. keepalive lets it finish as the download starts.
+    // Only the first click per item counts until the page is refreshed.
     link.addEventListener('click', function () {
-      navigator.sendBeacon('/api/downloads', JSON.stringify({ id: id }));
+      if (state[id].counted) return;
+      state[id].counted = true;
+      fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({ id: id }),
+        keepalive: true
+      }).catch(function () {});
       if (state[id].count != null) {
         state[id].count += 1;
         render(id);
@@ -71,7 +83,7 @@
   });
 
   // Load all counts in one request
-  fetch('/api/downloads', { cache: 'no-store' })
+  fetch(API, { cache: 'no-store' })
     .then(function (r) { return r.json(); })
     .then(function (counts) {
       Object.keys(state).forEach(function (id) {
