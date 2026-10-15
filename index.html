@@ -15,25 +15,29 @@
 <a href="/">
  <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
 </a>
-<a href="nihongo.html">
+<a href="jp/index.html">
  <img src="/assets/japanese.jpg" alt="日本語" style="width: auto; height: 30px;">
 </a>
 <br>
+<p>
 <!--<a href="Websites/index.html">Website archives</a>-->
-<a href="projects.html">photoshop skills</a>
-<a href="chriscorner.html">
+ ● <a href="projects.html">photoshop skills</a>
+  <a href="chriscorner.html">
     <img src="chriscorner/image/chris.jpg" alt="Chris Corner" style="width: auto; height: 50px;">
-</a>
-<a href="barakdomain.html">Barak's Domain</a>
-<a href="websitetutorial.html">Website Tutorial</a>
-<a href="gambia.html">Gambia, The</a>
-<a href="movie.html">Movies</a>
-<a href="captainslog.html">The Captain's Log</a>
-<a href="example404.html">404</a>
-<a href="people.html">This Webpage Has People</a>
-<a href="memes.html">Memes</a>
-<a href="anki.html">Anki</a>
-<a href="learnjapanese.html">Learn Japanese</a>
+  </a>
+ ● <a href="barakdomain.html">Barak's Domain</a>
+ ● <a href="websitetutorial.html">Website Tutorial</a>
+ ● <a href="gambia.html">Gambia, The</a>
+ ● <a href="movie.html">Movies</a>
+ ● <a href="captainslog.html">The Captain's Log</a>
+ ● <a href="example404.html">404</a>
+ ● <a href="people.html">This Webpage Has People</a>
+ ● <a href="memes.html">Memes</a>
+ ● <a href="anki.html">Anki</a>
+ ● <a href="learnjapanese.html">Learn Japanese</a>
+ ● <a href="downloads.html">Downloads</a>
+  ● <a href="https://18nakedcowboys.com">18nakedcowboys</a>
+</p>
 <br>
 <span class="space"></span>
 
@@ -124,10 +128,10 @@ document.getElementById("clickBtn").onclick = function () {
 
 <br>
 
-<audio controls autoplay>
+<!--<audio controls autoplay>
     <source src="assets/ramranch.mp3" type="audio/mp3">
     Your browser does not support the audio element.
-</audio>
+</audio>-->
 <br>
  <img src="assets/IMG_5839.JPG" alt="alt text" width="500" height="426"> 
 <p>Please enjoy my website</p>
@@ -137,6 +141,64 @@ document.getElementById("clickBtn").onclick = function () {
 <br>
 <br>
 <p>Frequently updated</p>
+
+<!-- Advertisement -->
+<style>
+  #ad {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 100%;
+  z-index: 9999;
+}
+#adBox {
+  position: relative;
+}
+  #adBox img {
+  display: block;
+  max-width: 100%;
+  max-height: 15vh;
+  width: auto;
+  height: auto;
+}
+  #adClose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+
+<div id="ad">
+  <div id="adBox">
+    <button id="adClose" type="button">X</button>
+    <a id="adLink" href="#" target="_blank"><img id="adImg" src="" alt=""></a>
+  </div>
+</div>
+
+<script>
+var ads = [
+  { desktop: "ads/ad-ramranch.jpg", mobile: "ads/ad-ramranch.jpg", link: "http://18nakedcowboys.com", alt: "ALT-TEXT-1" }
+];
+
+var isMobile = window.matchMedia("(max-width: 600px)").matches;
+var pick = ads[Math.floor(Math.random() * ads.length)];
+
+var img = document.getElementById("adImg");
+img.onload = function () {
+  document.getElementById("ad").style.display = "block";
+};
+img.alt = pick.alt;
+document.getElementById("adLink").href = pick.link;
+img.src = isMobile ? pick.mobile : pick.desktop;
+
+document.getElementById("adClose").onclick = function () {
+  document.getElementById("ad").style.display = "none";
+};
+</script>
 
 </body>
 
