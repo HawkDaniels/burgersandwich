@@ -1,0 +1,1176 @@
+
+/*
+============================================================
+MUNANCHO DIGITAL ARCHIVE
+FILE: Munancho/css/Style.css
+
+PROJECT STRUCTURE
+------------------------------------------------------------
+Munancho.html          Page structure and content
+Munancho/albums/       Album artwork
+Munancho/audio/        Music files
+Munancho/css/Style.css Visual design
+Munancho/js/script.js  Album data and player functionality
+
+DESIGN:
+Y2K futurism + premium music streaming interface.
+
+SECTION GUIDE:
+01. Design variables
+02. Global foundation
+03. Header and navigation
+04. Hero section
+05. Section headings
+06. Lore document panel
+07. Album archive
+08. Tracklist
+09. Music player
+10. Accessibility
+11. Responsive layouts
+============================================================
+*/
+
+
+/* ==========================================================
+   SECTION 01 — DESIGN VARIABLES
+
+   These reusable values control the site's visual identity.
+
+   Change the colors here to update the design consistently.
+   ========================================================== */
+
+:root {
+    color-scheme: dark;
+
+    --background: #080b14;
+    --panel: #111827;
+    --panel-light: #17243a;
+
+    --text: #f3f6ff;
+    --muted: #8994ad;
+
+    --blue: #78aaff;
+    --blue-bright: #5294ff;
+    --cyan: #73f5ff;
+
+    --border: rgba(160, 190, 255, 0.17);
+    --border-strong: rgba(120, 170, 255, 0.48);
+    --glass: rgba(10, 16, 30, 0.84);
+
+    --glow: 0 0 24px rgba(82, 148, 255, 0.14);
+    --glow-cyan: 0 0 22px rgba(115, 245, 255, 0.18);
+
+    --radius-small: 7px;
+    --radius-medium: 12px;
+    --radius-large: 18px;
+
+    --transition-fast: 180ms ease;
+    --transition-smooth: 260ms ease;
+}
+
+
+/* ==========================================================
+   SECTION 02 — GLOBAL FOUNDATION
+
+   Sets shared page behavior, typography, and background.
+   ========================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+}
+
+body {
+    min-width: 320px;
+    margin: 0;
+    padding-bottom: 125px;
+
+    background:
+        radial-gradient(
+            ellipse at 76% 4%,
+            rgba(38, 73, 133, 0.24),
+            transparent 34%
+        ),
+        radial-gradient(
+            ellipse at 8% 48%,
+            rgba(24, 56, 92, 0.10),
+            transparent 35%
+        ),
+        var(--background);
+
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection {
+    color: #080b14;
+    background: var(--cyan);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Keeps keyboard navigation clearly visible. */
+button:focus-visible,
+a:focus-visible,
+audio:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
+}
+
+
+/* ==========================================================
+   SECTION 03 — HEADER AND NAVIGATION
+
+   .site-header = Header layout and glass background.
+   .logo        = Munancho wordmark.
+   nav          = Navigation links.
+   .status      = Archive availability indicator.
+   ========================================================== */
+
+.site-header {
+    position: relative;
+    z-index: 5;
+
+    min-height: 76px;
+    padding: 20px 7%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(8, 11, 20, 0.76);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.logo {
+    flex-shrink: 0;
+
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+
+    transition: color var(--transition-fast);
+}
+
+.logo:hover {
+    color: var(--blue);
+}
+
+.logo span {
+    color: var(--cyan);
+    font-size: 0.6rem;
+    vertical-align: top;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+nav a,
+.status,
+.eyebrow,
+.player-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+nav a {
+    color: var(--muted);
+    transition: color var(--transition-fast);
+}
+
+nav a:hover {
+    color: var(--cyan);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--cyan);
+    white-space: nowrap;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+    background: var(--cyan);
+
+    box-shadow:
+        0 0 8px rgba(115, 245, 255, 0.75),
+        0 0 18px rgba(115, 245, 255, 0.35);
+}
+
+
+/* ==========================================================
+   SECTION 04 — HERO SECTION
+
+   .hero             = Intro section dimensions and spacing.
+   .hero h1          = Main headline.
+   .hero h1 span     = Gradient headline accent.
+   .hero-description = Introductory text.
+   .explore-button   = Link to the album archive.
+   .hero-decoration  = Decorative M// monogram.
+   ========================================================== */
+
+.hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    min-height: 540px;
+    padding: 100px 10% 90px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+
+    top: 5%;
+    right: -8%;
+
+    width: min(600px, 65vw);
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    background: radial-gradient(
+        circle,
+        rgba(61, 117, 209, 0.13),
+        rgba(29, 66, 120, 0.04) 42%,
+        transparent 70%
+    );
+
+    pointer-events: none;
+}
+
+.eyebrow {
+    color: var(--cyan);
+    line-height: 1.6;
+}
+
+.hero h1 {
+    position: relative;
+    z-index: 1;
+
+    margin: 24px 0;
+
+    font-size: clamp(3.5rem, 9vw, 7.5rem);
+    line-height: 0.91;
+    letter-spacing: -0.075em;
+    font-weight: 900;
+}
+
+.hero h1 span {
+    background: linear-gradient(
+        100deg,
+        #ffffff 0%,
+        #83aaff 48%,
+        #73f5ff 100%
+    );
+
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.hero-description {
+    position: relative;
+    z-index: 1;
+
+    max-width: 460px;
+
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+.explore-button {
+    position: relative;
+    z-index: 1;
+
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 20px;
+
+    border: 1px solid rgba(115, 245, 255, 0.48);
+    border-radius: var(--radius-small);
+
+    background: rgba(115, 245, 255, 0.05);
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+
+    transition:
+        background var(--transition-smooth),
+        border-color var(--transition-smooth),
+        box-shadow var(--transition-smooth),
+        transform var(--transition-smooth);
+}
+
+.explore-button:hover {
+    transform: translateY(-2px);
+
+    border-color: var(--cyan);
+    background: rgba(115, 245, 255, 0.11);
+
+    box-shadow: var(--glow-cyan);
+}
+
+.hero-decoration {
+    position: absolute;
+    z-index: -1;
+
+    top: 18%;
+    right: 7%;
+
+    color: rgba(120, 170, 255, 0.07);
+
+    font-size: clamp(8rem, 25vw, 22rem);
+    font-weight: 900;
+    letter-spacing: -0.12em;
+    line-height: 1;
+
+    pointer-events: none;
+    user-select: none;
+}
+
+
+/* ==========================================================
+   SECTION 05 — SECTION HEADINGS
+
+   .section-block   = Shared section spacing.
+   .section-heading = Heading group spacing.
+   .accent          = Cyan accent text.
+   ========================================================== */
+
+.section-block {
+    padding: 75px 10%;
+    scroll-margin-top: 30px;
+}
+
+.section-heading {
+    margin-bottom: 30px;
+}
+
+.section-heading h2 {
+    margin: 10px 0;
+
+    font-size: clamp(2rem, 4vw, 3.3rem);
+    line-height: 1.1;
+    letter-spacing: -0.055em;
+}
+
+.accent {
+    color: var(--cyan);
+}
+
+.section-description {
+    margin-top: 12px;
+
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+
+/* ==========================================================
+   SECTION 06 — LORE DOCUMENT PANEL
+
+   Creates the glass-like recovered archive document.
+
+   .lore-panel = Main document surface.
+   .file-stamp = Classification label.
+   .file-footer = Closing document status.
+   ========================================================== */
+
+.lore-panel {
+    position: relative;
+
+    max-width: 850px;
+    padding: 32px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+
+    background: linear-gradient(
+        135deg,
+        rgba(28, 42, 67, 0.68),
+        rgba(11, 15, 27, 0.84)
+    );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.025),
+        var(--glow);
+
+    color: #c0cbe0;
+    line-height: 1.9;
+
+    overflow-wrap: anywhere;
+}
+
+.file-stamp {
+    display: block;
+    margin-bottom: 24px;
+
+    color: var(--cyan);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.file-footer {
+    display: block;
+    margin-top: 28px;
+    padding-top: 16px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+}
+
+/* ==========================================================
+   SECTION 07 — ALBUM ARCHIVE
+
+   .album-grid  = Responsive grid containing the album tiles.
+   .album-card  = Clickable tile generated by JavaScript.
+   .album-art   = Album cover image.
+   .album-title = Album name.
+   .album-meta  = Release year and track count.
+
+   JavaScript controls which album is selected.
+   CSS controls how that selection looks.
+   ========================================================== */
+
+/* Automatically fits album cards to the available screen width. */
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 24px;
+}
+
+/* Creates the glass-like surface around each album. */
+.album-card {
+    position: relative;
+    min-width: 0;
+    padding: 12px;
+
+    overflow: hidden;
+    text-align: left;
+
+    color: var(--text);
+    background: linear-gradient(
+        145deg,
+        rgba(25, 39, 64, 0.82),
+        rgba(12, 18, 32, 0.92)
+    );
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+    cursor: pointer;
+
+    transition:
+        transform var(--transition-smooth),
+        border-color var(--transition-smooth),
+        background var(--transition-smooth),
+        box-shadow var(--transition-smooth);
+}
+
+/* Adds lift and blue illumination when a card is hovered. */
+.album-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--border-strong);
+    box-shadow: var(--glow);
+}
+
+/* Identifies the album currently open in the archive. */
+.album-card.selected {
+    border-color: var(--cyan);
+    background: linear-gradient(
+        145deg,
+        rgba(35, 60, 91, 0.88),
+        rgba(12, 20, 36, 0.96)
+    );
+
+    box-shadow:
+        inset 0 0 0 1px rgba(115, 245, 255, 0.08),
+        var(--glow-cyan);
+}
+
+/* Keeps all album artwork square and consistently cropped. */
+.album-art {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+
+    object-fit: cover;
+
+    border-radius: var(--radius-small);
+
+    background: linear-gradient(
+        135deg,
+        #233d69,
+        #101522 55%,
+        #315d78
+    );
+}
+
+/* Displays M// if an album image is missing. */
+.album-art-placeholder {
+    display: grid;
+    place-items: center;
+
+    color: var(--cyan);
+    font-size: 3rem;
+    font-weight: 900;
+
+    text-shadow: 0 0 30px rgba(115, 245, 255, 0.45);
+}
+
+/* Styles the album title beneath its artwork. */
+.album-title {
+    margin: 16px 0 6px;
+
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* Shows quieter supporting information under the title. */
+.album-meta {
+    margin: 0;
+
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   SECTION 08 — TRACKLIST
+
+   .track-list   = Container for all song rows.
+   .track-row    = One individual song.
+   .track-number = Song position in the album.
+   .track-name   = Clickable song title.
+   .track-year   = Song release year.
+   .track-album  = Album name.
+   .like-button  = Interactive like counter.
+
+   JavaScript creates the rows and updates the like counts.
+   ========================================================== */
+
+/* Creates a clean divider above the first track. */
+.track-list {
+    border-top: 1px solid var(--border);
+}
+
+/* Arranges track information into consistent columns. */
+.track-row {
+    display: grid;
+
+    grid-template-columns:
+        35px
+        minmax(120px, 1.6fr)
+        minmax(70px, 0.5fr)
+        minmax(110px, 1fr)
+        65px;
+
+    align-items: center;
+    gap: 16px;
+
+    min-width: 0;
+    padding: 17px 12px;
+
+    border-bottom: 1px solid var(--border);
+
+    transition: background var(--transition-fast);
+}
+
+/* Gives hovered and currently playing songs a subtle highlight. */
+.track-row:hover,
+.track-row.playing {
+    background: rgba(120, 170, 255, 0.08);
+}
+
+/* Adds a brighter accent to the active song. */
+.track-row.playing .track-name {
+    color: var(--cyan);
+}
+
+/* Keeps the track number aligned and easy to scan. */
+.track-number {
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Makes the song title clickable without default button styling. */
+.track-name {
+    min-width: 0;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--text);
+    text-align: left;
+    font: inherit;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    overflow-wrap: anywhere;
+
+    transition: color var(--transition-fast);
+}
+
+/* Highlights song titles when the pointer moves over them. */
+.track-name:hover {
+    color: var(--cyan);
+}
+
+/* Styles the year and album metadata. */
+.track-year,
+.track-album {
+    min-width: 0;
+
+    color: var(--muted);
+    font-size: 0.8rem;
+
+    overflow-wrap: anywhere;
+}
+
+/* Creates the compact pill-shaped like control. */
+.like-button {
+    justify-self: end;
+
+    min-width: 58px;
+    padding: 7px 9px;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.015);
+
+    font-size: 0.8rem;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        color var(--transition-fast),
+        border-color var(--transition-fast),
+        background var(--transition-fast);
+}
+
+/* Adds cyan feedback when the like control is hovered. */
+.like-button:hover,
+.like-button.liked {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    background: rgba(115, 245, 255, 0.06);
+}
+
+/* Provides a clear empty state before an album is selected. */
+.empty-message {
+    padding: 25px 0;
+
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+
+/* ==========================================================
+   SECTION 09 — PERSISTENT MUSIC PLAYER
+
+   .player        = Fixed bottom player bar.
+   .now-playing   = Current song and album information.
+   .mini-art      = Small album artwork.
+   #audio-player  = Native browser audio controls.
+   .player-label  = Archive player identification.
+
+   The HTML audio element handles playback and seeking.
+   JavaScript updates the song details and audio source.
+   ========================================================== */
+
+/* Keeps the music player visible at the bottom of the screen. */
+.player {
+    position: fixed;
+    z-index: 10;
+
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    min-height: 90px;
+    padding: 15px 5%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(180px, 1.5fr)
+        minmax(0, 1fr);
+
+    align-items: center;
+    gap: 25px;
+
+    border-top: 1px solid var(--border);
+
+    background: var(--glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+
+    box-shadow: 0 -8px 35px rgba(0, 0, 0, 0.18);
+}
+
+/* Groups the mini cover with the current song information. */
+.now-playing {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 0;
+}
+
+/* Creates the small artwork tile next to the player information. */
+.mini-art {
+    display: grid;
+    place-items: center;
+
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+
+    background: linear-gradient(
+        135deg,
+        #244477,
+        #121827,
+        #376b83
+    );
+
+    background-size: cover;
+    background-position: center;
+
+    color: var(--cyan);
+    font-weight: 900;
+}
+
+/* Displays the active song title. */
+.now-playing p {
+    margin: 0 0 5px;
+
+    font-size: 0.85rem;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+/* Displays the album name and playback messages. */
+.now-playing span {
+    color: var(--muted);
+    font-size: 0.72rem;
+}
+
+/* Makes the native audio controls fit the player layout. */
+#audio-player {
+    display: block;
+
+    width: 100%;
+    max-width: 520px;
+    min-width: 0;
+    height: 40px;
+}
+
+/* Keeps the player identification aligned on desktop. */
+.player-label {
+    color: var(--muted);
+    text-align: right;
+}
+
+
+/* ==========================================================
+   END OF PART 2
+
+   Part 3 adds mobile layouts, accessibility refinements,
+   reduced-motion support, and final responsive adjustments.
+   ========================================================== */
+
+/* ==========================================================
+   SECTION 10 — ACCESSIBILITY AND INTERACTION
+
+   Improves keyboard navigation, touch interactions, and
+   readability without changing the overall visual design.
+   ========================================================== */
+
+/* Gives clickable album tiles a visible keyboard focus. */
+.album-card:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
+}
+
+/* Makes keyboard focus easy to see on like buttons. */
+.like-button:focus-visible,
+.track-name:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
+}
+
+/* Prevents touch devices from getting stuck in hover states. */
+@media (hover: hover) {
+    .album-card:hover .album-art {
+        filter: saturate(1.08);
+    }
+}
+
+/* Respects users who prefer less movement on screen. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ==========================================================
+   SECTION 11 — TABLET LAYOUT
+
+   Activates when the screen is 900px wide or narrower.
+
+   Adjusts:
+   - Header spacing
+   - Hero spacing
+   - Main section widths
+   - Music player columns
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    /* Gives the header more room on medium screens. */
+    .site-header {
+        padding-right: 5%;
+        padding-left: 5%;
+        gap: 16px;
+    }
+
+    nav {
+        gap: 18px;
+    }
+
+    /* Reduces oversized horizontal margins. */
+    .hero {
+        padding-right: 7%;
+        padding-left: 7%;
+    }
+
+    .section-block {
+        padding-right: 7%;
+        padding-left: 7%;
+    }
+
+    /* Allows the player to prioritize the song and audio controls. */
+    .player {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(160px, 1.3fr);
+
+        gap: 16px;
+    }
+
+    /* Hides the decorative label when space is limited. */
+    .player-label {
+        display: none;
+    }
+}
+
+
+/* ==========================================================
+   SECTION 12 — MOBILE LAYOUT
+
+   Activates at 700px and below.
+
+   Keeps the archive readable without horizontal scrolling.
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+    /* Allows the header to use two rows when necessary. */
+    .site-header {
+        padding: 18px 5%;
+        flex-wrap: wrap;
+    }
+
+    /* Moves navigation onto its own row. */
+    nav {
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    nav a {
+        font-size: 0.65rem;
+    }
+
+    .status {
+        font-size: 0.58rem;
+    }
+
+    /* Reduces the hero's vertical and horizontal spacing. */
+    .hero {
+        min-height: auto;
+        padding: 80px 6% 75px;
+    }
+
+    .hero h1 {
+        font-size: clamp(3.1rem, 12vw, 5.5rem);
+    }
+
+    /* Keeps the decorative monogram from overpowering the text. */
+    .hero-decoration {
+        top: 25%;
+        right: -5%;
+        font-size: 45vw;
+        opacity: 0.7;
+    }
+
+    /* Makes each section comfortable to read on a phone. */
+    .section-block {
+        padding: 55px 6%;
+    }
+
+    /* Reduces padding inside the lore document. */
+    .lore-panel {
+        padding: 22px;
+        font-size: 0.92rem;
+        line-height: 1.85;
+    }
+
+    /* Allows two or more album cards to fit where practical. */
+    .album-grid {
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(min(145px, 100%), 1fr)
+        );
+
+        gap: 15px;
+    }
+
+    .album-card {
+        padding: 9px;
+    }
+
+    .album-title {
+        margin-top: 12px;
+        font-size: 0.9rem;
+    }
+
+    .album-meta {
+        font-size: 0.72rem;
+    }
+
+    /* Simplifies track rows to fit narrow screens. */
+    .track-row {
+        grid-template-columns:
+            25px
+            minmax(0, 1fr)
+            60px;
+
+        gap: 10px;
+        padding: 15px 6px;
+    }
+
+    /* Hides secondary metadata that crowds small screens. */
+    .track-year,
+    .track-album {
+        display: none;
+    }
+
+    .track-name {
+        font-size: 0.88rem;
+    }
+
+    .like-button {
+        min-width: 54px;
+        padding: 7px 6px;
+        font-size: 0.75rem;
+    }
+
+    /* Repositions the player for a compact mobile layout. */
+    .player {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(125px, 1fr);
+
+        gap: 10px;
+        padding: 12px;
+        min-height: 78px;
+    }
+
+    .mini-art {
+        width: 38px;
+        height: 38px;
+    }
+
+    .now-playing {
+        gap: 9px;
+    }
+
+    /* Prevents long song names from expanding the player. */
+    .now-playing > div:last-child {
+        min-width: 0;
+    }
+
+    .now-playing p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.78rem;
+    }
+
+    .now-playing span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.65rem;
+    }
+
+    #audio-player {
+        height: 38px;
+    }
+
+    /* Reserves less page space beneath the fixed player. */
+    body {
+        padding-bottom: 100px;
+    }
+}
+
+
+/* ==========================================================
+   SECTION 13 — EXTRA-SMALL SCREENS
+
+   Activates at 380px and below.
+
+   Prioritizes readability on particularly narrow phones.
+   ========================================================== */
+
+@media (max-width: 380px) {
+
+    .logo {
+        font-size: 1.05rem;
+    }
+
+    .status {
+        font-size: 0.52rem;
+        gap: 5px;
+    }
+
+    nav {
+        gap: 8px;
+    }
+
+    nav a {
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+    }
+
+    .album-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .track-row {
+        grid-template-columns: 22px minmax(0, 1fr) 52px;
+        gap: 7px;
+    }
+
+    .like-button {
+        min-width: 48px;
+        font-size: 0.7rem;
+    }
+
+    /* Gives the audio controls more usable width. */
+    .player {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+        padding: 9px 12px;
+    }
+
+    .now-playing {
+        display: none;
+    }
+
+    #audio-player {
+        max-width: none;
+        width: 100%;
+    }
+
+    body {
+        padding-bottom: 75px;
+    }
+}
+
+
+/* ==========================================================
+   END OF MUNANCHO STYLESHEET
+
+   All three parts:
+
+   01–06: Foundation, header, hero, lore
+   07–09: Album tiles, tracklist, music player
+   10–13: Accessibility and responsive layouts
+   ========================================================== */

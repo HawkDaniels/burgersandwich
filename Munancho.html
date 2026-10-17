@@ -1,0 +1,373 @@
+
+<!--
+============================================================
+MUNANCHO DIGITAL ARCHIVE
+FILE: Munancho.html
+
+PROJECT MAP
+------------------------------------------------------------
+Munancho.html
+    Main webpage structure and content.
+
+Munancho/
+    albums/         Album artwork and visual assets.
+    audio/          Music files.
+    css/Style.css   Colors, layout, typography, and effects.
+    js/script.js    Album data, tracklists, and playback logic.
+
+HOW THE WEBSITE WORKS
+------------------------------------------------------------
+1. HTML defines the page sections and their containers.
+2. CSS controls how those sections look.
+3. JavaScript fills the album and track containers.
+4. The audio player plays the selected audio file.
+
+EDITING GUIDE
+------------------------------------------------------------
+Change text and page sections in this file.
+Change appearance in Munancho/css/Style.css.
+Change music data and playback behavior in Munancho/js/script.js.
+
+FILE PATH NOTE
+------------------------------------------------------------
+This HTML file sits BESIDE the Munancho folder.
+File and folder names must match their actual spelling.
+============================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ==================================================
+         SECTION 01 — PAGE SETUP
+
+         PURPOSE:
+         Defines browser settings, page metadata, and
+         external files required by the website.
+
+         WHAT YOU CAN CHANGE:
+         <title>       Browser tab title.
+         description   Search-engine summary.
+         stylesheet    Location of the CSS file.
+         script        Location of the JavaScript file.
+         ================================================== -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>MUNANCHO // Digital Archive</title>
+
+    <meta name="description"
+          content="Enter the digital archive of Munancho.">
+
+    <!-- Visual styling: colors, layout, and effects. -->
+    <link rel="stylesheet" href="Munancho/css/Style.css">
+
+    <!-- Website behavior: album selection and audio playback. -->
+    <script src="Munancho/js/script.js" defer></script>
+</head>
+
+<body>
+
+    <!-- ==================================================
+         SECTION 02 — SITE HEADER
+
+         PURPOSE:
+         Displays the brand, page navigation, and archive
+         status indicator.
+
+         IMPORTANT HOOKS:
+         .logo         Brand styling.
+         .status       Archive status styling.
+         #lore         Navigation destination for the lore.
+         #albums       Navigation destination for the archive.
+         ================================================== -->
+
+    <header class="site-header">
+
+        <a class="logo" href="#home">
+            MUNANCHO<span>®</span>
+        </a>
+
+        <nav aria-label="Main navigation">
+            <a href="#lore">THE LORE</a>
+            <a href="#albums">THE ARCHIVE</a>
+        </nav>
+
+        <span class="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            ARCHIVE ONLINE
+        </span>
+
+    </header>
+
+
+    <main id="home">
+
+        <!-- ==================================================
+             SECTION 03 — HERO / INTRODUCTION
+
+             PURPOSE:
+             Establishes the visual identity and introduces
+             visitors to the Munancho archive.
+
+             WHAT YOU CAN CHANGE:
+             .eyebrow          Small classification text.
+             h1                Main headline.
+             .hero-description Introductory paragraph.
+             .explore-button   Link to the album archive.
+             .hero-decoration  Decorative graphic.
+             ================================================== -->
+
+        <section class="hero">
+
+            <p class="eyebrow">MUNANCHO INC. / EST. 1724</p>
+
+            <h1>
+                THE SOUND<br>
+                OF <span>THE FUTURE.</span>
+            </h1>
+
+            <p class="hero-description">
+                A digital monument to the world's most questionable
+                musical pioneers. Preserved for generations to come.
+            </p>
+
+            <a class="explore-button" href="#albums">
+                EXPLORE THE ARCHIVE ↘
+            </a>
+
+            <!-- Decorative element; screen readers can ignore it. -->
+            <div class="hero-decoration" aria-hidden="true">M//</div>
+
+        </section>
+
+
+        <!-- ==================================================
+             SECTION 04 — LORE / CLASSIFIED HISTORY
+
+             PURPOSE:
+             Presents the fictional history and mythology
+             behind Munancho.
+
+             WHAT YOU CAN CHANGE:
+             .file-stamp   Document label.
+             .lore-panel   Main document container.
+             .file-footer  Document status label.
+
+             CONTENT NOTE:
+             Keep the story in separate paragraphs so it is
+             easier to read and style.
+             ================================================== -->
+
+        <section class="lore section-block" id="lore">
+
+            <div class="section-heading">
+                <p class="eyebrow">FILE 001 / CLASSIFIED HISTORY</p>
+                <h2>The Munancho Mythos</h2>
+            </div>
+
+            <div class="lore-panel">
+
+                <span class="file-stamp">OFFICIAL ARCHIVE</span>
+
+                <p>
+                    Founded in the questionable depths of history,
+                    Munancho Incorporated emerged as a musical force
+                    beyond human comprehension.
+                </p>
+
+                <p>
+                    Munancho Incorporated is a super conglomerate
+                    located in Mecca, Japan. It was discovered by
+                    Pope Barak Music and God Emperor Christopher Music
+                    on February 25th, 1724. Barak and Christopher Music
+                    were twins born on the same day in a Sprite factory
+                    via the first gay couple in recorded history.
+                </p>
+
+                <p>
+                    Barak “The Cheese” Music was born at the ripe age
+                    of 6. His first words were famously “I'm cheesing
+                    it,” which earned him his famous nickname “The
+                    Cheese” as well as becoming the number one pickup
+                    line on earth.
+                </p>
+
+                <p>
+                    Christopher “The Crunch” Music was famously born
+                    as just a pair of legs with zero bones left broken.
+                    He eventually overcame this fact by becoming the
+                    first person to ever throw it back sexual style
+                    with no heart or brain. This earned him his famous
+                    nickname of “The Crunch,” and he's been America's
+                    number one heartthrob since.
+                </p>
+
+                <p>
+                    Before beginning their music journey, the duo made
+                    their first ever controversial media stunt. They
+                    made the conscious decision to enter ketosis live
+                    on national television. Scholars today still debate
+                    the morality of this decision, but the general
+                    public has seemed to move on in favor of celebrating
+                    their success as the number one music group on earth.
+                </p>
+
+                <p>
+                    Munancho accomplishes their unique sound by combining
+                    harsh noise with experimental dolphin mating sounds.
+                    This fusion has created their signature soundstage
+                    that has yet to be recreated by anyone else.
+                </p>
+
+                <p>
+                    Munancho was unfortunately executed on March 3rd,
+                    2004 for smuggling fentanyl and Guitar Hero
+                    controllers over the US-Azerbaijan border.
+                    The albums left… are their legacy. Rest In Piece
+                    Munancho, we're all praying for you.
+                </p>
+
+                <p>
+                    Their legacy lives on through the recordings
+                    preserved below. The truth is classified.
+                    The music is eternal.
+                </p>
+
+                <span class="file-footer">
+                    DOCUMENT STATUS: QUESTIONABLE
+                </span>
+
+            </div>
+        </section>
+
+
+        <!-- ==================================================
+             SECTION 05 — ALBUM ARCHIVE
+
+             PURPOSE:
+             Provides the container for selectable album tiles.
+
+             JAVASCRIPT CONNECTION:
+             #album-grid is where script.js inserts the albums.
+
+             IMPORTANT:
+             Leave this container empty in the HTML. Album titles,
+             artwork, and other album information belong in the
+             JavaScript album database.
+             ================================================== -->
+
+        <section class="section-block" id="albums">
+
+            <div class="section-heading">
+                <p class="eyebrow">FILE 002 / AUDIO COLLECTION</p>
+
+                <h2>
+                    The Archive<span class="accent">.</span>
+                </h2>
+
+                <p class="section-description">
+                    Select an album to enter its sonic universe.
+                </p>
+            </div>
+
+            <div class="album-grid" id="album-grid">
+                <!-- JavaScript generates the selectable album tiles. -->
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             SECTION 06 — TRACK MANIFEST
+
+             PURPOSE:
+             Displays the songs belonging to the selected album.
+
+             JAVASCRIPT CONNECTIONS:
+             #track-heading    Selected album title.
+             #track-subheading Album details.
+             #track-list       Generated song rows.
+
+             FUTURE TRACK COLUMNS:
+             Track # | Song | Year | Album | Likes
+             ================================================== -->
+
+        <section class="section-block track-section"
+                 id="track-section">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">FILE 003 / TRACK MANIFEST</p>
+
+                <h2 id="track-heading">Select an album.</h2>
+
+                <p class="section-description" id="track-subheading">
+                    The track manifest will appear here.
+                </p>
+
+            </div>
+
+            <div class="track-list" id="track-list">
+                <p class="empty-message">
+                    Awaiting archive selection...
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==================================================
+         SECTION 07 — PERSISTENT MUSIC PLAYER
+
+         PURPOSE:
+         Keeps the audio player available at the bottom
+         of the page while visitors browse the archive.
+
+         IMPORTANT HOOKS:
+         #player-art     Small album artwork / placeholder.
+         #player-title   Current song title.
+         #player-album   Current album name.
+         #audio-player   Browser audio playback element.
+
+         JAVASCRIPT RESPONSIBILITY:
+         Assign the selected song's file path and update
+         the displayed song and album information.
+         ================================================== -->
+
+    <footer class="player">
+
+        <div class="now-playing">
+
+            <div class="mini-art" id="player-art" aria-hidden="true">
+                M//
+            </div>
+
+            <div>
+                <p id="player-title">Nothing playing</p>
+                <span id="player-album">
+                    Select an album to begin
+                </span>
+            </div>
+
+        </div>
+
+        <!-- JavaScript assigns the source when a track is selected. -->
+        <audio id="audio-player"
+               controls
+               preload="metadata">
+        </audio>
+
+        <span class="player-label">
+            MUNANCHO PLAYER / 001
+        </span>
+
+    </footer>
+
+</body>
+</html>
