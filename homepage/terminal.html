@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>burgersandwich terminal</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #0c0c0c;
+    color: #33ff66;
+    font-family: "DejaVu Sans Mono", "Consolas", "Courier New", monospace;
+    font-size: 16px;
+  }
+  #terminal {
+    box-sizing: border-box;
+    height: 100%;
+    padding: 12px 16px;
+    overflow-y: auto;
+    cursor: text;
+  }
+  #output div { white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
+  .prompt { color: #5fafff; }
+  .error  { color: #ff5f5f; }
+  .dim    { color: #7a7a7a; }
+  #inputLine { display: flex; line-height: 1.4; }
+  #cmd {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    margin-left: 0.5em;
+    caret-color: #33ff66;
+  }
+</style>
+</head>
+<body>
+<div id="terminal">
+  <div id="output"></div>
+  <div id="inputLine">
+    <span class="prompt" id="promptText"></span>
+    <input id="cmd" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   EDIT THESE SETTINGS
+   ============================================================ */
+
+// The prompt shown before each command.
+var PROMPT = "guest@burgersandwich:~$";
+
+// The message shown when the page loads. One line per entry.
+var WELCOME = [
+  "burgersandwich terminal v0.1b",
+  "Last login: " + new Date().toString(),
+  "",
+  "Type 'help' to see available commands.",
+  ""
+];
+
+// Commands that go to a page: "command": ["URL", "description shown in help"]
+var PAGES = {
+  "home":    ["/altindex.html",          "Return home"],
+  "log":    ["/pages/captainslog.html",         "Visit The Captain's Log"],
+  "chris":    ["/pages/chriscorner.html",         "Visit Chris's Corner"],
+  "barak":    ["/pages/barakdomain.html",         "Visit Barak's Domain"],
+  "download":    ["/pages/downloads.html",         "Visit Downloads"],
+  "404":    ["/pages/example404.html",         "404"],
+  "tag":    ["/tags/tags.html",         "Visit #code ***Incomplete"],
+  //"":    ["",         ""],
+};
+
+// Where pages open:
+//   "top"    = replace the whole browser window (removes frames)
+//   "self"   = load inside the current frame/window
+//   "newtab" = open in a new tab
+var OPEN_IN = "top";
+
+/* ============================================================
+   TERMINAL CODE (no need to edit below)
+   ============================================================ */
+
+var output = document.getElementById("output");
+var input = document.getElementById("cmd");
+var cmdHistory = [];
+var cmdIndex = 0;
+
+document.getElementById("promptText").textContent = PROMPT;
+
+function print(text, cls) {
+  var line = document.createElement("div");
+  line.textContent = text;
+  if (cls) line.className = cls;
+  output.appendChild(line);
+  document.getElementById("terminal").scrollTop = 1e9;
+}
+
+function go(url) {
+  if (OPEN_IN === "newtab") window.open(url, "_blank");
+  else if (OPEN_IN === "self") window.location.href = url;
+  else top.location.href = url;
+}
+
+// Built-in commands: "name": [function, "description"]
+var BUILTINS = {
+  "help": [function () {
+    print("Available commands:");
+    var all = {};
+    for (var b in BUILTINS) all[b] = BUILTINS[b][1];
+    for (var p in PAGES) all[p] = PAGES[p][1];
+    var width = 0;
+    for (var k in all) width = Math.max(width, k.length);
+    for (var name in all) {
+      var pad = new Array(width - name.length + 3).join(" ");
+      print("  " + name + pad + all[name]);
+    }
+  }, "Show this list"],
+
+  "clear": [function () { output.innerHTML = ""; }, "Clear the screen"],
+
+  "echo": [function (args) { print(args.join(" ")); }, "Print text back"],
+
+  "burger": [function (args) { print("sandwich"); }, "burgersandwich"]
+};
+
+function run(raw) {
+  var line = document.createElement("div");
+  var p = document.createElement("span");
+  p.className = "prompt";
+  p.textContent = PROMPT + " ";
+  line.appendChild(p);
+  line.appendChild(document.createTextNode(raw));
+  output.appendChild(line);
+
+  var parts = raw.trim().split(/\s+/);
+  var name = parts[0].toLowerCase();
+  var args = parts.slice(1);
+  if (!name) return;
+
+  if (BUILTINS[name]) {
+    BUILTINS[name][0](args);
+  } else if (PAGES[name]) {
+    print("Opening " + PAGES[name][0] + " ...", "dim");
+    setTimeout(function () { go(PAGES[name][0]); }, 400);
+  } else {
+    print("bash: " + name + ": command not found", "error");
+  }
+  document.getElementById("terminal").scrollTop = 1e9;
+}
+
+input.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    var value = input.value;
+    if (value.trim()) { cmdHistory.push(value); }
+    cmdIndex = cmdHistory.length;
+    input.value = "";
+    run(value);
+  } else if (e.key === "ArrowUp") {
+    if (cmdIndex > 0) { cmdIndex--; input.value = cmdHistory[cmdIndex]; }
+    e.preventDefault();
+  } else if (e.key === "ArrowDown") {
+    if (cmdIndex < cmdHistory.length - 1) { cmdIndex++; input.value = cmdHistory[cmdIndex]; }
+    else { cmdIndex = cmdHistory.length; input.value = ""; }
+    e.preventDefault();
+  }
+});
+
+// Clicking anywhere focuses the input, like a real terminal.
+document.getElementById("terminal").addEventListener("click", function () {
+  if (!window.getSelection().toString()) input.focus();
+});
+
+for (var i = 0; i < WELCOME.length; i++) print(WELCOME[i]);
+input.focus();
+</script>
+</body>
+</html>

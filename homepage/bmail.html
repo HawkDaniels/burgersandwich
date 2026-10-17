@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bMail</title>
+<style>
+  :root {
+    --face: #d4d0c8;
+    --sel: #0a246a;
+    --line: #808080;
+    --head: #e8e6df;
+    --accent: #3a6ea5;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { display: flex; flex-direction: column; background: var(--face); color: #000;
+    font: 12px Tahoma, Verdana, "Segoe UI", sans-serif; overflow: hidden; }
+  button { font: inherit; }
+
+  .raised { box-shadow: inset -1px -1px #404040, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #e8e6df; }
+  .sunken { box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #e8e6df, inset 2px 2px #404040; background: #fff; }
+
+  /* Title & menu */
+  #appTitle { display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px; color: #fff; font-weight: bold;
+    background: linear-gradient(90deg, #0a246a, #a6caf0); flex: 0 0 auto; }
+  #appTitle svg { width: 16px; height: 16px; }
+  .menubar { display: flex; padding: 2px 2px; flex: 0 0 auto; border-bottom: 1px solid #fff; box-shadow: 0 1px #808080; }
+  .menubar > span { position: relative; padding: 2px 7px; cursor: default; }
+  .menubar > span:hover { box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+  .menubar > span.open { box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+
+  /* Drop-down menu */
+  .dropdown { position: absolute; top: 100%; left: 0; z-index: 60; min-width: 190px; padding: 2px;
+    background: var(--face); display: none; }
+  .menubar > span.open .dropdown { display: block; }
+  .dropdown div { padding: 3px 20px; white-space: nowrap; }
+  .dropdown div:hover { background: var(--sel); color: #fff; }
+  .dropdown hr { border: none; height: 2px; margin: 3px 1px; box-shadow: inset 0 1px #808080, inset 0 -1px #fff; }
+
+  /* Toolbar */
+  #toolbar { display: flex; gap: 1px; padding: 3px 4px; flex: 0 0 auto; border-bottom: 1px solid #808080; overflow-x: auto; }
+  .tool { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 58px; padding: 3px 6px;
+    background: none; border: none; cursor: pointer; }
+  .tool svg { width: 24px; height: 24px; }
+  .tool:hover:not(:disabled) { box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+  .tool:active:not(:disabled) { box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+  .tool:disabled { opacity: 0.4; cursor: default; }
+  .toolSep { width: 2px; margin: 2px 4px; box-shadow: inset 1px 0 #808080, inset -1px 0 #fff; }
+
+  /* Panes */
+  #main { flex: 1; min-height: 0; display: flex; gap: 3px; padding: 3px; }
+  #folderPane { width: 190px; flex: 0 0 190px; display: flex; flex-direction: column; }
+  .paneHead { padding: 3px 6px; background: var(--face); font-weight: bold; flex: 0 0 auto;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+  #folders { flex: 1; overflow: auto; padding: 4px 2px; }
+  .folder { display: flex; align-items: center; gap: 5px; padding: 2px 4px; margin-left: 14px; cursor: default; white-space: nowrap; }
+  .folder.root { margin-left: 0; }
+  .folder svg { width: 16px; height: 16px; flex: 0 0 16px; }
+  .folder .fname { padding: 0 2px; }
+  .folder.current .fname { background: var(--sel); color: #fff; }
+  .folder .count { color: #00f; font-weight: bold; }
+  .folder.current .count { color: #fff; }
+
+  #rightPane { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  #listWrap { flex: 0 0 42%; display: flex; flex-direction: column; min-height: 80px; }
+  #list { flex: 1; overflow: auto; outline: none; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { position: sticky; top: 0; background: var(--face); font-weight: normal; text-align: left; padding: 2px 5px;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; cursor: pointer; white-space: nowrap; overflow: hidden; z-index: 1; }
+  th:active { box-shadow: inset 1px 1px #808080; }
+  th .arrow { font-size: 8px; margin-left: 4px; }
+  td { padding: 2px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; }
+  td svg { width: 14px; height: 14px; vertical-align: -3px; }
+  th.ic, td.ic { width: 22px; padding: 2px 3px; text-align: center; }
+  th.from { width: 26%; } th.date { width: 150px; }
+  tr.unread td { font-weight: bold; }
+  tr.sel td { background: var(--sel); color: #fff; }
+  #list:not(:focus) tr.sel td { background: #c0c0c0; color: #000; }
+  .emptyList { padding: 12px; color: #808080; }
+
+  #splitter { height: 5px; cursor: ns-resize; flex: 0 0 auto; }
+
+  #preview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  #pvHead { flex: 0 0 auto; padding: 6px 8px; background: var(--head); border-bottom: 1px solid #808080; line-height: 1.6; }
+  #pvHead b { display: inline-block; width: 58px; font-weight: normal; color: #444; }
+  #pvHead .subj { font-weight: bold; }
+  #pvAttach { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .attach { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; background: #fff;
+    border: 1px solid #a0a0a0; cursor: pointer; color: #000; text-decoration: none; }
+  .attach:hover { border-color: var(--accent); background: #eef4fb; }
+  .attach svg { width: 14px; height: 14px; }
+  #pvBody { flex: 1; overflow: auto; padding: 10px 12px; font: 13px Arial, Helvetica, sans-serif; line-height: 1.5;
+    white-space: pre-wrap; word-wrap: break-word; user-select: text; }
+  #pvBody a { color: #00e; }
+  #pvBody a:visited { color: #551a8b; }
+  .pvEmpty { color: #808080; font: 12px Tahoma, sans-serif; padding: 20px; text-align: center; white-space: normal; }
+
+  #status { display: flex; gap: 2px; padding: 2px; flex: 0 0 auto; }
+  #status div { padding: 2px 6px; box-shadow: inset -1px -1px #fff, inset 1px 1px #808080; }
+  #status div:first-child { flex: 1; }
+
+  /* Dialogs (compose, alerts, progress) */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); display: flex; align-items: center;
+    justify-content: center; z-index: 50; padding: 10px; }
+  .dlg { background: var(--face); padding: 3px; width: 560px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; }
+  .dlg.small { width: 340px; }
+  .dlgTitle { display: flex; align-items: center; gap: 6px; height: 20px; padding: 0 3px 0 5px; color: #fff; font-weight: bold;
+    background: linear-gradient(90deg, #0a246a, #a6caf0); flex: 0 0 auto; }
+  .dlgTitle span { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .dlgTitle svg { width: 16px; height: 16px; }
+  .xBtn { width: 16px; height: 14px; border: none; background: var(--face); padding: 0; line-height: 10px; font-weight: bold; cursor: pointer; }
+  .fields { padding: 6px; display: grid; grid-template-columns: 62px 1fr; gap: 4px 6px; align-items: center; }
+  .fields input { font: inherit; border: none; padding: 3px 4px; outline: none; width: 100%; }
+  .fields .fixed { padding: 3px 4px; color: #444; }
+  .composeBody { margin: 0 6px 6px; height: 230px; font: 13px Arial, sans-serif; border: none; padding: 6px; resize: vertical; outline: none; }
+  .dlgBtns { display: flex; justify-content: flex-end; gap: 6px; padding: 4px 6px 6px; }
+  .btn { min-width: 75px; padding: 4px 12px; border: none; background: var(--face); cursor: pointer; }
+  .btn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #404040, inset -2px -2px #e8e6df, inset 2px 2px #808080; }
+  .msgRow { display: flex; gap: 12px; padding: 14px 12px 6px; align-items: flex-start; line-height: 1.4; }
+  .msgRow svg { width: 32px; height: 32px; flex: 0 0 32px; }
+  .bar { height: 16px; margin: 4px 12px 10px; padding: 2px; }
+  .bar div { height: 100%; width: 0; background: repeating-linear-gradient(90deg, var(--sel) 0 8px, transparent 8px 10px);
+    transition: width 0.15s linear; }
+
+  /* New-mail toast */
+  #toast { position: fixed; right: 10px; bottom: 30px; width: 230px; padding: 3px; background: var(--face); z-index: 40; display: none; cursor: pointer; }
+  #toast.on { display: block; }
+  #toast .body { padding: 10px; display: flex; gap: 8px; align-items: center; }
+  #toast svg { width: 24px; height: 24px; }
+
+  @media (max-width: 700px) {
+    #main { flex-direction: column; }
+    #folderPane { width: auto; flex: 0 0 auto; max-height: 120px; }
+    #folders { display: flex; flex-wrap: wrap; gap: 2px; }
+    .folder, .folder.root { margin-left: 0; }
+    .folder.root { display: none; }
+    .tool span { display: none; }
+    .tool { min-width: 36px; }
+    th.date, td.date { width: 72px; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+/* ============================================================
+   EDIT THESE SETTINGS
+   ============================================================ */
+
+var APP_NAME = "Mail";
+var ACCOUNT_NAME = "Local Folders";          // name at the top of the folder list
+var VISITOR_NAME = "Guest";                 // who the inbox "belongs" to
+var VISITOR_ADDRESS = "guest@burgersandwich.jp";
+
+// Where links open: "top" (whole window), "self" (this frame), "newtab"
+var OPEN_IN = "top";
+
+// What "Send" does in the New Message window:
+//   "fake"   - the message is "sent" and appears in the visitor's Sent Items
+//   "mailto" - opens the visitor's own email program addressed to CONTACT_EMAIL
+var SEND_MODE = "fake";
+var CONTACT_EMAIL = "";
+
+// ------------------------------------------------------------
+// FOLDERS and their messages.
+//
+// Folder:  name, icon (inbox, sent, drafts, deleted, junk, folder),
+//          role: "sent" (visitor's sent mail goes here) or "deleted" (deleted
+//          mail goes here) - optional
+//
+// Message:
+//   from       - sender's name
+//   address    - sender's email address (optional)
+//   subject
+//   date       - any text, e.g. "10/12/2026 3:45 PM", or "today 9:14 AM",
+//                "yesterday 6:02 PM"
+//   body       - the message. Use \n for a new line.
+//                Links: [link text](page.htm) or just paste a full https:// address.
+//   attachments - list of { name: "file.pdf", link: "page.htm" } (optional)
+//   important  - true shows a red "!" (optional)
+//   read       - true makes it start as already read (optional)
+//   arriveAfter - seconds after the page opens before this message shows up
+//                 as "new mail" (optional). Clicking Send/Recv delivers it early.
+// ------------------------------------------------------------
+var FOLDERS = [
+  {
+    name: "Inbox", icon: "inbox",
+    messages: [
+      {
+        from: "John Sandwich", address: "jsandwich@burgersandwich.jp",
+        subject: "Welcome to burgersandwich.jp",
+        date: "today 12:14 AM",
+        important: true,
+        body: "John Sandwich Here!\n\nI'm so glad you made it to my website. Please try visiting some pages to earn burgerpoints:\n\n" +
+              "- Chris's Corner: [chriscorner.html](/pages/chriscorner.html)\n" +
+              "- Barak's Domain: [barakdomain.html](/pages/barakdomain.html)\n\n" +
+              "Happy burgin!\nJohn Sandwich",
+        attachments: [ { name: "homeward.txt", link: "/index.html" } ]
+      },
+      {
+        from: "Burger Sandwich", address: "orders@burgersandwich.jp",
+        subject: "Your order has shipped!",
+        date: "yesterday 6:02 PM",
+        body: "Good news!\n\nYour order is on its way. Track it here:\nhttps://burgersandwich.jp\n\nThank you for your business."
+      },
+      {
+        from: "Mom", address: "mom@example.com",
+        subject: "RE: RE: RE: FW: funny pictures",
+        date: "10/12/2026 3:45 PM",
+        read: true,
+        body: "Did you see these?? Call me.\n\n[Open the album](https://example.com/photos)",
+        attachments: [ { name: "IMG_0001.jpg", link: "https://example.com/photos" } ]
+      },
+      {
+        from: "John Sandwich", address: "jsandwich@burgersandwich.jp",
+        subject: "Have you seen these naked cowboys??",
+        arriveAfter: 15,
+        body: "I really can't recommend it enough they're like breeding rams ready to rut: [18nakedcowboys.com](https://18nakedcowboys.com)"
+      }
+    ]
+  },
+  {
+    name: "Sent Items", icon: "sent", role: "sent",
+    messages: []
+  },
+  {
+    name: "Drafts", icon: "drafts",
+    messages: [
+      { from: "", subject: "(no subject)", date: "", read: true,
+        body: "I'll finish this later." }
+    ]
+  },
+  {
+    name: "Deleted Items", icon: "deleted", role: "deleted",
+    messages: []
+  },
+  {
+    name: "Junk E-mail", icon: "junk",
+    messages: [
+      { from: "Prince Adewale", address: "prince@totally-real.example",
+        subject: "URGENT BUSINESS PROPOSAL - CONFIDENTIAL", date: "10/03/2026 4:20 AM",
+        body: "DEAR FRIEND,\n\nI AM IN NEED OF A TRUSTWORTHY PARTNER TO HELP TRANSFER $18,500,000 USD.\n\nKINDLY REPLY WITH YOUR BANK DETAILS.\n\n(This is not a joke.)" }
+    ]
+  }
+];
+
+/* ============================================================
+   PAGE CODE (no need to edit below)
+   ============================================================ */
+</script>
+
+<div id="appTitle"></div>
+<div class="menubar"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>T</u>ools</span><span><u>M</u>essage</span><span id="helpMenu"><u>H</u>elp<div class="dropdown raised"><div data-help="reset">Reset Mailbox...</div><hr><div data-help="about">About Mail</div></div></span></div>
+<div id="toolbar"></div>
+<div id="main">
+  <div id="folderPane" class="sunken">
+    <div class="paneHead">Folders</div>
+    <div id="folders"></div>
+  </div>
+  <div id="rightPane">
+    <div id="listWrap" class="sunken"><div id="list" tabindex="0"></div></div>
+    <div id="splitter"></div>
+    <div id="preview" class="sunken"><div id="pvHead"></div><div id="pvBody"></div></div>
+  </div>
+</div>
+<div id="status"><div id="statusText"></div><div id="statusConn">Working Online</div></div>
+<div id="toast" class="raised"></div>
+
+<script>
+// ---------- Icons ----------
+var ICONS = {
+  app: '<rect x="1" y="3" width="14" height="10" fill="#fff" stroke="#000"/><path d="M1 3l7 6 7-6" fill="none" stroke="#000"/>',
+  newmail: '<rect x="2" y="7" width="18" height="13" fill="#fff" stroke="#333"/><path d="M2 7l9 7 9-7" fill="none" stroke="#333"/><path d="M19 1l4 4-9 9-5 1 1-5z" fill="#fc0" stroke="#333"/>',
+  reply: '<rect x="6" y="8" width="17" height="12" fill="#fff" stroke="#333"/><path d="M6 8l8.5 6L23 8" fill="none" stroke="#333"/><path d="M1 9l5-5v3h4v4H6v3z" fill="#3a6ea5" stroke="#123"/>',
+  replyall: '<rect x="8" y="8" width="15" height="12" fill="#fff" stroke="#333"/><path d="M8 8l7.5 6L23 8" fill="none" stroke="#333"/><path d="M5 9l4-4v2h3v4H9v2z" fill="#3a6ea5" stroke="#123"/><path d="M1 9l4-4v8z" fill="#3a6ea5" stroke="#123"/>',
+  forward: '<rect x="1" y="8" width="17" height="12" fill="#fff" stroke="#333"/><path d="M1 8l8.5 6L18 8" fill="none" stroke="#333"/><path d="M23 9l-5-5v3h-4v4h4v3z" fill="#3a6ea5" stroke="#123"/>',
+  print: '<rect x="6" y="2" width="12" height="7" fill="#fff" stroke="#333"/><rect x="2" y="9" width="20" height="9" fill="#c0c0c0" stroke="#333"/><rect x="6" y="15" width="12" height="7" fill="#fff" stroke="#333"/><path d="M8 18h8M8 20h6" stroke="#666"/>',
+  del: '<path d="M5 5l14 14M19 5L5 19" stroke="#c00" stroke-width="4"/>',
+  sendrecv: '<rect x="2" y="7" width="14" height="10" fill="#fff" stroke="#333"/><path d="M2 7l7 5 7-5" fill="none" stroke="#333"/><path d="M14 4h6v4l3-3m-3 3l-3-3M20 20h-6v-4l-3 3m3-3l3 3" fill="none" stroke="#3a6ea5" stroke-width="2"/>',
+  addr: '<rect x="4" y="2" width="16" height="20" fill="#3a6ea5" stroke="#123"/><rect x="6" y="4" width="12" height="16" fill="#fff"/><circle cx="12" cy="9" r="3" fill="#c96"/><path d="M7 18c0-4 10-4 10 0z" fill="#36c"/>',
+  find: '<circle cx="10" cy="10" r="6" fill="#bdf" stroke="#333" stroke-width="2"/><path d="M14.5 14.5l7 7" stroke="#333" stroke-width="3"/>',
+  inbox: '<path d="M1 9l3-6h8l3 6v5H1z" fill="#fff" stroke="#333"/><path d="M1 9h4l1 2h4l1-2h4" fill="none" stroke="#333"/><path d="M8 1v5M6 4l2 2 2-2" fill="none" stroke="#3a6ea5"/>',
+  sent: '<path d="M1 9l3-6h8l3 6v5H1z" fill="#fff" stroke="#333"/><path d="M1 9h4l1 2h4l1-2h4" fill="none" stroke="#333"/><path d="M8 7V1M6 3l2-2 2 2" fill="none" stroke="#090"/>',
+  drafts: '<path d="M2 1h9l3 3v11H2z" fill="#fff" stroke="#333"/><path d="M4 6h7M4 9h7M4 12h5" stroke="#999"/><path d="M14 5l-5 6-1 2 2-1 5-6z" fill="#fc0" stroke="#333"/>',
+  deleted: '<path d="M3 5h10l-1 10H4z" fill="#ddd" stroke="#333"/><rect x="2" y="3" width="12" height="2" fill="#aaa" stroke="#333"/><path d="M6 7v6M8 7v6M10 7v6" stroke="#777"/>',
+  junk: '<path d="M3 5h10l-1 10H4z" fill="#ddd" stroke="#333"/><rect x="2" y="3" width="12" height="2" fill="#aaa" stroke="#333"/><circle cx="8" cy="10" r="3" fill="none" stroke="#c00" stroke-width="1.5"/><path d="M6 12l4-4" stroke="#c00" stroke-width="1.5"/>',
+  folder: '<path d="M1 4h5l2 2h7v8H1z" fill="#fc0" stroke="#333"/>',
+  account: '<rect x="1" y="2" width="14" height="10" fill="#c0c0c0" stroke="#333"/><rect x="3" y="4" width="10" height="6" fill="#3a6ea5"/><rect x="5" y="12" width="6" height="2" fill="#808080"/>',
+  closed: '<rect x="1" y="3" width="14" height="10" fill="#ffe680" stroke="#333"/><path d="M1 3l7 6 7-6" fill="none" stroke="#333"/>',
+  open: '<path d="M1 7l7-5 7 5v7H1z" fill="#fff" stroke="#333"/><path d="M1 7l7 5 7-5" fill="none" stroke="#333"/>',
+  clip: '<path d="M10 4v7a2.5 2.5 0 01-5 0V3.5a1.5 1.5 0 013 0V10" fill="none" stroke="#333" stroke-width="1.2"/>',
+  bang: '<rect x="6.5" y="2" width="3" height="8" fill="#d00"/><rect x="6.5" y="12" width="3" height="3" fill="#d00"/>',
+  file: '<path d="M3 1h7l3 3v11H3z" fill="#fff" stroke="#333"/><path d="M10 1v3h3" fill="none" stroke="#333"/>',
+  info: '<circle cx="16" cy="16" r="14" fill="#fff" stroke="#000"/><circle cx="16" cy="9" r="2.3" fill="#00f"/><rect x="13.5" y="13" width="5" height="12" fill="#00f"/>',
+  warn: '<path d="M16 2l15 27H1z" fill="#ff0" stroke="#000"/><rect x="14.5" y="11" width="3" height="10" fill="#000"/><rect x="14.5" y="23" width="3" height="3" fill="#000"/>'
+};
+function svg(name, size) {
+  var vb = { newmail:24, reply:24, replyall:24, forward:24, print:24, del:24, sendrecv:24, addr:24, find:24, info:32, warn:32 }[name] || 16;
+  return '<svg viewBox="0 0 ' + vb + ' ' + vb + '">' + (ICONS[name] || "") + '</svg>';
+}
+
+function esc(t) {
+  return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+function go(url) {
+  if (!url || url === "#") return;
+  if (OPEN_IN === "newtab") window.open(url, "_blank");
+  else if (OPEN_IN === "self") window.location.href = url;
+  else top.location.href = url;
+}
+
+// ---------- Dates ----------
+function parseDate(s) {
+  if (s instanceof Date) return s;
+  var m = String(s || "").match(/^(today|yesterday)\s*(.*)$/i);
+  if (m) {
+    var d = new Date();
+    if (m[1].toLowerCase() === "yesterday") d.setDate(d.getDate() - 1);
+    var t = m[2].match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+    if (t) {
+      var h = Number(t[1]) % 12;
+      if (t[3] && t[3].toLowerCase() === "pm") h += 12;
+      if (!t[3]) h = Number(t[1]);
+      d.setHours(h, Number(t[2]), 0, 0);
+    }
+    return d;
+  }
+  var p = new Date(s);
+  return isNaN(p) ? null : p;
+}
+function fmtTime(d) {
+  var h = d.getHours(), m = d.getMinutes();
+  return ((h % 12) || 12) + ":" + (m < 10 ? "0" : "") + m + " " + (h < 12 ? "AM" : "PM");
+}
+function fmtDate(d, full) {
+  if (!d) return "";
+  var now = new Date();
+  if (!full && d.toDateString() === now.toDateString()) return fmtTime(d);
+  return (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear() + " " + fmtTime(d);
+}
+
+// ---------- Visitor's state (remembered in their browser) ----------
+var STORE_KEY = "mailState:" + APP_NAME;
+var state = { read: {}, deleted: {}, purged: {}, sent: [], arrived: {} };
+try {
+  var saved = JSON.parse(localStorage.getItem(STORE_KEY));
+  if (saved) for (var k in state) if (saved[k]) state[k] = saved[k];
+} catch (e) {}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+// ---------- Messages ----------
+var messages = [];   // every configured message, with its home folder
+FOLDERS.forEach(function (f, fi) {
+  f.messages.forEach(function (m) {
+    m._id = f.name + "|" + m.from + "|" + m.subject;
+    m._folder = fi;
+    m._date = parseDate(m.date);
+    messages.push(m);
+  });
+});
+state.sent.forEach(function (m) { m._date = new Date(m.date); });
+
+function folderByRole(role) {
+  for (var i = 0; i < FOLDERS.length; i++) if (FOLDERS[i].role === role) return i;
+  return -1;
+}
+var SENT = folderByRole("sent"), DELETED = folderByRole("deleted");
+
+function hasArrived(m) { return !m.arriveAfter || state.arrived[m._id]; }
+function isRead(m) { return m.read || state.read[m._id] || m._sent; }
+
+function messagesIn(fi) {
+  var list = [];
+  messages.forEach(function (m) {
+    if (state.purged[m._id] || !hasArrived(m)) return;
+    var where = state.deleted[m._id] ? DELETED : m._folder;
+    if (where === fi) list.push(m);
+  });
+  if (fi === SENT || (fi === DELETED && DELETED >= 0)) {
+    state.sent.forEach(function (m) {
+      if (state.purged[m._id]) return;
+      var where = state.deleted[m._id] ? DELETED : SENT;
+      if (where === fi) list.push(m);
+    });
+  }
+  return list;
+}
+
+// Arrival time for delayed messages
+var loadTime = new Date();
+messages.forEach(function (m) {
+  if (m.arriveAfter) {
+    if (state.arrived[m._id]) m._date = new Date(state.arrived[m._id]);
+    else setTimeout(function () { deliver([m]); }, m.arriveAfter * 1000);
+  }
+});
+
+function deliver(list) {
+  var fresh = list.filter(function (m) { return !state.arrived[m._id]; });
+  if (!fresh.length) return 0;
+  fresh.forEach(function (m) {
+    var now = new Date();
+    state.arrived[m._id] = now.toISOString();
+    m._date = now;
+  });
+  save();
+  renderFolders();
+  renderList();
+  showToast(fresh.length);
+  return fresh.length;
+}
+
+// ---------- UI state ----------
+var current = 0;              // folder index
+var selectedId = null;
+var sortKey = "date", sortDir = -1;
+var listEl = document.getElementById("list");
+
+document.title = APP_NAME;
+document.getElementById("appTitle").innerHTML = svg("app") + "<span>" + esc(FOLDERS[current].name + " - " + APP_NAME) + "</span>";
+
+// ---------- Toolbar ----------
+var TOOLS = [
+  ["new", "newmail", "Create Mail"], ["sep"],
+  ["reply", "reply", "Reply"], ["replyall", "replyall", "Reply All"], ["forward", "forward", "Forward"], ["sep"],
+  ["print", "print", "Print"], ["delete", "del", "Delete"], ["sep"],
+  ["sendrecv", "sendrecv", "Send/Recv"], ["sep"],
+  ["addr", "addr", "Addresses"], ["find", "find", "Find"]
+];
+document.getElementById("toolbar").innerHTML = TOOLS.map(function (t) {
+  if (t[0] === "sep") return '<div class="toolSep"></div>';
+  return '<button class="tool" data-tool="' + t[0] + '" title="' + t[2] + '">' + svg(t[1]) + '<span>' + t[2] + '</span></button>';
+}).join("");
+
+function updateTools() {
+  var has = !!selectedMsg();
+  ["reply", "replyall", "forward", "print", "delete"].forEach(function (k) {
+    document.querySelector('[data-tool="' + k + '"]').disabled = !has;
+  });
+}
+
+document.getElementById("toolbar").addEventListener("click", function (e) {
+  var b = e.target.closest("[data-tool]");
+  if (!b || b.disabled) return;
+  var m = selectedMsg();
+  switch (b.getAttribute("data-tool")) {
+    case "new": compose({}); break;
+    case "reply": case "replyall":
+      compose({ to: m.address || m.from, subject: /^re:/i.test(m.subject) ? m.subject : "RE: " + m.subject, quote: m }); break;
+    case "forward":
+      compose({ subject: "FW: " + m.subject, quote: m }); break;
+    case "print": window.print(); break;
+    case "delete": deleteSelected(); break;
+    case "sendrecv": sendReceive(); break;
+    case "addr": alertBox("Address Book", "Your address book is empty.", "info"); break;
+    case "find": findMessage(); break;
+  }
+});
+
+// ---------- Folder list ----------
+function renderFolders() {
+  var html = '<div class="folder root">' + svg("account") + '<span class="fname">' + esc(ACCOUNT_NAME) + '</span></div>';
+  FOLDERS.forEach(function (f, i) {
+    var unread = messagesIn(i).filter(function (m) { return !isRead(m); }).length;
+    html += '<div class="folder' + (i === current ? " current" : "") + '" data-f="' + i + '">' + svg(f.icon || "folder") +
+      '<span class="fname">' + esc(f.name) + (unread ? ' <span class="count">(' + unread + ')</span>' : "") + '</span></div>';
+  });
+  document.getElementById("folders").innerHTML = html;
+}
+document.getElementById("folders").addEventListener("click", function (e) {
+  var f = e.target.closest("[data-f]");
+  if (!f) return;
+  current = Number(f.getAttribute("data-f"));
+  selectedId = null;
+  document.querySelector("#appTitle span").textContent = FOLDERS[current].name + " - " + APP_NAME;
+  renderFolders();
+  renderList();
+});
+
+// ---------- Message list ----------
+var visible = [];
+
+function sorted(list) {
+  return list.slice().sort(function (a, b) {
+    var x, y;
+    if (sortKey === "date") { x = a._date ? a._date.getTime() : 0; y = b._date ? b._date.getTime() : 0; }
+    else if (sortKey === "from") { x = (a._sent ? a.to : a.from || "").toLowerCase(); y = (b._sent ? b.to : b.from || "").toLowerCase(); }
+    else { x = (a.subject || "").toLowerCase(); y = (b.subject || "").toLowerCase(); }
+    return x < y ? -sortDir : x > y ? sortDir : 0;
+  });
+}
+
+function renderList() {
+  visible = sorted(messagesIn(current));
+  var isSent = current === SENT;
+  var arrow = function (k) { return sortKey === k ? '<span class="arrow">' + (sortDir > 0 ? "&#9650;" : "&#9660;") + '</span>' : ""; };
+  var html = '<table><thead><tr>' +
+    '<th class="ic">' + svg("bang") + '</th><th class="ic">' + svg("clip") + '</th><th class="ic">' + svg("closed") + '</th>' +
+    '<th class="from" data-sort="from">' + (isSent ? "To" : "From") + arrow("from") + '</th>' +
+    '<th data-sort="subject">Subject' + arrow("subject") + '</th>' +
+    '<th class="date" data-sort="date">' + (isSent ? "Sent" : "Received") + arrow("date") + '</th></tr></thead><tbody>';
+  visible.forEach(function (m) {
+    html += '<tr data-id="' + esc(m._id) + '" class="' + (isRead(m) ? "" : "unread") + (m._id === selectedId ? " sel" : "") + '">' +
+      '<td class="ic">' + (m.important ? svg("bang") : "") + '</td>' +
+      '<td class="ic">' + (m.attachments && m.attachments.length ? svg("clip") : "") + '</td>' +
+      '<td class="ic">' + svg(isRead(m) ? "open" : "closed") + '</td>' +
+      '<td>' + esc(m._sent ? m.to : m.from) + '</td>' +
+      '<td>' + esc(m.subject || "(no subject)") + '</td>' +
+      '<td class="date">' + esc(fmtDate(m._date)) + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  if (!visible.length) html += '<div class="emptyList">There are no items in this view.</div>';
+  listEl.innerHTML = html;
+
+  if (!selectedMsg()) selectedId = null;
+  renderPreview();
+  updateStatus();
+  updateTools();
+}
+
+function selectedMsg() {
+  for (var i = 0; i < visible.length; i++) if (visible[i]._id === selectedId) return visible[i];
+  return null;
+}
+
+listEl.addEventListener("click", function (e) {
+  var th = e.target.closest("th[data-sort]");
+  if (th) {
+    var k = th.getAttribute("data-sort");
+    if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = k === "date" ? -1 : 1; }
+    renderList();
+    return;
+  }
+  var tr = e.target.closest("tr[data-id]");
+  if (tr) selectMsg(tr.getAttribute("data-id"));
+});
+
+function selectMsg(id) {
+  selectedId = id;
+  var m = selectedMsg();
+  if (m && !isRead(m)) { state.read[m._id] = true; save(); renderFolders(); }
+  renderList();
+  var row = listEl.querySelector("tr.sel");
+  if (row) row.scrollIntoView({ block: "nearest" });
+}
+
+// Arrow keys move through the list, Delete deletes
+listEl.addEventListener("keydown", function (e) {
+  if (!visible.length) return;
+  var i = -1;
+  for (var j = 0; j < visible.length; j++) if (visible[j]._id === selectedId) i = j;
+  if (e.key === "ArrowDown") { e.preventDefault(); selectMsg(visible[Math.min(visible.length - 1, i + 1)]._id); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); selectMsg(visible[Math.max(0, i - 1)]._id); }
+  else if (e.key === "Delete" && selectedId) { deleteSelected(); }
+});
+
+// ---------- Preview ----------
+function linkify(text) {
+  var out = esc(text);
+  // [text](url)
+  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (_, t, u) {
+    return '<a href="' + u + '" data-go="' + u + '">' + t + '</a>';
+  });
+  // bare https:// addresses not already inside a link
+  out = out.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, function (_, pre, u) {
+    return pre + '<a href="' + u + '" data-go="' + u + '">' + u + '</a>';
+  });
+  return out;
+}
+
+function renderPreview() {
+  var m = selectedMsg();
+  var head = document.getElementById("pvHead"), body = document.getElementById("pvBody");
+  if (!m) {
+    head.style.display = "none";
+    body.innerHTML = '<div class="pvEmpty">' + (visible.length ? "Select a message to read it." : "") + '</div>';
+    return;
+  }
+  head.style.display = "";
+  var from = m._sent ? VISITOR_NAME + " &lt;" + esc(VISITOR_ADDRESS) + "&gt;"
+                     : esc(m.from) + (m.address ? " &lt;" + esc(m.address) + "&gt;" : "");
+  var to = m._sent ? esc(m.to) : esc(VISITOR_NAME) + " &lt;" + esc(VISITOR_ADDRESS) + "&gt;";
+  var att = "";
+  if (m.attachments && m.attachments.length) {
+    att = '<div id="pvAttach"><b>Attached:</b>' + m.attachments.map(function (a) {
+      return '<a class="attach" href="' + esc(a.link || "#") + '" data-go="' + esc(a.link || "") + '">' + svg("file") + esc(a.name) + '</a>';
+    }).join("") + '</div>';
+  }
+  head.innerHTML =
+    '<div><b>From:</b>' + from + '</div>' +
+    '<div><b>Date:</b>' + esc(fmtDate(m._date, true)) + '</div>' +
+    '<div><b>To:</b>' + to + '</div>' +
+    '<div><b>Subject:</b><span class="subj">' + esc(m.subject || "(no subject)") + '</span></div>' + att;
+  body.innerHTML = linkify(m.body || "");
+  body.scrollTop = 0;
+}
+
+// Links in messages and attachments follow the OPEN_IN setting
+document.getElementById("preview").addEventListener("click", function (e) {
+  var a = e.target.closest("[data-go]");
+  if (!a) return;
+  e.preventDefault();
+  go(a.getAttribute("data-go"));
+});
+
+function updateStatus() {
+  var unread = visible.filter(function (m) { return !isRead(m); }).length;
+  document.getElementById("statusText").textContent =
+    visible.length + " message(s), " + unread + " unread";
+}
+
+// ---------- Draggable divider between list and preview ----------
+document.getElementById("splitter").addEventListener("pointerdown", function (e) {
+  e.preventDefault();
+  var wrap = document.getElementById("listWrap");
+  var pane = document.getElementById("rightPane");
+  var top = pane.getBoundingClientRect().top;
+  function move(ev) {
+    var h = Math.max(80, Math.min(pane.clientHeight - 100, ev.clientY - top));
+    wrap.style.flex = "0 0 " + h + "px";
+  }
+  function up() {
+    document.removeEventListener("pointermove", move);
+    document.removeEventListener("pointerup", up);
+  }
+  document.addEventListener("pointermove", move);
+  document.addEventListener("pointerup", up);
+});
+
+// ---------- Delete ----------
+function deleteSelected() {
+  var m = selectedMsg();
+  if (!m) return;
+  var idx = visible.indexOf(m);
+  if (current === DELETED || DELETED < 0) {
+    state.purged[m._id] = true;
+  } else {
+    state.deleted[m._id] = true;
+    state.read[m._id] = true;
+  }
+  save();
+  var next = visible[idx + 1] || visible[idx - 1];
+  renderFolders();
+  if (next && next !== m) selectMsg(next._id);
+  else { selectedId = null; renderList(); }
+}
+
+// ---------- Dialogs ----------
+function dialog(html, cls) {
+  var ov = document.createElement("div");
+  ov.className = "overlay";
+  ov.innerHTML = '<div class="dlg raised ' + (cls || "") + '">' + html + '</div>';
+  document.body.appendChild(ov);
+  ov.querySelectorAll("[data-close]").forEach(function (b) {
+    b.addEventListener("click", function () { ov.remove(); });
+  });
+  return ov;
+}
+
+function alertBox(title, text, icon) {
+  var ov = dialog(
+    '<div class="dlgTitle"><span>' + esc(title) + '</span><button class="xBtn raised" data-close>&times;</button></div>' +
+    '<div class="msgRow">' + svg(icon || "info") + '<div>' + esc(text) + '</div></div>' +
+    '<div class="dlgBtns" style="justify-content:center"><button class="btn raised" data-close>OK</button></div>', "small");
+  ov.querySelector(".btn").focus();
+}
+
+function compose(opts) {
+  var quote = "";
+  if (opts.quote) {
+    var q = opts.quote;
+    quote = "\n\n----- Original Message -----\nFrom: " + (q._sent ? VISITOR_NAME : q.from) +
+      "\nSent: " + fmtDate(q._date, true) + "\nSubject: " + q.subject + "\n\n" +
+      String(q.body || "").replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, "$1");
+  }
+  var ov = dialog(
+    '<div class="dlgTitle">' + svg("app") + '<span>' + esc(opts.subject || "New Message") + '</span>' +
+      '<button class="xBtn raised" data-close>&times;</button></div>' +
+    '<div class="fields">' +
+      '<span>From:</span><div class="fixed">' + esc(VISITOR_NAME) + ' &lt;' + esc(VISITOR_ADDRESS) + '&gt;</div>' +
+      '<span>To:</span><input class="sunken" data-f="to" spellcheck="false">' +
+      '<span>Subject:</span><input class="sunken" data-f="subject">' +
+    '</div>' +
+    '<textarea class="composeBody sunken" data-f="body"></textarea>' +
+    '<div class="dlgBtns"><button class="btn raised" data-send>Send</button><button class="btn raised" data-close>Cancel</button></div>');
+  var to = ov.querySelector('[data-f="to"]'), subj = ov.querySelector('[data-f="subject"]'), body = ov.querySelector('[data-f="body"]');
+  to.value = SEND_MODE === "mailto" && CONTACT_EMAIL && !opts.to ? CONTACT_EMAIL : (opts.to || "");
+  subj.value = opts.subject || "";
+  body.value = quote;
+  subj.addEventListener("input", function () {
+    ov.querySelector(".dlgTitle span").textContent = subj.value || "New Message";
+  });
+  (to.value ? body : to).focus();
+  body.setSelectionRange(0, 0);
+
+  ov.querySelector("[data-send]").addEventListener("click", function () {
+    if (!to.value.trim()) { alertBox(APP_NAME, "The message must have at least one name in the To box.", "warn"); return; }
+    if (SEND_MODE === "mailto") {
+      location.href = "mailto:" + encodeURIComponent(CONTACT_EMAIL || to.value.trim()) +
+        "?subject=" + encodeURIComponent(subj.value) + "&body=" + encodeURIComponent(body.value);
+      ov.remove();
+      return;
+    }
+    var m = { _sent: true, _id: "sent|" + Date.now(), to: to.value.trim(), subject: subj.value,
+              body: body.value, date: new Date().toISOString() };
+    m._date = new Date(m.date);
+    state.sent.push(m);
+    save();
+    ov.remove();
+    progress("Sending message...", function () {
+      renderFolders();
+      renderList();
+    });
+  });
+}
+
+// Progress bar dialog, then callback
+function progress(text, done) {
+  var ov = dialog(
+    '<div class="dlgTitle"><span>' + esc(APP_NAME) + '</span></div>' +
+    '<div class="msgRow">' + svg("sendrecv").replace("<svg", '<svg style="width:32px;height:32px"') + '<div>' + esc(text) + '</div></div>' +
+    '<div class="bar sunken"><div></div></div>', "small");
+  var bar = ov.querySelector(".bar div"), p = 0;
+  var t = setInterval(function () {
+    p += 8 + Math.random() * 18;
+    bar.style.width = Math.min(100, p) + "%";
+    if (p >= 100) { clearInterval(t); setTimeout(function () { ov.remove(); done(); }, 250); }
+  }, 120);
+}
+
+function sendReceive() {
+  progress("Checking for new messages...", function () {
+    var pending = messages.filter(function (m) { return m.arriveAfter && !state.arrived[m._id]; });
+    if (!deliver(pending)) alertBox(APP_NAME, "There are no new messages.", "info");
+  });
+}
+
+function findMessage() {
+  var ov = dialog(
+    '<div class="dlgTitle"><span>Find Message</span><button class="xBtn raised" data-close>&times;</button></div>' +
+    '<div class="fields"><span>Look for:</span><input class="sunken" data-f="q"></div>' +
+    '<div class="dlgBtns"><button class="btn raised" data-find>Find Now</button><button class="btn raised" data-close>Cancel</button></div>', "small");
+  var q = ov.querySelector("input");
+  q.focus();
+  function run() {
+    var words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return;
+    for (var fi = 0; fi < FOLDERS.length; fi++) {
+      var hits = messagesIn(fi).filter(function (m) {
+        var text = [m.from, m.to, m.subject, m.body].join(" ").toLowerCase();
+        return words.every(function (w) { return text.indexOf(w) !== -1; });
+      });
+      if (hits.length) {
+        ov.remove();
+        current = fi;
+        document.querySelector("#appTitle span").textContent = FOLDERS[current].name + " - " + APP_NAME;
+        renderFolders();
+        visible = sorted(messagesIn(current));
+        selectMsg(hits[0]._id);
+        listEl.focus();
+        return;
+      }
+    }
+    ov.remove();
+    alertBox("Find Message", "No messages were found.", "info");
+  }
+  ov.querySelector("[data-find]").addEventListener("click", run);
+  q.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); run(); } });
+}
+
+// ---------- New mail notice ----------
+var toast = document.getElementById("toast");
+var toastTimer;
+function showToast(n) {
+  toast.innerHTML = '<div class="dlgTitle"><span>' + esc(APP_NAME) + '</span></div><div class="body">' + svg("closed") +
+    '<div>You have ' + n + ' new message' + (n > 1 ? "s" : "") + '.</div></div>';
+  toast.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { toast.classList.remove("on"); }, 6000);
+}
+toast.addEventListener("click", function () {
+  toast.classList.remove("on");
+  current = 0;
+  document.querySelector("#appTitle span").textContent = FOLDERS[current].name + " - " + APP_NAME;
+  renderFolders();
+  renderList();
+});
+
+// ---------- Help menu ----------
+var helpMenu = document.getElementById("helpMenu");
+helpMenu.addEventListener("click", function (e) {
+  e.stopPropagation();
+  var item = e.target.closest("[data-help]");
+  if (!item) { helpMenu.classList.toggle("open"); return; }
+  helpMenu.classList.remove("open");
+  if (item.getAttribute("data-help") === "about") {
+    alertBox("About " + APP_NAME, APP_NAME + " version 6.0. Use Help > Reset Mailbox to put every message back the way it started.", "info");
+  } else {
+    confirmReset();
+  }
+});
+document.addEventListener("click", function () { helpMenu.classList.remove("open"); });
+
+// Put the mailbox back to how it is in the settings: restores deleted mail,
+// marks everything unread again, clears sent mail and re-arms delayed messages.
+function confirmReset() {
+  var ov = dialog(
+    '<div class="dlgTitle"><span>Reset Mailbox</span><button class="xBtn raised" data-close>&times;</button></div>' +
+    '<div class="msgRow">' + svg("warn") + '<div>This will restore all deleted messages, mark everything as unread, ' +
+      'and remove any messages you have sent.<br><br>Are you sure you want to reset the mailbox?</div></div>' +
+    '<div class="dlgBtns" style="justify-content:center"><button class="btn raised" data-yes>Yes</button>' +
+    '<button class="btn raised" data-close>No</button></div>', "small");
+  ov.querySelector("[data-yes]").addEventListener("click", function () {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    location.reload();
+  });
+  ov.querySelector("[data-close]:not(.xBtn)").focus();
+}
+
+// ---------- Start ----------
+renderFolders();
+renderList();
+listEl.focus();
+</script>
+</body>
+</html>

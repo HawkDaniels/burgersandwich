@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<meta name="format-detection" content="telephone=no">
+<title>bPhone</title>
+<style>
+  :root {
+    --icon: 60px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; overscroll-behavior: none; }
+  body { font-family: var(--font); color: #fff; -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none; -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+  button { font-family: inherit; }
+
+  /* The phone fills the screen on a real phone... */
+  #phone { position: fixed; inset: 0; overflow: hidden; background: #000 center / cover no-repeat;
+    display: flex; flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+
+  /* ...and is drawn as a phone in a frame on a computer */
+  #statusBar, #homeBar { display: none; }
+  @media (min-width: 600px) and (min-height: 600px) {
+    body { background: radial-gradient(circle at 50% 40%, #2a2a2e, #0b0b0d); }
+    #phone { inset: auto; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: 390px; height: min(844px, 94vh); border-radius: 54px; padding: 0;
+      box-shadow: 0 0 0 11px #111, 0 0 0 13px #3a3a3c, 0 30px 80px rgba(0,0,0,0.6); }
+    #statusBar { display: flex; }
+    #homeBar { display: block; }
+  }
+
+  /* Status bar (only shown in the computer frame - a real phone has its own) */
+  #statusBar { height: 50px; flex: 0 0 auto; align-items: center; justify-content: space-between;
+    padding: 6px 30px 0 34px; font-weight: 600; font-size: 16px; position: relative; z-index: 5; }
+  #island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 122px; height: 35px;
+    background: #000; border-radius: 20px; }
+  .sbIcons { display: flex; gap: 6px; align-items: center; }
+  .sbIcons svg { height: 12px; }
+  #homeBar { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: 134px; height: 5px;
+    border-radius: 3px; background: rgba(255,255,255,0.85); z-index: 30; }
+
+  /* Pages of apps */
+  #pages { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  #pages::-webkit-scrollbar { display: none; }
+  .page { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; padding: 14px 22px 0;
+    display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; row-gap: 22px; column-gap: 8px;
+    align-content: start; }
+
+  /* Calendar widget */
+  .widget { grid-column: 1 / -1; border-radius: 22px; padding: 12px 14px 10px; display: flex; gap: 12px;
+    background: #fff; color: #1f1f1f; box-shadow: 0 2px 8px rgba(0,0,0,0.18); cursor: pointer; }
+  .calPart { flex: 1 1 0; min-width: 0; }
+  .widget.noEvents .calPart { flex: 1 1 auto; }
+  .calMonth { font-size: 15px; font-weight: 600; color: #1f1f1f; margin: 0 0 4px 4px; }
+  .calGrid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 1px; text-align: center; }
+  .calGrid .dow { font-size: 9.5px; font-weight: 600; color: #747775; padding-bottom: 2px; }
+  .calGrid .d { position: relative; font-size: 11px; line-height: 17px; height: 17px; color: #1f1f1f;
+    font-variant-numeric: tabular-nums; }
+  .calGrid .d.other { color: #b0b3b2; }
+  .calGrid .d.today span { display: inline-block; width: 17px; height: 17px; border-radius: 50%;
+    background: #0b57d0; color: #fff; font-weight: 600; }
+  .calGrid .d.has::after { content: ""; position: absolute; left: 50%; bottom: -1px; width: 3px; height: 3px;
+    margin-left: -1.5px; border-radius: 50%; background: #0b57d0; }
+  .calGrid .d.today.has::after { display: none; }
+  .widget.noEvents .calGrid .d, .widget.noEvents .calGrid .d.today span { height: 21px; line-height: 21px; width: auto; }
+  .widget.noEvents .calGrid .d.today span { width: 21px; }
+
+  .evPart { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 4px; overflow: hidden;
+    border-left: 1px solid #e3e3e3; padding-left: 12px; }
+  .evDay { font-size: 11px; font-weight: 600; color: #0b57d0; margin-top: 2px; }
+  .evDay:not(:first-child) { margin-top: 6px; }
+  .evDay.later { color: #444746; }
+  .ev { display: flex; gap: 6px; padding: 4px 6px; border-radius: 6px; background: #eef3fd; min-width: 0; }
+  .ev i { flex: 0 0 3px; border-radius: 2px; }
+  .ev div { min-width: 0; }
+  .ev b { display: block; font-size: 11.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ev small { display: block; font-size: 10px; color: #444746; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .evNone { font-size: 12px; color: #747775; margin-top: 4px; }
+
+  /* App icons */
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; cursor: pointer; }
+  .icon { position: relative; width: var(--icon); height: var(--icon); border-radius: 22.5%; display: flex;
+    align-items: center; justify-content: center; overflow: visible; transition: transform 0.12s, filter 0.12s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  .icon > .art { position: absolute; inset: 0; border-radius: 22.5%; overflow: hidden; display: flex;
+    align-items: center; justify-content: center; background-size: cover; background-position: center; }
+  .icon svg { width: 58%; height: 58%; }
+  .app:active .icon, .app.pressed .icon { transform: scale(0.9); filter: brightness(0.75); }
+  .label { font-size: 12px; text-align: center; max-width: 100%; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+  .badge { position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px;
+    background: #ff3b30; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .badge:empty { display: none; }
+  .cal { position: absolute; inset: 0; background: #fff; border-radius: 22.5%; display: flex; flex-direction: column;
+    align-items: center; color: #000; }
+  .cal b { font-size: 10px; color: #ff3b30; font-weight: 600; margin-top: 7px; letter-spacing: 0.3px; }
+  .cal span { font-size: 32px; font-weight: 300; line-height: 1; margin-top: 1px; }
+
+  /* Page dots and dock */
+  #dock { margin: 12px 12px 12px; padding: 14px 16px; border-radius: 32px; flex: 0 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 8px; justify-items: center;
+    background: rgba(255,255,255,0.22); -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8); }
+  #dock .label { display: none; }
+  @media (min-width: 600px) and (min-height: 600px) { #dock { margin-bottom: 22px; } }
+
+  /* Launch animation */
+  #launch { position: absolute; z-index: 20; border-radius: 22.5%; pointer-events: none; display: none;
+    transition: all 0.32s cubic-bezier(.2,.8,.2,1); }
+
+  /* Alert */
+  #alertWrap { position: absolute; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3); }
+  #alertWrap.on { display: flex; }
+  .alert { width: 270px; border-radius: 14px; overflow: hidden; text-align: center; color: #fff;
+    background: rgba(40,40,42,0.85); -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);
+    animation: pop 0.2s ease-out; }
+  .alert h3 { margin: 20px 16px 4px; font-size: 17px; font-weight: 600; }
+  .alert p { margin: 0 16px 18px; font-size: 13px; line-height: 1.35; }
+  .alert button { width: 100%; border: none; border-top: 0.5px solid rgba(255,255,255,0.2); background: none;
+    color: #0a84ff; font-size: 17px; padding: 12px; font-weight: 600; }
+  @keyframes pop { from { transform: scale(1.15); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  /* ---------- Call screen ---------- */
+  #call { position: absolute; inset: 0; z-index: 50; display: none; flex-direction: column; align-items: center;
+    padding: calc(env(safe-area-inset-top) + 70px) 30px calc(env(safe-area-inset-bottom) + 50px);
+    background: rgba(20,20,22,0.7); -webkit-backdrop-filter: blur(40px) saturate(1.4); backdrop-filter: blur(40px) saturate(1.4);
+    animation: slideIn 0.35s ease-out; }
+  #call.on { display: flex; }
+  @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(#a5a5ab, #828289) center / cover;
+    display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 500; margin-bottom: 16px; }
+  #callName { font-size: 32px; font-weight: 400; text-align: center; line-height: 1.15; }
+  #callSub { margin-top: 8px; font-size: 17px; opacity: 0.75; text-align: center; min-height: 22px;
+    font-variant-numeric: tabular-nums; }
+  .spacer { flex: 1; }
+  .callBtns { width: 100%; max-width: 300px; display: flex; justify-content: space-between; }
+  .round { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; }
+  .round button { width: 76px; height: 76px; border-radius: 50%; border: none; display: flex; align-items: center;
+    justify-content: center; color: #fff; cursor: pointer; }
+  .round button svg { width: 34px; height: 34px; }
+  .decline button { background: #ff3b30; }
+  .decline button svg { transform: rotate(135deg); }
+  .accept button { background: #34c759; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(52,199,89,0.6); } 50% { box-shadow: 0 0 0 14px rgba(52,199,89,0); } }
+
+  #inCall { display: none; flex-direction: column; align-items: center; width: 100%; }
+  #call.active #inCall { display: flex; }
+  #call.active #incoming { display: none; }
+  .grid6 { display: grid; grid-template-columns: repeat(3, 76px); justify-content: space-between; row-gap: 22px;
+    width: 100%; max-width: 300px; margin-bottom: 40px; }
+  .grid6 .round button { background: rgba(255,255,255,0.18); }
+  .grid6 .round button.on { background: #fff; color: #000; }
+  .grid6 .round button:disabled { opacity: 0.4; }
+  .grid6 .round.link button { background: #0a84ff; }
+  .grid6 .round span { max-width: 90px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #endBtn { background: #ff3b30; }
+  #endBtn svg { transform: rotate(135deg); }
+  #incoming { width: 100%; display: flex; justify-content: center; }
+</style>
+</head>
+<body>
+
+<script>
+/* ============================================================
+   EDIT THESE SETTINGS
+   ============================================================ */
+
+// Background: an image path ("images/wallpaper.jpg") or "" for the built-in gradient.
+var WALLPAPER = "";
+
+// ------------------------------------------------------------
+// CALENDAR WIDGET at the top of the first page.
+// Shows this month with today highlighted. Days with events get a small dot.
+// ------------------------------------------------------------
+var SHOW_CALENDAR_WIDGET = true;
+var CALENDAR_LINK = "";         // where tapping the month opens ("" = nothing)
+var WEEK_STARTS_MONDAY = false;
+
+// Upcoming events listed on the right half. false = the month fills the widget.
+var SHOW_EVENTS = true;
+var MAX_EVENTS = 2;             // how many show in the list (more makes the widget taller)
+//   date  - "today", "tomorrow", "+3" (days from today) or "2026-10-31"
+//   time  - any text, e.g. "7:00 PM" or "All day" (optional)
+//   title - event name
+//   color - the stripe on the left (optional)
+//   link  - where tapping the event goes (optional)
+var EVENTS = [
+  { date: "today",    time: "7:00 PM",  title: "Burger night", color: "#f4511e", link: "https://burgersandwich.jp" },
+  { date: "tomorrow", time: "All day",  title: "Site update",  color: "#0b57d0", link: "desktop.htm" },
+  { date: "+4",       time: "10:30 AM", title: "Check email",  color: "#33b679", link: "inbox.htm" },
+  { date: "2026-10-31", time: "8:00 PM", title: "Halloween",  color: "#8e24aa" }
+];
+
+// Where links open: "top" (whole window), "self" (this frame), "newtab"
+var OPEN_IN = "top";
+
+// ------------------------------------------------------------
+// APPS
+//   name    - label under the icon
+//   glyph   - built-in symbol: phone, messages, mail, globe, camera, photos,
+//             music, video, maps, notes, clock, calendar, settings, terminal,
+//             desktop, folder, game, star, heart, user, cart
+//   image   - your own icon picture instead of a glyph (optional)
+//   color   - icon background: one color "#34c759" or two for a gradient
+//             ["#5ac8fa", "#007aff"]
+//   link    - where tapping goes
+//   alert   - instead of a link, pop up a message: { title: "...", text: "..." }
+//   action  - "call" makes the incoming call happen right away (for testing)
+//   badge   - red number in the corner (optional)
+//   missedCalls - true adds a red badge here for each missed/declined call
+// ------------------------------------------------------------
+var PAGES = [
+  [
+    { name: "Terminal", glyph: "terminal", color: ["#3a3a3c", "#111"], link: "terminal.htm" },
+    { name: "Media", glyph: "video", color: ["#aa5cc3", "#00a4dc"], link: "jellyfin.htm" },
+    { name: "Desktop", glyph: "desktop", color: ["#1abc9c", "#008080"], link: "desktop.htm" },
+    { name: "Mail", glyph: "mail", color: ["#5ac8fa", "#007aff"], link: "inbox.htm", badge: 3 },
+    { name: "Photos", glyph: "photos", color: ["#fff", "#f2f2f7"], link: "https://example.com/photos" },
+    { name: "Music", glyph: "music", color: ["#ff6b7f", "#fa2d48"], link: "https://example.com/music" },
+    { name: "Maps", glyph: "maps", color: ["#7ed67e", "#30b350"], link: "https://example.com/map" },
+    { name: "Calendar", glyph: "calendar", link: "https://example.com/calendar" },
+    { name: "Notes", glyph: "notes", color: ["#ffe57f", "#ffd52e"],
+      alert: { title: "Notes", text: "You don't have any notes yet." } },
+    { name: "Clock", glyph: "clock", color: ["#1c1c1e", "#000"], link: "https://example.com/clock" },
+    { name: "Games", glyph: "game", color: ["#ff9f0a", "#ff375f"], link: "https://example.com/games" },
+    { name: "Settings", glyph: "settings", color: ["#9a9aa0", "#636366"],
+      alert: { title: "Settings", text: "Settings are managed by your administrator." } }
+  ],
+  [
+    { name: "Food", glyph: "cart", color: ["#ffb340", "#ff7a00"], link: "https://burgersandwich.jp" },
+    { name: "Favorites", glyph: "star", color: ["#ffd60a", "#ff9f0a"], link: "https://example.com/favorites" },
+    { name: "Files", glyph: "folder", color: ["#64d2ff", "#0a84ff"], link: "https://example.com/files" },
+    { name: "Health", glyph: "heart", color: ["#fff", "#f2f2f7"], link: "https://example.com/health" }
+  ]
+];
+
+// The bar at the bottom (up to 4 apps, no labels).
+var DOCK = [
+  { name: "Phone", glyph: "phone", color: ["#65e07b", "#34c759"], action: "call", missedCalls: true },
+  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "https://example.com/messages" },
+  { name: "Browser", glyph: "globe", color: ["#5ac8fa", "#0a6cff"], link: "https://burgersandwich.jp" },
+  { name: "Camera", glyph: "camera", color: ["#c7c7cc", "#8e8e93"],
+    alert: { title: "Camera", text: "Camera access is not available." } }
+];
+
+// ------------------------------------------------------------
+// INCOMING CALL
+// ------------------------------------------------------------
+var CALL_ENABLED = true;
+var CALL_MIN_SECONDS = 10;      // the call comes at a random time between these
+var CALL_MAX_SECONDS = 180;
+var CALL_NAME = "Unknown";      // caller's name
+var CALL_SUBTITLE = "mobile";   // small text under the name while ringing
+var CALL_PHOTO = "";            // caller photo path, or "" for initials
+var RING_SECONDS = 30;          // how long it rings before becoming a missed call
+var CALL_AGAIN = false;         // true = after a call ends, schedule another one
+
+// What plays when the call is answered. The call hangs up when it finishes.
+var CALL_AUDIO = "audio/call.mp3";
+// If the audio file is missing or fails, the phone reads this text aloud instead
+// ("" to just end the call).
+var CALL_SPEECH = "Hello? Hello? Can you hear me? I'll call you back.";
+
+// Optional link during the call. Shows as a blue button on the call screen.
+var CALL_LINK = "https://burgersandwich.jp";
+var CALL_LINK_LABEL = "Open Link";
+// true = go to CALL_LINK automatically when the call ends
+var REDIRECT_WHEN_CALL_ENDS = false;
+
+/* ============================================================
+   PAGE CODE (no need to edit below)
+   ============================================================ */
+</script>
+
+<div id="phone">
+  <div id="statusBar">
+    <span id="sbTime">9:41</span>
+    <div id="island"></div>
+    <div class="sbIcons">
+      <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#fff"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+      <svg viewBox="0 0 16 12"><path d="M8 11.5l2.3-2.6a3.3 3.3 0 00-4.6 0zM3.4 6.6a6.6 6.6 0 019.2 0l1.6-1.7a9 9 0 00-12.4 0zM.3 3.2a11 11 0 0115.4 0L16 2.9A12 12 0 000 2.9z" fill="#fff"/></svg>
+      <svg viewBox="0 0 27 12"><rect x="0.5" y="0.5" width="23" height="11" rx="3" fill="none" stroke="rgba(255,255,255,.5)"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="#fff"/><path d="M25 4v4a2 2 0 000-4z" fill="rgba(255,255,255,.5)"/></svg>
+    </div>
+  </div>
+  <div id="pages"></div>
+  <div id="dock"></div>
+  <div id="homeBar"></div>
+  <div id="launch"></div>
+  <div id="alertWrap"><div class="alert"><h3 id="alertTitle"></h3><p id="alertText"></p><button id="alertOk">OK</button></div></div>
+
+  <div id="call">
+    <div class="avatar" id="callAvatar"></div>
+    <div id="callName"></div>
+    <div id="callSub"></div>
+    <div class="spacer"></div>
+    <div id="inCall">
+      <div class="grid6">
+        <div class="round"><button id="muteBtn"></button><span>mute</span></div>
+        <div class="round"><button class="toggle" data-g="keypad"></button><span>keypad</span></div>
+        <div class="round"><button class="toggle" data-g="speaker"></button><span>speaker</span></div>
+        <div class="round"><button disabled data-g="plus"></button><span>add call</span></div>
+        <div class="round link" id="linkWrap"><button id="linkBtn" data-g="link"></button><span id="linkLabel"></span></div>
+        <div class="round"><button disabled data-g="user"></button><span>contacts</span></div>
+      </div>
+      <div class="round"><button id="endBtn"></button></div>
+    </div>
+    <div id="incoming">
+      <div class="callBtns">
+        <div class="round decline"><button id="declineBtn"></button><span>Decline</span></div>
+        <div class="round accept"><button id="acceptBtn"></button><span>Accept</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- Glyphs (white line drawings, 24x24) ----------
+var G = {
+  phone: '<path d="M6.6 2.5l2.6 3.2c.4.5.4 1.2-.1 1.7L7.6 8.8a12 12 0 007.6 7.6l1.4-1.5c.5-.5 1.2-.5 1.7-.1l3.2 2.6c.5.4.6 1.2.1 1.7l-1.5 1.7c-.7.8-1.9 1.1-2.9.7C10.4 19.4 4.6 13.6 2.5 6.8c-.3-1 0-2.2.7-2.9l1.7-1.5c.5-.5 1.3-.4 1.7.1z" fill="#fff"/>',
+  messages: '<path d="M12 3C6.5 3 2 6.7 2 11.2c0 2.6 1.5 4.9 3.8 6.4L5 21l4-2.1c1 .2 2 .4 3 .4 5.5 0 10-3.7 10-8.2S17.5 3 12 3z" fill="#fff"/>',
+  mail: '<rect x="2.5" y="5" width="19" height="14" rx="2" fill="#fff"/><path d="M3 6l9 7 9-7" fill="none" stroke="#1d7bf5" stroke-width="1.6"/>',
+  globe: '<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="1.6"/><ellipse cx="12" cy="12" rx="4" ry="9" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M3 12h18M4.5 7.5h15M4.5 16.5h15" stroke="#fff" stroke-width="1.6"/>',
+  camera: '<path d="M4 7h3l1.6-2.2h6.8L17 7h3a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0120 19H4a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 014 7z" fill="#2c2c2e"/><circle cx="12" cy="12.8" r="4" fill="#8e8e93" stroke="#fff" stroke-width="1.3"/>',
+  photos: '<g transform="translate(12 12)"><ellipse rx="3" ry="6" cy="-4.5" fill="#ff9f0a" opacity=".9"/><ellipse rx="3" ry="6" cy="-4.5" fill="#ffd60a" opacity=".9" transform="rotate(45)"/><ellipse rx="3" ry="6" cy="-4.5" fill="#34c759" opacity=".9" transform="rotate(90)"/><ellipse rx="3" ry="6" cy="-4.5" fill="#5ac8fa" opacity=".9" transform="rotate(135)"/><ellipse rx="3" ry="6" cy="-4.5" fill="#0a84ff" opacity=".9" transform="rotate(180)"/><ellipse rx="3" ry="6" cy="-4.5" fill="#bf5af2" opacity=".9" transform="rotate(225)"/><ellipse rx="3" ry="6" cy="-4.5" fill="#ff375f" opacity=".9" transform="rotate(270)"/><ellipse rx="3" ry="6" cy="-4.5" fill="#ff453a" opacity=".9" transform="rotate(315)"/></g>',
+  music: '<path d="M9 17.5V6l11-2.5v11.5" fill="none" stroke="#fff" stroke-width="2"/><ellipse cx="6.5" cy="17.5" rx="3" ry="2.4" fill="#fff"/><ellipse cx="17.5" cy="15" rx="3" ry="2.4" fill="#fff"/>',
+  video: '<rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M10 9l5 3-5 3z" fill="#fff"/>',
+  maps: '<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0113 0c0 4.8-6.5 11-6.5 11z" fill="#fff"/><circle cx="12" cy="10" r="2.6" fill="#30b350"/>',
+  notes: '<rect x="4" y="3" width="16" height="18" rx="2" fill="#fff"/><rect x="4" y="3" width="16" height="4" rx="2" fill="#ffd52e"/><path d="M7 11h10M7 14.5h10M7 18h6" stroke="#c7c7cc" stroke-width="1.4"/>',
+  clock: '<circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M12 6.5V12l3.5 2.5" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1" fill="#ff9f0a"/>',
+  settings: '<g fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></g><circle cx="12" cy="12" r="6.3" fill="none" stroke="#fff" stroke-width="2.2"/>',
+  terminal: '<path d="M5 7l5 5-5 5" fill="none" stroke="#34c759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17h7" stroke="#34c759" stroke-width="2.2" stroke-linecap="round"/>',
+  desktop: '<rect x="2.5" y="4" width="19" height="13" rx="1.5" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M9 21h6M12 17v4" stroke="#fff" stroke-width="1.8"/><rect x="5" y="7" width="4" height="3" fill="#fff"/><rect x="5" y="11.5" width="4" height="3" fill="#fff"/>',
+  folder: '<path d="M2.5 6.5A1.5 1.5 0 014 5h5l2 2h9a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0120 19H4a1.5 1.5 0 01-1.5-1.5z" fill="#fff"/>',
+  game: '<path d="M7 8h10a5 5 0 014.8 6.4l-.6 2a2.5 2.5 0 01-4.3.8L15 15H9l-1.9 2.2a2.5 2.5 0 01-4.3-.8l-.6-2A5 5 0 017 8z" fill="#fff"/><path d="M7.5 10.5v3M6 12h3" stroke="#ff5a3c" stroke-width="1.5"/><circle cx="16" cy="11" r="1" fill="#ff5a3c"/><circle cx="17.5" cy="13" r="1" fill="#ff5a3c"/>',
+  star: '<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" fill="#fff"/>',
+  heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0112 7.6 4.3 4.3 0 0119.5 10c0 5.4-7.5 10-7.5 10z" fill="#ff375f"/>',
+  user: '<circle cx="12" cy="8.5" r="3.8" fill="#fff"/><path d="M4.5 20c.5-4 3.6-6 7.5-6s7 2 7.5 6z" fill="#fff"/>',
+  cart: '<path d="M3 4h2.5l2.2 10.5h10.5L20.5 7H7" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.6" fill="#fff"/><circle cx="17" cy="19" r="1.6" fill="#fff"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0012 0M12 17v4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 3l16 18" stroke="currentColor" stroke-width="1.8"/>',
+  keypad: '<g fill="currentColor"><circle cx="6" cy="5" r="1.8"/><circle cx="12" cy="5" r="1.8"/><circle cx="18" cy="5" r="1.8"/><circle cx="6" cy="11" r="1.8"/><circle cx="12" cy="11" r="1.8"/><circle cx="18" cy="11" r="1.8"/><circle cx="6" cy="17" r="1.8"/><circle cx="12" cy="17" r="1.8"/><circle cx="18" cy="17" r="1.8"/><circle cx="12" cy="22" r="1.5"/></g>',
+  speaker: '<path d="M3 9.5h4l5-4.5v14l-5-4.5H3z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  plus: '<path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  link: '<path d="M10 14a4 4 0 005.7 0l3.5-3.5a4 4 0 00-5.7-5.7L12 6.3M14 10a4 4 0 00-5.7 0l-3.5 3.5a4 4 0 005.7 5.7l1.5-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  ring: '<path d="M6.6 2.5l2.6 3.2c.4.5.4 1.2-.1 1.7L7.6 8.8a12 12 0 007.6 7.6l1.4-1.5c.5-.5 1.2-.5 1.7-.1l3.2 2.6c.5.4.6 1.2.1 1.7l-1.5 1.7c-.7.8-1.9 1.1-2.9.7C10.4 19.4 4.6 13.6 2.5 6.8c-.3-1 0-2.2.7-2.9l1.7-1.5c.5-.5 1.3-.4 1.7.1z" fill="currentColor"/>'
+};
+function glyph(name) { return '<svg viewBox="0 0 24 24">' + (G[name] || "") + '</svg>'; }
+
+function esc(t) {
+  return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+function go(url) {
+  if (!url || url === "#") return;
+  if (OPEN_IN === "newtab") window.open(url, "_blank");
+  else if (OPEN_IN === "self") window.location.href = url;
+  else top.location.href = url;
+}
+
+var phone = document.getElementById("phone");
+phone.style.backgroundImage = WALLPAPER ? "url('" + WALLPAPER + "')"
+  : "radial-gradient(120% 70% at 20% 0%, #ff8a5c 0%, transparent 55%), " +
+    "radial-gradient(100% 70% at 100% 30%, #c04ad6 0%, transparent 60%), " +
+    "radial-gradient(120% 80% at 30% 100%, #1f3fd6 0%, transparent 60%), linear-gradient(#3b1d78, #0d1449)";
+
+// ---------- Build the home screen ----------
+var allApps = [];
+var DAYS = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+
+function iconHtml(a) {
+  var bg = Array.isArray(a.color) ? "linear-gradient(" + a.color[0] + "," + a.color[1] + ")" : (a.color || "#8e8e93");
+  var inner;
+  if (a.image) inner = '<div class="art" style="background-image:url(\'' + esc(a.image) + '\')"></div>';
+  else if (a.glyph === "calendar") inner = '<div class="cal"><b class="calDay"></b><span class="calNum"></span></div>';
+  else inner = '<div class="art" style="background:' + bg + '">' + glyph(a.glyph) + '</div>';
+  return '<div class="icon">' + inner + '<div class="badge">' + (a.badge || "") + '</div></div>';
+}
+
+function appHtml(a) {
+  var k = allApps.length;
+  allApps.push(a);
+  return '<div class="app" data-k="' + k + '">' + iconHtml(a) + '<div class="label">' + esc(a.name) + '</div></div>';
+}
+
+var pagesEl = document.getElementById("pages");
+pagesEl.innerHTML = PAGES.map(function (page, i) {
+  var widget = (i === 0 && SHOW_CALENDAR_WIDGET) ? '<div class="widget" id="calWidget"></div>' : "";
+  return '<div class="page">' + widget + page.map(appHtml).join("") + '</div>';
+}).join("");
+document.getElementById("dock").innerHTML = DOCK.map(appHtml).join("");
+
+// ---------- Calendar widget ----------
+var MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December"];
+
+function dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+// Turn "today", "tomorrow", "+3" or "2026-10-31" into a date
+function eventDate(s) {
+  var today = dayStart(new Date());
+  s = String(s || "").trim().toLowerCase();
+  if (s === "today") return today;
+  if (s === "tomorrow") return new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+  var plus = s.match(/^\+(\d+)$/);
+  if (plus) return new Date(today.getFullYear(), today.getMonth(), today.getDate() + Number(plus[1]));
+  var ymd = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (ymd) return new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]));
+  var p = new Date(s);
+  return isNaN(p) ? null : dayStart(p);
+}
+
+var shownEvents = [];
+
+function renderWidget() {
+  var w = document.getElementById("calWidget");
+  if (!w) return;
+  var now = new Date(), today = dayStart(now);
+  var y = today.getFullYear(), m = today.getMonth();
+
+  // Which days this month have events
+  var marked = {};
+  EVENTS.forEach(function (ev) {
+    var d = eventDate(ev.date);
+    if (d) marked[d.toDateString()] = true;
+  });
+
+  // Month grid
+  var heads = WEEK_STARTS_MONDAY ? ["M", "T", "W", "T", "F", "S", "S"] : ["S", "M", "T", "W", "T", "F", "S"];
+  var first = new Date(y, m, 1);
+  var lead = (first.getDay() - (WEEK_STARTS_MONDAY ? 1 : 0) + 7) % 7;
+  var start = new Date(y, m, 1 - lead);
+  var daysInMonth = new Date(y, m + 1, 0).getDate();
+  var weeks = Math.ceil((lead + daysInMonth) / 7);
+  var grid = heads.map(function (h) { return '<div class="dow">' + h + '</div>'; }).join("");
+  for (var i = 0; i < weeks * 7; i++) {
+    var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    var cls = "d" + (d.getMonth() !== m ? " other" : "") +
+      (d.getTime() === today.getTime() ? " today" : "") + (marked[d.toDateString()] ? " has" : "");
+    grid += '<div class="' + cls + '"><span>' + d.getDate() + '</span></div>';
+  }
+  var html = '<div class="calPart"><div class="calMonth">' + MONTHS[m] + '</div><div class="calGrid">' + grid + '</div></div>';
+
+  // Upcoming events
+  if (SHOW_EVENTS) {
+    shownEvents = EVENTS
+      .map(function (ev) { return { ev: ev, d: eventDate(ev.date) }; })
+      .filter(function (x) { return x.d && x.d >= today; })
+      .sort(function (a, b) { return a.d - b.d; })
+      .slice(0, MAX_EVENTS);
+    var list = "", lastDay = "";
+    shownEvents.forEach(function (x, k) {
+      var diff = Math.round((x.d - today) / 86400000);
+      var label = diff === 0 ? "Today" : diff === 1 ? "Tomorrow"
+        : x.d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+      if (label !== lastDay) {
+        list += '<div class="evDay' + (diff === 0 ? "" : " later") + '">' + esc(label) + '</div>';
+        lastDay = label;
+      }
+      list += '<div class="ev" data-e="' + k + '"><i style="background:' + esc(x.ev.color || "#0b57d0") + '"></i><div>' +
+        '<b>' + esc(x.ev.title) + '</b>' + (x.ev.time ? '<small>' + esc(x.ev.time) + '</small>' : "") + '</div></div>';
+    });
+    html += '<div class="evPart">' + (list || '<div class="evDay">Today</div><div class="evNone">No upcoming events</div>') + '</div>';
+  }
+  w.className = "widget" + (SHOW_EVENTS ? "" : " noEvents");
+  w.innerHTML = html;
+}
+renderWidget();
+
+var calW = document.getElementById("calWidget");
+if (calW) calW.addEventListener("click", function (e) {
+  var ev = e.target.closest("[data-e]");
+  if (ev) { var x = shownEvents[ev.getAttribute("data-e")]; if (x && x.ev.link) go(x.ev.link); return; }
+  if (CALENDAR_LINK) go(CALENDAR_LINK);
+});
+
+
+// ---------- Clock ----------
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+var widgetDay = new Date().toDateString();
+function tick() {
+  var d = new Date();
+  var hm = ((d.getHours() % 12) || 12) + ":" + pad(d.getMinutes());
+  document.getElementById("sbTime").textContent = hm;
+  // Redraw the calendar when the date changes (e.g. left open past midnight)
+  if (d.toDateString() !== widgetDay) { widgetDay = d.toDateString(); renderWidget(); }
+  var days = document.querySelectorAll(".calDay"), nums = document.querySelectorAll(".calNum");
+  for (var i = 0; i < days.length; i++) { days[i].textContent = DAYS[d.getDay()].slice(0, 3); nums[i].textContent = d.getDate(); }
+}
+tick();
+setInterval(tick, 5000);
+
+// ---------- Tapping apps ----------
+var launch = document.getElementById("launch");
+
+function openApp(a, el) {
+  if (a.action === "call") { startCall(); return; }
+  if (a.alert) { showAlert(a.alert.title, a.alert.text); return; }
+  if (!a.link) return;
+  // Icon zooms to fill the screen, then the link opens
+  var icon = el.querySelector(".icon").getBoundingClientRect();
+  var box = phone.getBoundingClientRect();
+  var art = el.querySelector(".art, .cal");
+  launch.style.background = art ? getComputedStyle(art).background : "#000";
+  launch.style.transition = "none";
+  launch.style.display = "block";
+  launch.style.left = (icon.left - box.left) + "px";
+  launch.style.top = (icon.top - box.top) + "px";
+  launch.style.width = icon.width + "px";
+  launch.style.height = icon.height + "px";
+  launch.style.borderRadius = "22.5%";
+  launch.offsetWidth;
+  launch.style.transition = "";
+  launch.style.left = "0px"; launch.style.top = "0px";
+  launch.style.width = box.width + "px"; launch.style.height = box.height + "px";
+  launch.style.borderRadius = "0";
+  setTimeout(function () {
+    go(a.link);
+    // If the page didn't leave (e.g. new tab), put the home screen back
+    setTimeout(function () { launch.style.display = "none"; }, 600);
+  }, 330);
+}
+
+phone.addEventListener("click", function (e) {
+  var el = e.target.closest(".app");
+  if (!el) return;
+  openApp(allApps[el.getAttribute("data-k")], el);
+});
+
+// Coming back with the Back button: hide the zoom left over from leaving
+window.addEventListener("pageshow", function () { launch.style.display = "none"; });
+
+// ---------- Alerts ----------
+function showAlert(title, text) {
+  document.getElementById("alertTitle").textContent = title || "";
+  document.getElementById("alertText").textContent = text || "";
+  document.getElementById("alertWrap").classList.add("on");
+}
+document.getElementById("alertOk").addEventListener("click", function () {
+  document.getElementById("alertWrap").classList.remove("on");
+});
+
+// ---------- Sound ----------
+// iPhones only allow sound after the visitor has touched the page once, so the
+// ringtone is "unlocked" on the first tap anywhere.
+var actx = null;
+function unlockAudio() {
+  try {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === "suspended") actx.resume();
+    var b = actx.createBuffer(1, 1, 22050), s = actx.createBufferSource();
+    s.buffer = b; s.connect(actx.destination); s.start(0);
+  } catch (e) {}
+}
+document.addEventListener("touchend", unlockAudio, { passive: true });
+document.addEventListener("click", unlockAudio);
+
+var ringTimer = null;
+function ringOnce() {
+  if (!actx || actx.state !== "running") return;
+  var t0 = actx.currentTime;
+  var gain = actx.createGain();
+  gain.connect(actx.destination);
+  gain.gain.setValueAtTime(0, t0);
+  // Two short trills, like a phone ringing
+  for (var burst = 0; burst < 2; burst++) {
+    var s = t0 + burst * 0.45;
+    for (var i = 0; i < 8; i++) {
+      var on = s + i * 0.05;
+      gain.gain.setValueAtTime(0.12, on);
+      gain.gain.setValueAtTime(0, on + 0.03);
+    }
+  }
+  [880, 1046].forEach(function (f) {
+    var o = actx.createOscillator();
+    o.type = "sine";
+    o.frequency.value = f;
+    o.connect(gain);
+    o.start(t0);
+    o.stop(t0 + 1);
+  });
+}
+function startRinging() {
+  ringOnce();
+  ringTimer = setInterval(ringOnce, 2500);
+  if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+}
+function stopRinging() { clearInterval(ringTimer); ringTimer = null; }
+
+// ---------- Incoming call ----------
+var callEl = document.getElementById("call");
+var callSub = document.getElementById("callSub");
+var missed = 0;
+var callState = "idle";        // idle, ringing, active, ending
+var missTimer = null, durTimer = null, callStart = 0;
+var audio = null, speaking = false;
+
+document.getElementById("callName").textContent = CALL_NAME;
+var avatar = document.getElementById("callAvatar");
+if (CALL_PHOTO) avatar.style.backgroundImage = "url('" + CALL_PHOTO + "')";
+else avatar.textContent = (CALL_NAME.trim().split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2) || "?").toUpperCase();
+
+document.getElementById("acceptBtn").innerHTML = glyph("ring");
+document.getElementById("declineBtn").innerHTML = glyph("ring");
+document.getElementById("endBtn").innerHTML = glyph("ring");
+document.getElementById("muteBtn").innerHTML = glyph("mic");
+document.querySelectorAll("[data-g]").forEach(function (b) { b.innerHTML = glyph(b.getAttribute("data-g")); });
+document.getElementById("linkLabel").textContent = CALL_LINK_LABEL;
+if (!CALL_LINK) {
+  var lw = document.getElementById("linkWrap");
+  lw.classList.remove("link");
+  lw.querySelector("button").disabled = true;
+  lw.querySelector("button").innerHTML = glyph("video");
+  document.getElementById("linkLabel").textContent = "video";
+}
+
+// Preload the call audio so it starts instantly when answered
+if (CALL_AUDIO) {
+  audio = new Audio();
+  audio.preload = "auto";
+  audio.src = CALL_AUDIO;
+  audio.setAttribute("playsinline", "");
+}
+
+function scheduleCall() {
+  if (!CALL_ENABLED) return;
+  var lo = Math.min(CALL_MIN_SECONDS, CALL_MAX_SECONDS), hi = Math.max(CALL_MIN_SECONDS, CALL_MAX_SECONDS);
+  var secs = lo + Math.random() * (hi - lo);
+  setTimeout(function () {
+    // Wait until the visitor is actually looking at the page
+    if (document.hidden) {
+      document.addEventListener("visibilitychange", function wait() {
+        if (!document.hidden) { document.removeEventListener("visibilitychange", wait); startCall(); }
+      });
+    } else startCall();
+  }, secs * 1000);
+}
+
+function startCall() {
+  if (callState !== "idle") return;
+  callState = "ringing";
+  callEl.classList.remove("active");
+  callEl.classList.add("on");
+  callSub.textContent = CALL_SUBTITLE;
+  document.getElementById("alertWrap").classList.remove("on");
+  startRinging();
+  missTimer = setTimeout(function () { finishCall(true); }, RING_SECONDS * 1000);
+}
+
+function answer() {
+  if (callState !== "ringing") return;
+  callState = "active";
+  stopRinging();
+  clearTimeout(missTimer);
+  callEl.classList.add("active");
+  callSub.textContent = "00:00";
+  callStart = Date.now();
+  durTimer = setInterval(function () {
+    var s = Math.floor((Date.now() - callStart) / 1000);
+    callSub.textContent = pad(Math.floor(s / 60)) + ":" + pad(s % 60);
+  }, 250);
+
+  // Wake up speech now, during the tap, in case the audio fails later and the
+  // fallback has to talk (iPhones block speech that doesn't start from a tap)
+  if (CALL_SPEECH && window.speechSynthesis) {
+    try { speechSynthesis.speak(new SpeechSynthesisUtterance("")); } catch (e) {}
+  }
+
+  // Play the audio (allowed because this runs from the Accept tap)
+  if (audio && !audio.error) {
+    audio.currentTime = 0;
+    audio.onended = function () { hangUp(); };
+    audio.onerror = function () { if (callState === "active" && !speaking) speakInstead(); };
+    var p = audio.play();
+    if (p && p.catch) p.catch(function () { if (callState === "active" && !speaking) speakInstead(); });
+  } else speakInstead();
+}
+
+// Fallback when there's no audio file: read CALL_SPEECH aloud
+function speakInstead() {
+  if (!CALL_SPEECH || !window.speechSynthesis) { setTimeout(hangUp, 2500); return; }
+  speaking = true;
+  var started = false;
+  var u = new SpeechSynthesisUtterance(CALL_SPEECH);
+  u.onstart = function () { started = true; };
+  u.onend = function () { speaking = false; hangUp(); };
+  u.onerror = function () { speaking = false; hangUp(); };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  // If the browser refuses to speak, don't leave the call hanging forever
+  setTimeout(function () { if (!started && speaking) { speaking = false; hangUp(); } }, 4000);
+}
+
+function hangUp() { finishCall(false); }
+
+function finishCall(wasMissed) {
+  if (callState === "idle" || callState === "ending") return;
+  var wasActive = callState === "active";
+  callState = "ending";
+  stopRinging();
+  clearTimeout(missTimer);
+  clearInterval(durTimer);
+  if (audio) { audio.onended = null; audio.onerror = null; audio.pause(); }
+  if (speaking && window.speechSynthesis) { speaking = false; speechSynthesis.cancel(); }
+
+  if (!wasActive) {
+    missed++;
+    document.querySelectorAll(".app").forEach(function (el) {
+      if (allApps[el.getAttribute("data-k")].missedCalls) el.querySelector(".badge").textContent = missed;
+    });
+  }
+  callSub.textContent = wasActive ? "Call Ended" : (wasMissed ? "Missed Call" : "Call Declined");
+
+  setTimeout(function () {
+    callEl.classList.remove("on", "active");
+    callState = "idle";
+    if (wasActive && REDIRECT_WHEN_CALL_ENDS && CALL_LINK) { go(CALL_LINK); return; }
+    if (CALL_AGAIN) scheduleCall();
+  }, wasActive ? 1200 : 700);
+}
+
+document.getElementById("acceptBtn").addEventListener("click", answer);
+document.getElementById("declineBtn").addEventListener("click", function () { finishCall(false); });
+document.getElementById("endBtn").addEventListener("click", hangUp);
+document.getElementById("muteBtn").addEventListener("click", function () {
+  this.classList.toggle("on");
+  if (audio) audio.muted = this.classList.contains("on");
+});
+document.querySelectorAll(".toggle").forEach(function (b) {
+  b.addEventListener("click", function () { b.classList.toggle("on"); });
+});
+document.getElementById("linkBtn").addEventListener("click", function () {
+  if (CALL_LINK) go(CALL_LINK);
+});
+
+scheduleCall();
+</script>
+</body>
+</html>

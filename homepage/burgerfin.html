@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Burgerfin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons">
+<style>
+  :root {
+    --bg: #101010;
+    --header: rgba(32, 32, 32, 0.92);
+    --drawer: #1c1c1c;
+    --card: #242424;
+    --text: #e0e0e0;
+    --muted: #a0a0a0;
+    --accent: #00a4dc;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Noto Sans", sans-serif; }
+  a { color: inherit; text-decoration: none; }
+
+  /* Optional full-page background image */
+  #backdrop { position: fixed; inset: 0; background-size: cover; background-position: center;
+    opacity: 0.25; z-index: -2; }
+  #backdrop::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(16,16,16,0.3), var(--bg) 85%); }
+
+  /* Header */
+  header { position: fixed; top: 0; left: 0; right: 0; height: 46px; z-index: 10;
+    display: flex; align-items: center; padding: 0 6px; background: var(--header);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .iconBtn { background: none; border: none; color: var(--text); cursor: pointer;
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; }
+  .iconBtn:hover { background: rgba(255,255,255,0.1); }
+  .iconBtn:disabled { opacity: 0.3; cursor: default; background: none; }
+  .hidden { display: none !important; }
+  .logo { display: flex; align-items: center; gap: 10px; margin-left: 6px; font-size: 1.2em;
+    font-weight: 500; cursor: pointer; }
+  .logoMark { width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #aa5cc3, #00a4dc); }
+  .spacer { flex: 1; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #555;
+    display: flex; align-items: center; justify-content: center; }
+
+  /* Side drawer */
+  #drawer { position: fixed; top: 0; bottom: 0; left: -300px; width: 300px; z-index: 30;
+    background: var(--drawer); transition: left 0.2s ease; padding-top: 8px; overflow-y: auto; }
+  #drawer.open { left: 0; }
+  #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 25; display: none; }
+  #scrim.open { display: block; }
+  .drawerHead { color: var(--muted); font-size: 0.85em; font-weight: 500;
+    margin: 18px 20px 6px; }
+  .navItem { display: flex; align-items: center; gap: 18px; padding: 11px 20px; cursor: pointer; }
+  .navItem:hover { background: rgba(255,255,255,0.08); }
+  .navItem.current { color: var(--accent); }
+  .navItem .material-icons { color: var(--muted); }
+  .navItem.current .material-icons { color: var(--accent); }
+
+  /* Home rows */
+  main { padding: 66px 0 40px; }
+  .section { margin-bottom: 28px; }
+  .sectionHead { display: flex; align-items: center; padding: 0 3.3%; }
+  .sectionTitle { font-size: 1.35em; font-weight: 500; margin: 0 0 10px; }
+  .scrollBtns { margin-left: auto; display: flex; }
+  .row { display: flex; gap: 14px; overflow-x: auto; padding: 6px 3.3% 10px;
+    scroll-behavior: smooth; scrollbar-width: none; }
+  .row::-webkit-scrollbar { display: none; }
+
+  /* Library page */
+  .libHead { padding: 0 3.3%; margin-bottom: 14px; display: flex; align-items: baseline; gap: 14px; }
+  .libHead h1 { font-size: 1.6em; font-weight: 500; margin: 0; }
+  .libHead span { color: var(--muted); font-size: 0.9em; }
+  .grid { display: flex; flex-wrap: wrap; gap: 18px 14px; padding: 6px 3.3% 10px; }
+  .empty { padding: 40px 3.3%; color: var(--muted); }
+
+  /* Search page */
+  .searchBox { position: relative; margin: 8px 3.3% 24px; max-width: 640px; }
+  .searchBox .material-icons { position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .searchBox input { width: 100%; padding: 12px 14px 12px 46px; font: inherit; font-size: 1.05em;
+    color: var(--text); background: #292929; border: 2px solid transparent; border-radius: 6px;
+    outline: none; }
+  .searchBox input:focus { border-color: var(--accent); }
+  .groupTitle { font-size: 1.2em; font-weight: 500; margin: 0 3.3% 6px; }
+  .group { margin-bottom: 26px; }
+
+  /* Cards */
+  .card { flex: 0 0 auto; cursor: pointer; }
+  .card.backdrop { width: 300px; }
+  .card.portrait { width: 160px; }
+  .card.square   { width: 180px; }
+  .cardImg { position: relative; border-radius: 4px; overflow: hidden; background: var(--card);
+    background-size: cover; background-position: center; outline: 3px solid transparent;
+    transition: outline-color 0.15s; }
+  .backdrop .cardImg { aspect-ratio: 16 / 9; }
+  .portrait .cardImg { aspect-ratio: 2 / 3; }
+  .square   .cardImg { aspect-ratio: 1 / 1; }
+  .card:hover .cardImg { outline-color: var(--accent); }
+  .placeholderIcon { position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 56px; color: #5a5a5a; }
+  .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); opacity: 0;
+    transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; }
+  .card:hover .overlay { opacity: 1; }
+  .playBtn { width: 52px; height: 52px; border-radius: 50%; background: rgba(0,0,0,0.6);
+    border: 2px solid rgba(255,255,255,0.8); display: flex; align-items: center;
+    justify-content: center; }
+  .playBtn .material-icons { font-size: 32px; }
+  .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+    background: rgba(0,0,0,0.6); }
+  .progress div { height: 100%; background: var(--accent); }
+  .badge { position: absolute; top: 6px; right: 6px; min-width: 24px; height: 24px;
+    padding: 0 6px; border-radius: 12px; background: var(--accent); font-size: 0.8em;
+    display: flex; align-items: center; justify-content: center; }
+  .cardTitle { margin-top: 8px; font-size: 0.92em; text-align: center; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  .cardSub { font-size: 0.82em; color: var(--muted); text-align: center; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+  @media (max-width: 600px) {
+    .card.backdrop { width: 70vw; }
+    .card.portrait { width: 28vw; }
+    .card.square   { width: 40vw; }
+    .grid .card.backdrop { width: calc(100% - 0px); }
+    .logo span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+/* ============================================================
+   EDIT THESE SETTINGS
+   ============================================================ */
+
+// Name shown in the header and browser tab.
+var SERVER_NAME = "BURGERFIN-SERVER";
+
+// Optional background image for the whole page ("" for none).
+var PAGE_BACKGROUND = "";
+
+// Where item links open: "top" (whole window), "self" (this frame), "newtab"
+var OPEN_IN = "top";
+
+// ------------------------------------------------------------
+// LIBRARIES - each one appears under "My Media" and in the side menu.
+// Clicking a library opens a page showing only its items.
+//
+//   title   - library name
+//   icon    - icon shown in the side menu and when there's no image
+//   image   - picture for the library's "My Media" card (optional)
+//   style   - card shape on the library page: "portrait" (2:3 poster),
+//             "backdrop" (wide 16:9) or "square"
+//   recent  - how many of its items to show in a "Recently Added in ..." row on
+//             the home page (0 = no row). Items at the TOP of the list count as newest.
+//   items   - the things in the library:
+//               title     - text under the card
+//               subtitle  - smaller grey text (optional)
+//               image     - picture (optional; shows an icon if blank)
+//               thumb     - wide picture used on 16:9 cards such as Continue
+//                           Watching (optional; falls back to image)
+//               link      - where clicking goes
+//               badge     - small number/text in the corner (optional)
+//               tags      - extra search words, e.g. ["comedy", "2024"] (optional;
+//                           not shown on the page, only used by search)
+// ------------------------------------------------------------
+var LIBRARIES = [
+  {
+    title: "Main", icon: "movie", image: "images/movies.jpg", style: "portrait", recent: 8,
+    items: [
+      { title: "Home",   subtitle: "2026", image: "", link: "/altindex.html", tags: [] },
+      { title: "Chris's Corner",   subtitle: "2026", image: "", link: "/pages/chriscorner.html", tags: [] },
+      { title: "Barak's Domain",   subtitle: "2026", image: "", link: "/pages/barakdomain.html", tags: [] }
+      <!--{ title: "",   subtitle: "", image: "", link: "", tags: ["", ""] } -->
+    ]
+  },
+  {
+    title: "Fun", icon: "tv", image: "images/shows.jpg", style: "portrait", recent: 8,
+    items: [
+      { title: "Downloads",   subtitle: "2026", image: "", link: "/pages/downloads.html", tags: [] }
+    ]
+  },
+  {
+    title: "Info", icon: "library_music", image: "images/music.jpg", style: "square", recent: 0,
+    items: [
+      { title: "Captain's Log",   subtitle: "2026", image: "", link: "/pages/captainslog.html", tags: [] },
+      { title: "404",   subtitle: "2026", image: "", link: "/pages/example404.html", tags: [] }
+    ]
+  }
+];
+
+// ------------------------------------------------------------
+// Extra home-page rows, shown in this order after "My Media".
+// "Recently Added in ..." rows from LIBRARIES are added after these.
+//
+// The row marked  continueWatching: true  starts empty. When a visitor clicks an
+// item (on the home page or a library page), it moves into Continue Watching
+// with a random progress bar, and leaves the other home rows. This is remembered
+// in each visitor's own browser.
+// ------------------------------------------------------------
+var SECTIONS = [
+  {
+    title: "Continue Watching",
+    style: "backdrop",
+    continueWatching: true,
+    items: []
+  }
+];
+
+var PROGRESS_MIN = 20;            // lowest random progress (%)
+var PROGRESS_MAX = 80;            // highest random progress (%)
+var HIDE_EMPTY_CONTINUE = true;   // hide Continue Watching until something is in it
+
+// Extra items in the side menu, below the libraries.
+// Each "link" opens like any other item (see OPEN_IN above).
+var MENU = [
+  { head: "User" },
+  { title: "Clear Continue Watching", icon: "history", action: "clearContinue" },
+  { title: "Sign Out", icon: "exit_to_app", link: "https://example.com/signout" }
+];
+
+/* ============================================================
+   PAGE CODE (no need to edit below)
+   ============================================================ */
+</script>
+
+<div id="backdrop"></div>
+<div id="scrim"></div>
+<nav id="drawer"></nav>
+
+<header>
+  <button class="iconBtn hidden" id="backBtn" title="Back"><span class="material-icons">arrow_back</span></button>
+  <button class="iconBtn" id="menuBtn" title="Menu"><span class="material-icons">menu</span></button>
+  <div class="logo" id="logo"><div class="logoMark"></div><span id="serverName"></span></div>
+  <div class="spacer"></div>
+  <button class="iconBtn" title="SyncPlay"><span class="material-icons">groups</span></button>
+  <button class="iconBtn" title="Play on another device"><span class="material-icons">cast</span></button>
+  <button class="iconBtn" id="searchBtn" title="Search"><span class="material-icons">search</span></button>
+  <button class="iconBtn" title="User"><div class="avatar"><span class="material-icons" style="font-size:20px">person</span></div></button>
+</header>
+
+
+<main id="main"></main>
+
+<script>
+function esc(t) {
+  return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+function go(url) {
+  if (!url || url === "#") return;
+  if (OPEN_IN === "newtab") window.open(url, "_blank");
+  else if (OPEN_IN === "self") window.location.href = url;
+  else top.location.href = url;
+}
+
+document.title = SERVER_NAME;
+document.getElementById("serverName").textContent = SERVER_NAME;
+if (PAGE_BACKGROUND) {
+  document.getElementById("backdrop").style.backgroundImage = "url('" + PAGE_BACKGROUND + "')";
+}
+
+// ---------- Continue Watching memory (stored in the visitor's browser) ----------
+var STORE_KEY = "continueWatching:" + SERVER_NAME;
+
+function itemKey(it) { return it.link + "|" + it.title; }
+
+function loadWatched() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch (e) { return []; }
+}
+var watched = loadWatched();   // [{ key, progress }, ...] most recent first
+
+function saveWatched() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(watched)); } catch (e) {}
+}
+
+function randomProgress() {
+  return PROGRESS_MIN + Math.floor(Math.random() * (PROGRESS_MAX - PROGRESS_MIN + 1));
+}
+
+// Find an item by its key in the libraries or home rows
+function findItem(key) {
+  for (var l = 0; l < LIBRARIES.length; l++) {
+    for (var i = 0; i < LIBRARIES[l].items.length; i++) {
+      if (itemKey(LIBRARIES[l].items[i]) === key) return LIBRARIES[l].items[i];
+    }
+  }
+  for (var s = 0; s < SECTIONS.length; s++) {
+    if (SECTIONS[s].continueWatching) continue;
+    for (var j = 0; j < SECTIONS[s].items.length; j++) {
+      if (itemKey(SECTIONS[s].items[j]) === key) return SECTIONS[s].items[j];
+    }
+  }
+  return null;
+}
+
+// ---------- Cards ----------
+var main = document.getElementById("main");
+var rendered = [];   // every card on screen: { item, library }
+
+function cardHtml(it, style, opts) {
+  opts = opts || {};
+  var k = rendered.length;
+  rendered.push({ item: it, library: opts.library });
+  var pic = (style === "backdrop" && it.thumb) ? it.thumb : it.image;
+  var bg = pic ? ' style="background-image:url(\'' + esc(pic) + '\')"' : "";
+  return '<div class="card ' + esc(style || "backdrop") + '" data-k="' + k + '" title="' + esc(it.title) + '">' +
+    '<div class="cardImg"' + bg + '>' +
+      (pic ? "" : '<div class="placeholderIcon material-icons">' + esc(opts.icon || it.icon || "movie") + '</div>') +
+      (it.badge ? '<div class="badge">' + esc(it.badge) + '</div>' : "") +
+      (opts.progress ? '<div class="progress"><div style="width:' + Math.min(100, opts.progress) + '%"></div></div>' : "") +
+      '<div class="overlay"><div class="playBtn"><span class="material-icons">' +
+        (opts.library !== undefined ? "folder_open" : "play_arrow") + '</span></div></div>' +
+    '</div>' +
+    '<div class="cardTitle">' + esc(it.title) + '</div>' +
+    (it.subtitle ? '<div class="cardSub">' + esc(it.subtitle) + '</div>' : "") +
+  '</div>';
+}
+
+function rowHtml(id, title, cards) {
+  return '<div class="section"><div class="sectionHead"><h2 class="sectionTitle">' + esc(title) +
+    '</h2><div class="scrollBtns">' +
+    '<button class="iconBtn" data-row="' + id + '" data-dir="-1"><span class="material-icons">chevron_left</span></button>' +
+    '<button class="iconBtn" data-row="' + id + '" data-dir="1"><span class="material-icons">chevron_right</span></button>' +
+    '</div></div><div class="row" id="row' + id + '">' + cards + '</div></div>';
+}
+
+// Which library the item belongs to (for the placeholder icon)
+function iconFor(it) {
+  for (var l = 0; l < LIBRARIES.length; l++) {
+    if (LIBRARIES[l].items.indexOf(it) !== -1) return LIBRARIES[l].icon;
+  }
+  return "movie";
+}
+
+// ---------- Home page ----------
+function renderHome() {
+  var watchedKeys = {};
+  watched.forEach(function (w) { watchedKeys[w.key] = true; });
+  var html = "";
+
+  // My Media
+  var libCards = "";
+  LIBRARIES.forEach(function (lib, l) {
+    libCards += cardHtml({ title: lib.title, image: lib.image }, "backdrop", { library: l, icon: lib.icon });
+  });
+  if (libCards) html += rowHtml("media", "My Media", libCards);
+
+  // Extra rows
+  SECTIONS.forEach(function (sec, s) {
+    var cards = "";
+    if (sec.continueWatching) {
+      watched.forEach(function (w) {
+        var it = findItem(w.key);
+        if (it) cards += cardHtml(it, sec.style || "backdrop", { progress: w.progress, icon: iconFor(it) });
+      });
+      if (!cards && HIDE_EMPTY_CONTINUE) return;
+    } else {
+      sec.items.forEach(function (it) {
+        if (!watchedKeys[itemKey(it)]) cards += cardHtml(it, sec.style, { icon: iconFor(it) });
+      });
+      if (!cards) return;
+    }
+    html += rowHtml("s" + s, sec.title, cards);
+  });
+
+  // Recently Added rows
+  LIBRARIES.forEach(function (lib, l) {
+    if (!lib.recent) return;
+    var cards = "";
+    lib.items.filter(function (it) { return !watchedKeys[itemKey(it)]; })
+      .slice(0, lib.recent)
+      .forEach(function (it) { cards += cardHtml(it, lib.style, { icon: lib.icon }); });
+    if (cards) html += rowHtml("r" + l, "Recently Added in " + lib.title, cards);
+  });
+
+  main.innerHTML = html;
+}
+
+// ---------- Library page ----------
+function renderLibrary(l) {
+  var lib = LIBRARIES[l];
+  var cards = "";
+  lib.items.forEach(function (it) { cards += cardHtml(it, lib.style, { icon: lib.icon }); });
+  main.innerHTML =
+    '<div class="libHead"><h1>' + esc(lib.title) + '</h1><span>' + lib.items.length +
+      (lib.items.length === 1 ? " item" : " items") + '</span></div>' +
+    (cards ? '<div class="grid">' + cards + '</div>'
+           : '<div class="empty">This library is empty.</div>');
+}
+
+// ---------- Switching between pages (uses the address bar #) ----------
+function currentLibrary() {
+  var m = location.hash.match(/^#library=(\d+)$/);
+  return (m && LIBRARIES[m[1]]) ? Number(m[1]) : -1;
+}
+
+function isSearch() { return /^#search/.test(location.hash); }
+
+function render() {
+  rendered = [];
+  var l = currentLibrary();
+  var searching = isSearch();
+  if (searching) renderSearch();
+  else if (l >= 0) renderLibrary(l);
+  else renderHome();
+  document.getElementById("backBtn").classList.toggle("hidden", l < 0 && !searching);
+  document.title = searching ? "Search - " + SERVER_NAME
+    : l >= 0 ? LIBRARIES[l].title + " - " + SERVER_NAME : SERVER_NAME;
+  buildDrawer();
+  updateArrows();
+}
+
+// ---------- Search page ----------
+function searchQuery() {
+  var m = location.hash.match(/^#search=(.*)$/);
+  try { return m ? decodeURIComponent(m[1]) : ""; } catch (e) { return ""; }
+}
+
+function renderSearch() {
+  main.innerHTML =
+    '<div class="searchBox"><span class="material-icons">search</span>' +
+    '<input id="searchInput" type="search" placeholder="Search" autocomplete="off"></div>' +
+    '<div id="results"></div>';
+  var input = document.getElementById("searchInput");
+  input.value = searchQuery();
+  input.addEventListener("input", function () {
+    // Remember the search in the address bar so Back returns to these results
+    history.replaceState(null, "", "#search=" + encodeURIComponent(input.value));
+    showResults(input.value);
+  });
+  showResults(input.value);
+  input.focus();
+}
+
+// Every word typed must appear in the title, subtitle, tags or library name
+function matches(words, fields) {
+  var text = fields.join(" ").toLowerCase();
+  return words.every(function (w) { return text.indexOf(w) !== -1; });
+}
+
+function showResults(q) {
+  rendered = [];
+  var box = document.getElementById("results");
+  var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) { box.innerHTML = ""; return; }
+
+  var html = "";
+  var seen = {};
+
+  // Libraries whose names match
+  var libCards = "";
+  LIBRARIES.forEach(function (lib, l) {
+    if (matches(words, [lib.title])) {
+      libCards += cardHtml({ title: lib.title, image: lib.image }, "backdrop", { library: l, icon: lib.icon });
+    }
+  });
+  if (libCards) html += '<div class="group"><h2 class="groupTitle">Libraries</h2><div class="grid">' + libCards + '</div></div>';
+
+  // Items, grouped by library
+  LIBRARIES.forEach(function (lib) {
+    var cards = "";
+    lib.items.forEach(function (it) {
+      if (matches(words, [it.title, it.subtitle || "", (it.tags || []).join(" "), lib.title])) {
+        seen[itemKey(it)] = true;
+        cards += cardHtml(it, lib.style, { icon: lib.icon });
+      }
+    });
+    if (cards) html += '<div class="group"><h2 class="groupTitle">' + esc(lib.title) + '</h2><div class="grid">' + cards + '</div></div>';
+  });
+
+  // Items that only exist in hand-made home rows (like Next Up)
+  var other = "";
+  SECTIONS.forEach(function (sec) {
+    if (sec.continueWatching) return;
+    sec.items.forEach(function (it) {
+      var k = itemKey(it);
+      if (!seen[k] && matches(words, [it.title, it.subtitle || "", (it.tags || []).join(" ")])) {
+        seen[k] = true;
+        other += cardHtml(it, sec.style, { icon: iconFor(it) });
+      }
+    });
+  });
+  if (other) html += '<div class="group"><h2 class="groupTitle">Other</h2><div class="grid">' + other + '</div></div>';
+
+  box.innerHTML = html || '<div class="empty">No results for "' + esc(q.trim()) + '".</div>';
+}
+
+document.getElementById("searchBtn").addEventListener("click", function () {
+  if (!isSearch()) location.hash = "search";
+  else document.getElementById("searchInput").focus();
+});
+
+// Grey out a row's arrows when there's nothing more to scroll in that direction
+function updateArrows() {
+  var rows = main.querySelectorAll(".row");
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var id = row.id.replace(/^row/, "");
+    var left = main.querySelector('[data-row="' + id + '"][data-dir="-1"]');
+    var right = main.querySelector('[data-row="' + id + '"][data-dir="1"]');
+    if (left) left.disabled = row.scrollLeft <= 1;
+    if (right) right.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 1;
+  }
+}
+main.addEventListener("scroll", updateArrows, true);   // catches scrolling inside any row
+window.addEventListener("resize", updateArrows);
+
+function showLibrary(l) { location.hash = "library=" + l; }
+function showHome() {
+  if (location.hash) history.pushState(null, "", location.pathname + location.search);
+  render();
+}
+
+window.addEventListener("hashchange", function () { render(); window.scrollTo(0, 0); });
+window.addEventListener("popstate", render);
+document.getElementById("backBtn").addEventListener("click", showHome);
+document.getElementById("logo").addEventListener("click", showHome);
+
+// ---------- Clicks on cards ----------
+main.addEventListener("click", function (e) {
+  var btn = e.target.closest("[data-dir]");
+  if (btn) {
+    var row = document.getElementById("row" + btn.getAttribute("data-row"));
+    row.scrollBy({ left: row.clientWidth * 0.8 * Number(btn.getAttribute("data-dir")) });
+    return;
+  }
+  var card = e.target.closest(".card");
+  if (!card) return;
+  var entry = rendered[card.getAttribute("data-k")];
+
+  if (entry.library !== undefined) {   // a library card in My Media
+    showLibrary(entry.library);
+    return;
+  }
+
+  var key = itemKey(entry.item);
+  var progress = randomProgress();
+  // Already in Continue Watching? Keep its progress and move it to the front.
+  watched = watched.filter(function (w) {
+    if (w.key === key) { progress = w.progress; return false; }
+    return true;
+  });
+  watched.unshift({ key: key, progress: progress });
+  saveWatched();
+  render();
+  go(entry.item.link);
+});
+
+// ---------- Side menu ----------
+var drawer = document.getElementById("drawer");
+var scrim = document.getElementById("scrim");
+
+function buildDrawer() {
+  var l = currentLibrary();
+  var html = "";
+  if (LIBRARIES.length) html += '<div class="drawerHead">Media</div>';
+  LIBRARIES.forEach(function (lib, i) {
+    html += '<div class="navItem' + (l === i ? " current" : "") + '" data-lib="' + i + '">' +
+      '<span class="material-icons">' + esc(lib.icon || "folder") + '</span>' + esc(lib.title) + '</div>';
+  });
+  MENU.forEach(function (m) {
+    if (m.head) html += '<div class="drawerHead">' + esc(m.head) + '</div>';
+    else html += '<div class="navItem" data-link="' + esc(m.link || "#") + '"' +
+      (m.action ? ' data-action="' + esc(m.action) + '"' : "") + '><span class="material-icons">' +
+      esc(m.icon || "folder") + '</span>' + esc(m.title) + '</div>';
+  });
+  drawer.innerHTML = html;
+}
+
+function toggleDrawer(open) {
+  drawer.classList.toggle("open", open);
+  scrim.classList.toggle("open", open);
+}
+document.getElementById("menuBtn").addEventListener("click", function () { toggleDrawer(true); });
+scrim.addEventListener("click", function () { toggleDrawer(false); });
+drawer.addEventListener("click", function (e) {
+  var a = e.target.closest(".navItem");
+  if (!a) return;
+  toggleDrawer(false);
+  if (a.hasAttribute("data-lib")) { showLibrary(a.getAttribute("data-lib")); return; }
+  if (a.getAttribute("data-action") === "clearContinue") {
+    watched = [];
+    saveWatched();
+    render();
+    return;
+  }
+  go(a.getAttribute("data-link"));
+});
+
+render();
+</script>
+</body>
+</html>

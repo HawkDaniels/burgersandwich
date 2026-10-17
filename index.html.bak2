@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+  body {
+    font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  }
+</style>
+<title>burgersandwich website</title>
+</head>
+<body>
+
+<a href="/">
+ <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
+</a>
+<a href="jp/index.html">
+ <img src="/assets/japanese.jpg" alt="日本語" style="width: auto; height: 30px;">
+</a>
+<br>
+<p>
+<!--<a href="Websites/index.html">Website archives</a>-->
+ • <a href="projects.html">photoshop skills</a>
+  <a href="chriscorner.html">
+    <img src="chriscorner/image/chris.jpg" alt="Chris Corner" style="width: auto; height: 50px;">
+  </a>
+ • <a href="barakdomain.html">Barak's Domain</a>
+ • <a href="websitetutorial.html">Website Tutorial</a>
+ • <a href="gambia.html">Gambia, The</a>
+ • <a href="movie.html">Movies</a>
+ • <a href="captainslog.html">The Captain's Log</a>
+ • <a href="example404.html">404</a>
+ • <a href="people.html">This Webpage Has People</a>
+ • <a href="memes.html">Memes</a>
+ • <a href="anki.html">Anki</a>
+ • <a href="downloads.html">Downloads</a>
+</p>
+<br>
+<span class="space"></span>
+
+<span id="rate" style="position: fixed; top: 5px; right: 10px; font-weight: bold; font-size: 24px;">...</span>
+
+<script>
+fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=JPY")
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    document.getElementById("rate").textContent = "1 USD = " + d.rates.JPY + " JPY";
+  })
+  .catch(function () {
+    document.getElementById("rate").textContent = "rate unavailable";
+  });
+</script>
+
+
+<BODY ALIGN="Center" BGCOLOR="#EDD5AF" TEXT="#317F7F" LINK="#316563" VLINK="#00080" ALINK="#6330FF">
+
+<h1 style="font-size:60px;">Welcome to burgersandwich.jp!!</h1>
+<p>This website will soon feature all of your favorite burgersandwich content!</p>
+
+<h1 style="font-size:20px;">Please click the button below if this is your first time at burgersandwich.jp!!</h1>
+<button id="clickBtn" style="width: 250px; height: 60px; font-size: 18px;">I visited burgersandwich.jp!!</button>
+<span id="count">...</span>
+
+<style>
+  #count {
+    font-size: 22px;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+var API = "https://click-counter.oksohi.workers.dev/";
+var clicks = 0;
+
+function show(n) {
+  document.getElementById("count").textContent = n + " burgersandwiches";
+}
+
+fetch(API)
+  .then(function (r) { return r.json(); })
+  .then(function (d) { show(d.count); });
+
+document.getElementById("clickBtn").onclick = function () {
+  clicks++;
+
+  if (clicks === 1) {
+    fetch(API, { method: "POST" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { show(d.count); });
+  } else if (clicks === 2) {
+    alert("Please do not artifically inflate our visitor count :,(");
+  } else {
+    window.top.location.href = "banned.html";
+  }
+};
+</script>
+
+<br>
+<p>Please be honest and click only once!!</p>
+
+<br>
+
+   <iframe src="https://chat.burgersandwich.jp/" style="width:768px;height:500px;border:0"></iframe>
+
+<style>
+  #site-chat {
+    width: 40%;
+    height: 520px;
+    max-height: calc(100vh - 60px);
+    border: 0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+  }
+
+  /* On narrow screens, use the full width */
+  @media (max-width: 300px) {
+    #site-chat {
+      left: 10px;
+      width: auto;
+    }
+  }
+</style>
+
+<br>
+
+<!--<audio controls autoplay>
+    <source src="assets/ramranch.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+</audio>-->
+<br>
+ <img src="assets/IMG_5839.JPG" alt="alt text" width="500" height="426"> 
+<p>Please enjoy my website</p>
+<br>
+<br>
+<p>Please send any issues or requests to crsumter@gmail.com</p>
+<br>
+<br>
+<p>Frequently updated</p>
+
+<!-- Advertisement -->
+<style>
+  #ad {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  #adBox {
+    display: inline-block;
+    position: relative;
+    max-width: 100%;
+    pointer-events: auto;
+  }
+  #adBox img {
+    display: block;
+    max-width: 100%;
+    max-height: 15vh;
+    width: auto;
+    height: auto;
+  }
+  #adClose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  @media (max-width: 600px) {
+    #adBox {
+      display: block;
+      width: 100%;
+    }
+    #adBox img {
+      width: 100%;
+      max-height: none;
+    }
+  }
+</style>
+
+<div id="ad">
+  <div id="adBox">
+    <button id="adClose" type="button">X</button>
+    <a id="adLink" href="#" target="_blank"><img id="adImg" src="" alt=""></a>
+  </div>
+</div>
+
+<script>
+var ads = [
+  { src: "ads/ad-ramranch.jpg", link: "http://18nakedcowboys.com", alt: "ALT-TEXT-1" }
+];
+
+var pick = ads[Math.floor(Math.random() * ads.length)];
+
+var img = document.getElementById("adImg");
+img.onload = function () {
+  document.getElementById("ad").style.display = "block";
+};
+img.alt = pick.alt;
+document.getElementById("adLink").href = pick.link;
+img.src = pick.src;
+
+document.getElementById("adClose").onclick = function () {
+  document.getElementById("ad").style.display = "none";
+};
+</script>
+
+</body>
+
+<p>AI is only used ironically on this website. And also for basically all infrastructure sowwy T-T</p>
+<p>As of a few days ago we are suppoer bipoc friendly :)</p>
+<p>We aim to create an inclusive environment for all users, regardless of their background or identity. "This statement was generated by AI"</p>
+</html> 
