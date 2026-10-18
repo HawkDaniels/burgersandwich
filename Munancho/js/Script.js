@@ -1,15 +1,15 @@
 // JAVASCRIPT
 // ============================================================
 // MUNANCHO DIGITAL ARCHIVE
-// FILE: Munancho/js/script.js
+// FILE: /Munancho/js/script.js
 //
 // PROJECT STRUCTURE
 // ------------------------------------------------------------
-// Munancho.html          Main webpage
-// Munancho/albums/       Album cover images
-// Munancho/audio/        Song audio files
-// Munancho/css/Style.css Website appearance
-// Munancho/js/script.js  Album data and player functionality
+// /pages/Munancho.html          Main webpage
+// /Munancho/albums/       Album cover images
+// /Munancho/audio/        Song audio files
+// /Munancho/css/Style.css Website appearance
+// /Munancho/js/script.js  Album data and player functionality
 //
 // SECTION GUIDE
 // ------------------------------------------------------------
@@ -59,67 +59,67 @@ const albums = [
             {
                 title: "Intro-sis",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Intro-sis.mp3"
+                file: "/Munancho/audio/Munanchosis/Intro-sis.mp3"
             },
             {
                 title: "Moonlight",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Moonlight.mp3"
+                file: "/Munancho/audio/Munanchosis/Moonlight.mp3"
             },
             {
                 title: "KetObama",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/KetObama.mp3"
+                file: "/Munancho/audio/Munanchosis/KetObama.mp3"
             },
             {
                 title: "Hotdog Direction",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Hotdog Direction.mp3"
+                file: "/Munancho/audio/Munanchosis/Hotdog Direction.mp3"
             },
             {
                 title: "Shitting My Pants In Front of Latinas In C Major",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Shitting My Pants In Front of Latinas In C Major.mp3"
+                file: "/Munancho/audio/Munanchosis/Shitting My Pants In Front of Latinas In C Major.mp3"
             },
             {
                 title: "The Nice Guy Anthem",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Nice Guy Anthem.mp3"
+                file: "/Munancho/audio/Munanchosis/Nice Guy Anthem.mp3"
             },
             {
                 title: "Sex In The City On Ice [feat. Jed Kaczynstein]",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Sex In The City On Ice [feat. Jed Kaczynstein].mp3"
+                file: "/Munancho/audio/Munanchosis/Sex In The City On Ice [feat. Jed Kaczynstein].mp3"
             },
             {
                 title: "Big Boss Bars",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Big Boss Bars.mp3"
+                file: "/Munancho/audio/Munanchosis/Big Boss Bars.mp3"
             },
             {
                 title: "Ladyboy Femboy Trap Newhalf Funtime Summertime",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Femboy Trap Newhalf Funtime Summertime.mp3"
+                file: "/Munancho/audio/Munanchosis/Femboy Trap Newhalf Funtime Summertime.mp3"
             },
             {
                 title: "Sock Gang Loves You",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Sock Gang Loves You.mp3"
+                file: "/Munancho/audio/Munanchosis/Sock Gang Loves You.mp3"
             },
             {
                 title: "Abstinance In The Countryside On Fire",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Absttnence On The Countryside On Fire.mp3"
+                file: "/Munancho/audio/Munanchosis/Absttnence On The Countryside On Fire.mp3"
             },
             {
                 title: "Photos of Synthesis",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Photosyn-thesis.mp3"
+                file: "/Munancho/audio/Munanchosis/Photosyn-thesis.mp3"
             },
             {
                 title: "Outro-sis",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis/Outro-sis.mp3"
+                file: "/Munancho/audio/Munanchosis/Outro-sis.mp3"
             }
         ]
     },
@@ -134,32 +134,32 @@ const albums = [
             {
                 title: "Ma Saw My Report Card",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/A Time For Reflection (Ma Saw My Report Card).mp3"
+                file: "/Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/A Time For Reflection (Ma Saw My Report Card).mp3"
             },
             {
                 title: "Christopher Is A Litterer",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Coming Clean.mp3"
+                file: "/Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Coming Clean.mp3"
             },
             {
                 title: "Barak Is A Creamer",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Barak Is A Creamer.mp3"
+                file: "/Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Barak Is A Creamer.mp3"
             },
             {
                 title: "J-Hope Cow Milker",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/J-Hope The Cow Milker.mp3"
+                file: "/Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/J-Hope The Cow Milker.mp3"
             },
             {
                 title: "The Happy Cat Arises Part 13",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Happy Cat Rises.mp3"
+                file: "/Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Happy Cat Rises.mp3"
             },
             {
                 title: "Cruise of Sadness",
                 year: 2026,
-                file: "Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Cruise of Sadness.mp3"
+                file: "/Munancho/audio/Munanchosis Tracks That Got Cut For Being Too Good/Cruise of Sadness.mp3"
             }
         ]
     },
@@ -174,67 +174,67 @@ const albums = [
             {
                 title: "I Am Going to Kill Myself Today",
                 year: 2026,
-                file: "Munancho/audio/no-bones-remaining.mp3"
+                file: "/Munancho/audio/no-bones-remaining.mp3"
             },
             {
                 title: "Unrequited Bruv",
                 year: 2026,
-                file: "Munancho/audio/dolphin-frequency.mp3"
+                file: "/Munancho/audio/dolphin-frequency.mp3"
             },
             {
                 title: "Welcome To Hell",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "The Devil's Soliloquy",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "Sock Gang Does NOT Jelq On Hanukkah",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "Yellow Fever Blues",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "The Goon Company",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "Jelqing For The Greater Good",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "Eyes of Heaven (The Next Goonicide)",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "Gooner's Lament",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "Goth Girl Under The Table iHoP Syrup Slopjob",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "The Decision",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             },
             {
                 title: "BBC_Charlie_Kirk_Gaping_Cameltoe_Rule_34_Kevin_Stitt_Cuck_Cum_On_Face_Hentai_ASMR_God_X_Satan_Double_and_Dap_Edging_Loser_Humiliation",
                 year: 2026,
-                file: "Munancho/audio/government-cheese.mp3"
+                file: "/Munancho/audio/government-cheese.mp3"
             }
         ]
     }

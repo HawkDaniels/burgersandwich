@@ -11,34 +11,6 @@
 <title>burgersandwich website</title>
 </head>
 <body>
-
-<a href="/">
- <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
-</a>
-<a href="jp/index.html">
- <img src="/assets/japanese.jpg" alt="日本語" style="width: auto; height: 30px;">
-</a>
-<br>
-<p>
-<!--<a href="Websites/index.html">Website archives</a>-->
- • <a href="/pages/projects.html">photoshop skills</a>
-  <a href="/pages/chriscorner.html">
-    <img src="chriscorner/image/chris.jpg" alt="Chris Corner" style="width: auto; height: 50px;">
-  </a>
- • <a href="/pages/barakdomain.html">Barak's Domain</a>
- • <a href="/pages/websitetutorial.html">Website Tutorial</a>
- • <a href="/pages/gambia.html">Gambia, The</a>
- • <a href="/pages/movie.html">Movies</a>
- • <a href="/pages/captainslog.html">The Captain's Log</a>
- • <a href="/pages/example404.html">404</a>
- • <a href="/pages/people.html">This Webpage Has People</a>
- • <a href="/pages/memes.html">Memes</a>
- • <a href="/pages/anki.html">Anki</a>
- • <a href="/pages/downloads.html">Downloads</a>
- • <a href="/altindex.html">Alt</a>
- •
-</p>
-<br>
 <span class="space"></span>
 
 <span id="rate" style="position: fixed; top: 5px; right: 10px; font-weight: bold; font-size: 24px;">...</span>
@@ -125,6 +97,49 @@ document.getElementById("clickBtn").onclick = function () {
     }
   }
 </style>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div style="display: flex; justify-content: center; align-items: center;">
+  <button id="enterBtn" style="width: 550px; height: 60px; font-size: 30px;">Enter burgersandwich.jp!!</button>
+</div>
+
+<script>
+// Add or remove links here.
+var randomLinks = [
+  ["/homepage/terminal.html", 1],
+  ["/homepage/bmail.html", 1],
+  ["/homepage/burgeros.html", 1],
+  ["/homepage/ogburgersandwich.html", 1],
+  //["/homepage/bphone.html", 1],
+  ["/homepage/burgerfin.html", 1]
+  //["/homepage/.html", 1],
+];
+
+document.getElementById('enterBtn').addEventListener('click', function () {
+  var total = 0;
+  for (var i = 0; i < randomLinks.length; i++) total += randomLinks[i][1];
+
+  var roll = Math.random() * total;   // a number from 0 up to the total
+  for (var j = 0; j < randomLinks.length; j++) {
+    roll -= randomLinks[j][1];
+    if (roll < 0) {
+      top.location.href = randomLinks[j][0];
+      return;
+    }
+  }
+});
+</script>
+
+<h2 style="font-size:20px;">##Developer Links</h2>
+<p>These are the links accessible through the enter burgersandwich button</p>
+<p>
+  <a href="/homepage/terminal.html">Terminal</a> | <a href="/homepage/bmail.html">BMail</a> | <a href="/homepage/burgeros.html">BurgerOS</a> | <a href="/homepage/ogburgersandwich.html">OG Burgersandwich</a> | <a href="/homepage/bphone.html">bPhone</a> | <a href="/homepage/burgerfin.html">Burgerfin</a>
+</p>
 
 <br>
 
