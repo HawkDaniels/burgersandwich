@@ -37,6 +37,20 @@
     #homeBar { display: block; }
   }
 
+  /* Turned sideways (computer view only) for apps marked  landscape: true */
+  @media (min-width: 600px) and (min-height: 600px) {
+    #phone.landscape { width: min(844px, 94vw); height: min(390px, 94vh); }
+    #phone.landscape #statusBar { display: none; }
+    #phone.landscape::after { content: ""; position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      width: 35px; height: 122px; background: #000; border-radius: 20px; z-index: 58; pointer-events: none; }
+    #phone.landscape #appView { padding-top: 0; padding-left: 54px; }
+    #phone.landscape #callPill { top: auto; left: auto; bottom: 18px; right: 18px; }
+    #phone.turnToLand { animation: toLand 0.5s cubic-bezier(.3,.7,.3,1); }
+    #phone.turnToPort { animation: toPort 0.5s cubic-bezier(.3,.7,.3,1); }
+  }
+  @keyframes toLand { from { transform: translate(-50%, -50%) rotate(90deg); } to { transform: translate(-50%, -50%) rotate(0deg); } }
+  @keyframes toPort { from { transform: translate(-50%, -50%) rotate(-90deg); } to { transform: translate(-50%, -50%) rotate(0deg); } }
+
   /* Status bar (only shown in the computer frame - a real phone has its own) */
   #statusBar { height: 50px; flex: 0 0 auto; align-items: center; justify-content: space-between;
     padding: 6px 24px 0 34px; font-weight: 600; font-size: 16px; position: relative; z-index: 55; color: #fff;
@@ -380,6 +394,9 @@ var APPS_OPEN_IN_PHONE = true;
 //             ["#5ac8fa", "#007aff"]
 //   link    - the page the app opens
 //   inPhone - false = this app leaves the phone and opens its page normally
+//   landscape - true = on computers, the phone turns sideways while this app is
+//             open, giving web pages more room. It turns back on Home. (Real
+//             phones are left alone - visitors can turn their own phone.)
 //   alert   - instead of a link, pop up a message: { title: "...", text: "..." }
 //   action  - "phone"    the contact list and keypad
 //             "camera"   the visitor's camera; photos save to their Downloads
@@ -415,8 +432,8 @@ var PAGES = [
 // The bar at the bottom (up to 4 apps, no labels).
 var DOCK = [
   { name: "Phone", glyph: "phone", color: ["#65e07b", "#34c759"], action: "phone", missedCalls: true },
-  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "http://chat.burgersandwich.jp" },
-  { name: "Browser", glyph: "globe", color: ["#5ac8fa", "#0a6cff"], link: "/index.html" },
+  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "https://chat.burgersandwich.jp" },
+  { name: "Browser", glyph: "globe", color: ["#5ac8fa", "#0a6cff"], link: "/index.html", landscape: true },
   { name: "Camera", glyph: "camera", color: ["#c7c7cc", "#8e8e93"], action: "camera" }
 ];
 
@@ -890,7 +907,7 @@ function openApp(a, el) {
   if (a.alert) { showAlert(a.alert.title, a.alert.text); return; }
   if (!a.link) return;
   if (APPS_OPEN_IN_PHONE && a.inPhone !== false) {
-    zoomFrom(el, function () { openInPhone(a.link, a.name); });
+    zoomFrom(el, function () { openInPhone(a.link, a.name, a.landscape); });
   } else {
     zoomFrom(el, function () { go(a.link); }, true);
   }
@@ -963,6 +980,8 @@ function goHome() {
   appBody.innerHTML = "";
   phone.classList.remove("lightApp");
   closeCamera();
+  wantLandscape = false;
+  updateOrientation();
 }
 
 function shortUrl(url) {
@@ -973,14 +992,35 @@ function shortUrl(url) {
   } catch (e) { return url; }
 }
 
-function openInPhone(url, title) {
+function openInPhone(url, title, landscape) {
   showApp(title || shortUrl(url), shortUrl(url), function (body) {
     var f = document.createElement("iframe");
     f.src = url;
     f.setAttribute("allow", "camera; microphone; autoplay; fullscreen");
     body.appendChild(f);
   }, url);
+  wantLandscape = !!landscape;
+  updateOrientation();
 }
+
+// ---------- Turning the phone sideways (computer view only) ----------
+var FRAME_VIEW = window.matchMedia("(min-width: 600px) and (min-height: 600px)");
+var wantLandscape = false;
+
+function updateOrientation() {
+  var callShowing = callEl.classList.contains("on") && !callEl.classList.contains("min");
+  var land = wantLandscape && FRAME_VIEW.matches && appView.classList.contains("on") && !callShowing;
+  if (land === phone.classList.contains("landscape")) return;
+  phone.classList.remove("turnToLand", "turnToPort");
+  void phone.offsetWidth;
+  phone.classList.toggle("landscape", land);
+  if (FRAME_VIEW.matches) phone.classList.add(land ? "turnToLand" : "turnToPort");
+}
+phone.addEventListener("animationend", function (e) {
+  if (e.target === phone) phone.classList.remove("turnToLand", "turnToPort");
+});
+if (FRAME_VIEW.addEventListener) FRAME_VIEW.addEventListener("change", updateOrientation);
+else if (FRAME_VIEW.addListener) FRAME_VIEW.addListener(updateOrientation);
 
 document.getElementById("appBack").addEventListener("click", goHome);
 document.getElementById("homeBar").addEventListener("click", goHome);
@@ -1135,6 +1175,8 @@ function openCamera() {
   appView.classList.remove("on");
   appBody.innerHTML = "";
   phone.classList.remove("lightApp");
+  wantLandscape = false;
+  updateOrientation();
   camEl.classList.add("on");
   startStream();
 }
@@ -1465,6 +1507,7 @@ function placeCall(who, plan) {
   callEl.classList.add("on", "active");
   callState = "dialing";
   callSub.textContent = "calling" + (who.label ? " " + who.label : "") + "…";
+  updateOrientation();
   if (!plan.noRingback) startRingback();
   dialTimer = setTimeout(function () { stopRingback(); connect(); }, (plan.ring || 3) * 1000);
 }
@@ -1527,6 +1570,7 @@ function incomingCall(ic, auto) {
   callState = "ringing";
   callSub.textContent = who.label;
   document.getElementById("alertWrap").classList.remove("on");
+  updateOrientation();
   startRinging();
   missTimer = setTimeout(function () { finishCall("missed"); }, RING_SECONDS * 1000);
 }
@@ -1579,6 +1623,7 @@ function finishCall(reason) {
     callEl.classList.remove("on", "active", "min", "kp");
     callState = "idle";
     current = null;
+    updateOrientation();
     if (appView.classList.contains("on") && document.getElementById("phScroll") && phoneTab === "recents") renderPhoneTab();
     if (pendingOpen) { var u = pendingOpen; pendingOpen = null; openLink(u); }
     if (wasAuto) scheduleNextAuto();
@@ -1766,6 +1811,7 @@ document.getElementById("linkBtn").addEventListener("click", function () {
 pill.addEventListener("click", function () {
   callEl.classList.remove("min");
   pill.classList.remove("on");
+  updateOrientation();
 });
 
 // Computer keyboard: number keys work on the keypads, Escape goes home
