@@ -151,8 +151,8 @@
 
 var APP_NAME = "Mail";
 var ACCOUNT_NAME = "Local Folders";          // name at the top of the folder list
-var VISITOR_NAME = "Guest";                 // who the inbox "belongs" to
-var VISITOR_ADDRESS = "guest@burgersandwich.jp";
+var VISITOR_NAME = "User";                 // who the inbox "belongs" to
+var VISITOR_ADDRESS = "user@burgersandwich.jp";
 
 // Where links open: "top" (whole window), "self" (this frame), "newtab"
 var OPEN_IN = "top";
@@ -182,7 +182,10 @@ var CONTACT_EMAIL = "";
 //   important  - true shows a red "!" (optional)
 //   read       - true makes it start as already read (optional)
 //   arriveAfter - seconds after the page opens before this message shows up
-//                 as "new mail" (optional). Clicking Send/Recv delivers it early.
+//                 as "new mail" (optional). Each click of Send/Recv delivers
+//                 the next waiting message early, one at a time, soonest first.
+//   timerOnly  - true means this message only arrives when its arriveAfter
+//                time is up. Send/Recv can't bring it in early. (optional)
 // ------------------------------------------------------------
 var FOLDERS = [
   {
@@ -216,8 +219,21 @@ var FOLDERS = [
       {
         from: "John Sandwich", address: "jsandwich@burgersandwich.jp",
         subject: "Have you seen these naked cowboys??",
-        arriveAfter: 15,
+        arriveAfter: 30,
         body: "I really can't recommend it enough they're like breeding rams ready to rut: [18nakedcowboys.com](https://18nakedcowboys.com)"
+      },
+      {
+        from: "John Wizard", address: "jwizard@burgersandwitch.jp",
+        subject: "Warning to the Travelers of this Realm",
+        arriveAfter: 200,
+        body: "John Wizard here!\n\nThere's reports of evil magiks in this realm. I suggest avoiding any evil trickery and tomfoolery."
+      },
+      {
+        from: "Evil Wizard", address: "dawizza@burgersandwitch.jp",
+        subject: "sick bisiness opportunity",
+        arriveAfter: 260,
+        timerOnly: true,
+        body: "yo, i got a quest for any members of the burgersandwich order\nfast great pay super easy and all that stuff\nmeet me at the white rock by the sea.\n[go to white rock](/pages/whiterock.html)"
       }
     ]
   },
@@ -225,13 +241,13 @@ var FOLDERS = [
     name: "Sent Items", icon: "sent", role: "sent",
     messages: []
   },
-  {
-    name: "Drafts", icon: "drafts",
-    messages: [
-      { from: "", subject: "(no subject)", date: "", read: true,
-        body: "I'll finish this later." }
-    ]
-  },
+//  {
+//    name: "Drafts", icon: "drafts",
+//    messages: [
+//      { from: "", subject: "(no subject)", date: "", read: true,
+//        body: "I'll finish this later." }
+//    ]
+//  },
   {
     name: "Deleted Items", icon: "deleted", role: "deleted",
     messages: []
@@ -239,9 +255,9 @@ var FOLDERS = [
   {
     name: "Junk E-mail", icon: "junk",
     messages: [
-      { from: "Prince Adewale", address: "prince@totally-real.example",
-        subject: "URGENT BUSINESS PROPOSAL - CONFIDENTIAL", date: "10/03/2026 4:20 AM",
-        body: "DEAR FRIEND,\n\nI AM IN NEED OF A TRUSTWORTHY PARTNER TO HELP TRANSFER $18,500,000 USD.\n\nKINDLY REPLY WITH YOUR BANK DETAILS.\n\n(This is not a joke.)" }
+      { from: "Prince Senegal", address: "psenegal@senegal.gov",
+        subject: "URGENT REQUEST", date: "yesterday 4:20 PM",
+        body: "Dear friend,\n\nSenegal is in trouble and needs your help!\n\nPlease support our cause by visiting the [Senegal homepage](/pages/negasenegal.html)." }
     ]
   }
 ];
@@ -733,10 +749,14 @@ function progress(text, done) {
   }, 120);
 }
 
+// Delivers just ONE waiting message per click: the one due soonest.
+// Messages marked  timerOnly  are skipped - they only come on their timer.
 function sendReceive() {
   progress("Checking for new messages...", function () {
-    var pending = messages.filter(function (m) { return m.arriveAfter && !state.arrived[m._id]; });
-    if (!deliver(pending)) alertBox(APP_NAME, "There are no new messages.", "info");
+    var pending = messages
+      .filter(function (m) { return m.arriveAfter && !m.timerOnly && !state.arrived[m._id]; })
+      .sort(function (a, b) { return a.arriveAfter - b.arriveAfter; });
+    if (!deliver(pending.slice(0, 1))) alertBox(APP_NAME, "There are no new messages.", "info");
   });
 }
 

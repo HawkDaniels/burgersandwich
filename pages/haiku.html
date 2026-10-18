@@ -1,0 +1,56 @@
+<html>
+    <link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<style>
+    body {
+        font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+        text-align: left;
+  }
+</style>
+<head>
+<title>Burgersandwich Haiku</title>
+</head>
+<body ALIGN="Center" BGCOLOR="#EDD5AF" TEXT="#317F7F" LINK="#316563" VLINK="#00080" ALINK="#6330FF">
+<a href="/">
+ <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
+</a>
+<h1 style="font-size:60px;">Haiku Generator</h1>
+<p>Learn about Japanese culture and try your hand at poetry with some assistance from burgersandwich.jp!</p>
+<p>Write a line or two and we'll take care of the rest.</p>
+<p>Haiku Master's tip: remember a haiku has three lines with a 5-7-5 syllable pattern.</p>
+
+Line 1 (5 syllables)<br>
+<input id="line1"><br>
+Line 2 (7 syllables)<br>
+<input id="line2"><br>
+Line 3 (5 syllables)<br>
+<input id="line3"><br>
+<br>
+<button onclick="generate()">Generate Haiku</button>
+
+<p id="result"></p>
+
+<script>
+var phrases = [
+    ["Amazon.com"],
+    ["It is snowing on Mt. Fuji"],
+    ["Refrigerator"]
+//  ["My code will not run", "The cat ate my keys", "Monday again, why", "Coffee has run out", "I forgot my pants"],
+//  ["A pigeon judges my life", "I pressed reply all again", "The microwave beeps in rage", "The dog is plotting something", "Autocorrect ruined it"],
+//  ["Should have stayed in bed", "Pass me the nachos", "Nobody saw that", "This is fine. All fine.", "The end. Or is it?"]
+];
+
+function generate() {
+  var lines = [];
+  for (var i = 0; i < 3; i++) {
+    var text = document.getElementById("line" + (i + 1)).value;
+    if (text == "") {
+      text = phrases[i][Math.floor(Math.random() * phrases[i].length)];
+    }
+    lines.push(text);
+  }
+  document.getElementById("result").innerText = lines.join("\n");
+}
+</script>
+</body>
+</html>

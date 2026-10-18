@@ -6,6 +6,7 @@
 <style>
   body {
     font-family: Meiryo, "Yu Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+    text-align: left;
   }
 </style>
 <title>burgersandwich website</title>
@@ -73,37 +74,6 @@ document.getElementById("clickBtn").onclick = function () {
 <br>
 <p>Please be honest and click only once!!</p>
 
-<br>
-
-   <iframe src="https://chat.burgersandwich.jp/" style="width:768px;height:500px;border:0"></iframe>
-
-<style>
-  #site-chat {
-    width: 40%;
-    height: 520px;
-    max-height: calc(100vh - 60px);
-    border: 0;
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-  }
-
-  /* On narrow screens, use the full width */
-  @media (max-width: 300px) {
-    #site-chat {
-      left: 10px;
-      width: auto;
-    }
-  }
-</style>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
 <div style="display: flex; justify-content: center; align-items: center;">
   <button id="enterBtn" style="width: 550px; height: 60px; font-size: 30px;">Enter burgersandwich.jp!!</button>
 </div>
@@ -135,10 +105,41 @@ document.getElementById('enterBtn').addEventListener('click', function () {
 });
 </script>
 
+<br>
+
+   <iframe src="https://chat.burgersandwich.jp/" style="width:768px;height:500px;border:0"></iframe>
+
+<style>
+  #site-chat {
+    width: 40%;
+    height: 520px;
+    max-height: calc(100vh - 60px);
+    border: 0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+  }
+
+  /* On narrow screens, use the full width */
+  @media (max-width: 300px) {
+    #site-chat {
+      left: 10px;
+      width: auto;
+    }
+  }
+</style>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 <h2 style="font-size:20px;">##Developer Links</h2>
 <p>These are the links accessible through the enter burgersandwich button</p>
 <p>
-  <a href="/homepage/terminal.html">Terminal</a> | <a href="/homepage/bmail.html">BMail</a> | <a href="/homepage/burgeros.html">BurgerOS</a> | <a href="/homepage/ogburgersandwich.html">OG Burgersandwich</a> | <a href="/homepage/bphone.html">bPhone</a> | <a href="/homepage/burgerfin.html">Burgerfin</a>
+  <a href="/homepage/terminal.html">Terminal</a> | <a href="/homepage/bmail.html">bMail</a> | <a href="/homepage/burgeros.html">BurgerOS</a> | <a href="/homepage/ogburgersandwich.html">OG Burgersandwich</a> | <a href="/homepage/bphone.html">bPhone</a> | <a href="/homepage/burgerfin.html">Burgerfin</a>
 </p>
 
 <br>
@@ -148,7 +149,7 @@ document.getElementById('enterBtn').addEventListener('click', function () {
     Your browser does not support the audio element.
 </audio>-->
 <br>
- <img src="assets/IMG_5839.JPG" alt="alt text" width="500" height="426"> 
+ <img src="/assets/IMG_5839.JPG" alt="alt text" width="500" height="426"> 
 <p>Please enjoy my website</p>
 <br>
 <br>
@@ -205,23 +206,84 @@ document.getElementById('enterBtn').addEventListener('click', function () {
 <div id="ad">
   <div id="adBox">
     <button id="adClose" type="button">X</button>
-    <a id="adLink" href="#" target="_blank"><img id="adImg" src="" alt=""></a>
+    <a id="adLink" href="#"><img id="adImg" src="" alt=""></a>
   </div>
 </div>
 
 <script>
+  //src - image to serve
+  //link - url associated with the ad
+  //alt - text to display when image cannot load
+  //newTab - determine whether the click stays in the same window (false) or a separate window (true)
+  //weight - how likely the ad is to be served
+  //bypass - keep the ad out of the forced serve list
+  //NOTE: This will attempt to serve every ad at least once (based on probability without repeats) until all bypass (false) ads have been served. Then all ads are eligible and served randomly.
 var ads = [
-  { src: "/ads/ad-ramranch.jpg", link: "http://18nakedcowboys.com", alt: "ALT-TEXT-1" }
+  { src: "/ads/ad-ramranch.jpg", link: "https://18nakedcowboys.com", alt: "Failed to load ad", newTab: true,  weight: 1, bypass: false },
+  { src: "/ads/ad-munancho.jpg", link: "/pages/merch.html",          alt: "Failed to load ad", newTab: false, weight: 1, bypass: false }
 ];
 
-var pick = ads[Math.floor(Math.random() * ads.length)];
+var KEY = "adsSeen";
+
+function loadSeen() {
+  try {
+    var v = JSON.parse(localStorage.getItem(KEY));
+    return Array.isArray(v) ? v : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveSeen(list) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch (e) {}
+}
+
+function weightedPick(list) {
+  var total = 0;
+  list.forEach(function (a) { total += a.weight; });
+  var r = Math.random() * total;
+  for (var i = 0; i < list.length; i++) {
+    r -= list[i].weight;
+    if (r < 0) return list[i];
+  }
+  return list[list.length - 1];
+}
+
+var eligible = ads.filter(function (a) { return a.weight > 0; });
+var seen = loadSeen();
+
+var bypassAds = eligible.filter(function (a) { return a.bypass; });
+var pending = eligible.filter(function (a) {
+  return !a.bypass && seen.indexOf(a.src) === -1;
+});
+
+var pool = pending.length > 0 ? pending.concat(bypassAds) : eligible;
+var pick = weightedPick(pool);
 
 var img = document.getElementById("adImg");
 img.onload = function () {
   document.getElementById("ad").style.display = "block";
+  if (!pick.bypass) {
+    var list = loadSeen();
+    if (list.indexOf(pick.src) === -1) {
+      list.push(pick.src);
+      saveSeen(list);
+    }
+  }
 };
 img.alt = pick.alt;
-document.getElementById("adLink").href = pick.link;
+
+var a = document.getElementById("adLink");
+a.href = pick.link;
+if (pick.newTab) {
+  a.target = "_blank";
+  a.rel = "noopener";
+} else {
+  a.target = "_self";
+}
+
 img.src = pick.src;
 
 document.getElementById("adClose").onclick = function () {

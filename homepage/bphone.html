@@ -31,7 +31,7 @@
   @media (min-width: 600px) and (min-height: 600px) {
     body { background: radial-gradient(circle at 50% 40%, #2a2a2e, #0b0b0d); }
     #phone { inset: auto; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      width: 390px; height: min(844px, 94vh); border-radius: 54px; padding: 0;
+      width: 390px; height: min(844px, 94vh); border-radius: 26px; padding: 0;
       box-shadow: 0 0 0 11px #111, 0 0 0 13px #3a3a3c, 0 30px 80px rgba(0,0,0,0.6); }
     #statusBar { display: flex; }
     #homeBar { display: block; }
@@ -39,13 +39,19 @@
 
   /* Status bar (only shown in the computer frame - a real phone has its own) */
   #statusBar { height: 50px; flex: 0 0 auto; align-items: center; justify-content: space-between;
-    padding: 6px 30px 0 34px; font-weight: 600; font-size: 16px; position: relative; z-index: 5; }
+    padding: 6px 24px 0 34px; font-weight: 600; font-size: 16px; position: relative; z-index: 55; color: #fff;
+    transition: color 0.2s; pointer-events: none; }
+  #phone.lightApp #statusBar { color: #000; }
   #island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 122px; height: 35px;
     background: #000; border-radius: 20px; }
-  .sbIcons { display: flex; gap: 6px; align-items: center; }
-  .sbIcons svg { height: 12px; }
+  /* Right side must stay clear of the island (the frame is always 390px wide) */
+  .sbIcons { display: flex; gap: 3px; align-items: center; justify-content: flex-end; min-width: 0; max-width: 106px; }
+  .sbIcons svg { height: 10.5px; flex: 0 0 auto; }
+  #carrier { font-size: 12px; font-weight: 600; min-width: 0; flex: 0 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #homeBar { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: 134px; height: 5px;
-    border-radius: 3px; background: rgba(255,255,255,0.85); z-index: 30; }
+    border-radius: 3px; background: rgba(255,255,255,0.85); z-index: 56; cursor: pointer; }
+  #homeBar::before { content: ""; position: absolute; inset: -10px -20px; }
+  #phone.lightApp #homeBar { background: rgba(0,0,0,0.8); }
 
   /* Pages of apps */
   #pages { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden;
@@ -105,19 +111,124 @@
   .cal b { font-size: 10px; color: #ff3b30; font-weight: 600; margin-top: 7px; letter-spacing: 0.3px; }
   .cal span { font-size: 32px; font-weight: 300; line-height: 1; margin-top: 1px; }
 
-  /* Page dots and dock */
-  #dock { margin: 12px 12px 12px; padding: 14px 16px; border-radius: 32px; flex: 0 0 auto;
+  /* Page dots */
+  #dots { flex: 0 0 auto; display: flex; justify-content: center; align-self: center; gap: 8px;
+    padding: 10px 14px; margin-top: 2px; border-radius: 14px; cursor: pointer; }
+  #dots:hover { background: rgba(255,255,255,0.12); }
+  #dots.hide { display: none; }
+  #dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: background 0.2s; }
+  #dots i.on { background: #fff; }
+
+  /* Dock */
+  #dock { margin: 0 12px 12px; padding: 14px 16px; border-radius: 32px; flex: 0 0 auto;
     display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 8px; justify-items: center;
     background: rgba(255,255,255,0.22); -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8); }
   #dock .label { display: none; }
   @media (min-width: 600px) and (min-height: 600px) { #dock { margin-bottom: 22px; } }
 
   /* Launch animation */
-  #launch { position: absolute; z-index: 20; border-radius: 22.5%; pointer-events: none; display: none;
+  #launch { position: absolute; z-index: 25; border-radius: 22.5%; pointer-events: none; display: none;
     transition: all 0.32s cubic-bezier(.2,.8,.2,1); }
 
+  /* ---------- Apps opened inside the phone ---------- */
+  #appView { position: absolute; inset: 0; z-index: 20; display: none; flex-direction: column; background: #fff; color: #000;
+    padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  #appView.on { display: flex; animation: appIn 0.22s ease-out; }
+  @keyframes appIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+  @media (min-width: 600px) and (min-height: 600px) { #appView { padding-top: 50px; padding-bottom: 0; } }
+  #appHead { height: 44px; flex: 0 0 auto; display: flex; align-items: center; padding: 0 6px;
+    background: #f9f9f9; border-bottom: 0.5px solid #d1d1d6; }
+  #appBack, #appExt { flex: 0 0 84px; display: flex; align-items: center; gap: 2px; background: none; border: none;
+    color: #007aff; font-size: 17px; padding: 6px 4px; cursor: pointer; }
+  #appBack svg { width: 12px; height: 20px; }
+  #appExt { justify-content: flex-end; }
+  #appExt svg { width: 20px; height: 20px; }
+  #appExt.hide { visibility: hidden; }
+  #appTitleBox { flex: 1; min-width: 0; text-align: center; line-height: 1.15; }
+  #appTitle { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #appSub { font-size: 11px; color: #8e8e93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #appSub:empty { display: none; }
+  #appBody { flex: 1; min-height: 0; position: relative; overflow: hidden; background: #fff; }
+  #appBody iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+
+  /* Phone app: contacts & keypad */
+  .phWrap { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .phScroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
+  .phTitle { font-size: 32px; font-weight: 700; padding: 10px 16px 8px; }
+  .phEmpty { padding: 40px 16px; text-align: center; color: #8e8e93; }
+  .phLetter { position: sticky; top: 0; z-index: 1; background: #f2f2f7; color: #8e8e93; font-size: 13px; font-weight: 600; padding: 3px 16px; }
+  .phRow { display: flex; align-items: center; gap: 12px; padding: 0 16px; cursor: pointer; }
+  .phRow:active { background: #e5e5ea; }
+  .phAv { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(#a5a5ab, #828289) center / cover;
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 500; }
+  .phText { flex: 1; min-width: 0; padding: 10px 0; border-bottom: 0.5px solid #e5e5ea; display: flex; align-items: center; gap: 8px; }
+  .phText > div { flex: 1; min-width: 0; }
+  .phName { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .phNum { font-size: 13px; color: #8e8e93; margin-top: 1px; }
+  .phCall { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: #eafaee; color: #34c759;
+    display: flex; align-items: center; justify-content: center; }
+  .phCall svg { width: 18px; height: 18px; }
+  .phMissedName { color: #ff3b30; }
+  .phWhen { flex: 0 0 auto; font-size: 14px; color: #8e8e93; }
+  .phSub { font-size: 13px; color: #8e8e93; margin-top: 1px; }
+  .phTabs { flex: 0 0 auto; display: flex; border-top: 0.5px solid #d1d1d6; background: #f9f9f9; }
+  @media (min-width: 600px) and (min-height: 600px) { .phTabs { padding-bottom: 20px; } }
+  .phTab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 5px;
+    font-size: 10px; font-weight: 500; color: #8e8e93; background: none; border: none; cursor: pointer; }
+  .phTab svg { width: 26px; height: 26px; }
+  .phTab.on { color: #007aff; }
+
+  .dialWrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 10px 0; }
+  .dialNum { font-size: 34px; font-weight: 400; min-height: 44px; max-width: 90%; overflow: hidden; white-space: nowrap;
+    text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  .dialPad, .kpPad { display: grid; grid-template-columns: repeat(3, 76px); gap: 14px 24px; }
+  .dk { width: 76px; height: 76px; border-radius: 50%; border: none; background: #e5e5ea; color: #000; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; }
+  .dk b { font-size: 32px; font-weight: 400; line-height: 1; }
+  .dk small { font-size: 9.5px; font-weight: 600; letter-spacing: 2px; margin-top: 1px; min-height: 11px; }
+  .dk:active { background: #c7c7cc; }
+  .dk.dark { background: rgba(255,255,255,0.18); color: #fff; }
+  .dk.dark:active { background: rgba(255,255,255,0.4); }
+  .dialRow { display: grid; grid-template-columns: repeat(3, 76px); gap: 0 24px; align-items: center; justify-items: center; }
+  .dialCall { width: 76px; height: 76px; border-radius: 50%; border: none; background: #34c759; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; }
+  .dialCall svg { width: 34px; height: 34px; }
+  .dialDel { background: none; border: none; color: #8e8e93; cursor: pointer; padding: 10px; visibility: hidden; }
+  .dialDel.on { visibility: visible; }
+  .dialDel svg { width: 30px; height: 24px; }
+
+  /* Camera */
+  #camera { position: absolute; inset: 0; z-index: 45; background: #000; display: none; flex-direction: column; }
+  #camera.on { display: flex; }
+  #camView { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+  #camVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+  #camVideo.mirror { transform: scaleX(-1); }
+  #camMsg { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center;
+    padding: 30px; color: #ccc; font-size: 15px; line-height: 1.45; }
+  #camMsg.on { display: flex; }
+  #camClose { position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 14px; z-index: 2; width: 36px; height: 36px;
+    border-radius: 50%; border: none; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; cursor: pointer; }
+  @media (min-width: 600px) and (min-height: 600px) { #camClose { top: 56px; } }
+  #camFlash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  #camFlash.go { animation: flash 0.35s ease-out; }
+  @keyframes flash { from { opacity: 0.9; } to { opacity: 0; } }
+  #camBar { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; background: #000;
+    padding: 10px 0 calc(env(safe-area-inset-bottom) + 16px); }
+  @media (min-width: 600px) and (min-height: 600px) { #camBar { padding-bottom: 28px; } }
+  #camMode { font-size: 13px; font-weight: 600; color: #ffd60a; letter-spacing: 1px; }
+  #camRow { width: 100%; display: flex; align-items: center; justify-content: space-around; }
+  #camThumb { width: 46px; height: 46px; border-radius: 8px; background: #1c1c1e center / cover; border: 2px solid #333; }
+  #shutter { width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; background: none; padding: 4px; cursor: pointer; }
+  #shutter::after { content: ""; display: block; width: 100%; height: 100%; border-radius: 50%; background: #fff; transition: transform 0.1s; }
+  #shutter:active::after { transform: scale(0.88); }
+  #shutter:disabled { opacity: 0.4; }
+  #camFlip { width: 46px; height: 46px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; }
+  #camFlip svg { width: 24px; height: 24px; }
+  #camFlip.hide { visibility: hidden; }
+
   /* Alert */
-  #alertWrap { position: absolute; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center;
+  #alertWrap { position: absolute; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center;
     background: rgba(0,0,0,0.3); }
   #alertWrap.on { display: flex; }
   .alert { width: 270px; border-radius: 14px; overflow: hidden; text-align: center; color: #fff;
@@ -131,17 +242,23 @@
 
   /* ---------- Call screen ---------- */
   #call { position: absolute; inset: 0; z-index: 50; display: none; flex-direction: column; align-items: center;
-    padding: calc(env(safe-area-inset-top) + 70px) 30px calc(env(safe-area-inset-bottom) + 50px);
+    padding: calc(env(safe-area-inset-top) + 70px) 30px calc(env(safe-area-inset-bottom) + 44px);
     background: rgba(20,20,22,0.7); -webkit-backdrop-filter: blur(40px) saturate(1.4); backdrop-filter: blur(40px) saturate(1.4);
     animation: slideIn 0.35s ease-out; }
   #call.on { display: flex; }
+  #call.min { display: none; }
   @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(#a5a5ab, #828289) center / cover;
+  .avatar { flex: 0 0 auto; width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(#a5a5ab, #828289) center / cover;
     display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 500; margin-bottom: 16px; }
   #callName { font-size: 32px; font-weight: 400; text-align: center; line-height: 1.15; }
+  #dtmfShow { display: none; font-size: 34px; min-height: 42px; letter-spacing: 2px; text-align: center;
+    max-width: 100%; overflow: hidden; white-space: nowrap; font-variant-numeric: tabular-nums; }
   #callSub { margin-top: 8px; font-size: 17px; opacity: 0.75; text-align: center; min-height: 22px;
     font-variant-numeric: tabular-nums; }
-  .spacer { flex: 1; }
+  #caption { margin-top: 16px; font-size: 17px; line-height: 1.35; text-align: center; max-width: 310px;
+    max-height: 7em; overflow-y: auto; color: rgba(255,255,255,0.95); }
+  #caption:empty { display: none; }
+  .spacer { flex: 1; min-height: 12px; }
   .callBtns { width: 100%; max-width: 300px; display: flex; justify-content: space-between; }
   .round { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; }
   .round button { width: 76px; height: 76px; border-radius: 50%; border: none; display: flex; align-items: center;
@@ -156,15 +273,46 @@
   #call.active #inCall { display: flex; }
   #call.active #incoming { display: none; }
   .grid6 { display: grid; grid-template-columns: repeat(3, 76px); justify-content: space-between; row-gap: 22px;
-    width: 100%; max-width: 300px; margin-bottom: 40px; }
+    width: 100%; max-width: 300px; margin-bottom: 36px; }
   .grid6 .round button { background: rgba(255,255,255,0.18); }
   .grid6 .round button.on { background: #fff; color: #000; }
-  .grid6 .round button:disabled { opacity: 0.4; }
+  .grid6 .round button:disabled { opacity: 0.4; cursor: default; }
   .grid6 .round.link button { background: #0a84ff; }
   .grid6 .round span { max-width: 90px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .grid6 .round button.attn { animation: attn 1.3s infinite; }
+  @keyframes attn { 0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); } 50% { box-shadow: 0 0 0 10px rgba(255,255,255,0); } }
+  .kpPad { display: none; margin-bottom: 26px; }
+  .endRow { display: grid; grid-template-columns: repeat(3, 76px); justify-content: space-between; align-items: center;
+    width: 100%; max-width: 300px; }
+  .endRow .round { grid-column: 2; }
+  #kpHide { grid-column: 3; background: none; border: none; color: #fff; font-size: 17px; cursor: pointer; visibility: hidden; }
   #endBtn { background: #ff3b30; }
   #endBtn svg { transform: rotate(135deg); }
   #incoming { width: 100%; display: flex; justify-content: center; }
+
+  /* Keypad open during a call */
+  #call.kp .avatar, #call.kp #callName, #call.kp #callSub, #call.kp .grid6 { display: none; }
+  #call.kp #dtmfShow { display: block; }
+  #call.kp .kpPad { display: grid; }
+  #call.kp #kpHide { visibility: visible; }
+
+  /* Small phones */
+  @media (max-height: 700px) {
+    #call { padding-top: calc(env(safe-area-inset-top) + 40px); padding-bottom: calc(env(safe-area-inset-bottom) + 28px); }
+    .avatar { width: 72px; height: 72px; font-size: 30px; margin-bottom: 10px; }
+    .round button, .dk, .dialCall { width: 64px; height: 64px; }
+    .grid6, .endRow, .dialPad, .kpPad, .dialRow { grid-template-columns: repeat(3, 64px); }
+    .grid6 { row-gap: 14px; margin-bottom: 22px; }
+    .kpPad, .dialPad { gap: 10px 22px; }
+    .dk b { font-size: 28px; }
+  }
+
+  /* "Return to call" pill when a call is running behind an app */
+  #callPill { position: absolute; z-index: 57; display: none; top: calc(env(safe-area-inset-top) + 6px); left: 12px;
+    padding: 4px 11px; border-radius: 14px; background: #34c759; color: #fff; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-variant-numeric: tabular-nums; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+  #callPill.on { display: block; }
+  @media (min-width: 600px) and (min-height: 600px) { #callPill { top: 15px; left: 24px; } }
 </style>
 </head>
 <body>
@@ -176,6 +324,18 @@
 
 // Background: an image path ("images/wallpaper.jpg") or "" for the built-in gradient.
 var WALLPAPER = "";
+
+// Background AROUND the phone, seen on computers (a real phone shows only the phone screen).
+//   OUTSIDE_BACKGROUND - an image path, e.g. "images/desk.jpg" ("" for none). It fills the
+//                        window and is cropped to fit.
+//   OUTSIDE_COLOR      - a color, e.g. "#1b3a2f" ("" for the default dark gradient).
+//                        Shows behind the image while it loads, or on its own.
+var OUTSIDE_BACKGROUND = "";
+var OUTSIDE_COLOR = "";
+
+// Carrier name shown next to the signal bars ("" hides it and shows Wi-Fi instead).
+// The bar is only drawn in the computer view - a real phone shows its own.
+var CARRIER_NAME = "BurgerNet";
 
 // ------------------------------------------------------------
 // CALENDAR WIDGET at the top of the first page.
@@ -194,14 +354,20 @@ var MAX_EVENTS = 2;             // how many show in the list (more makes the wid
 //   color - the stripe on the left (optional)
 //   link  - where tapping the event goes (optional)
 var EVENTS = [
-  { date: "today",    time: "7:00 PM",  title: "Burger night", color: "#f4511e", link: "https://burgersandwich.jp" },
-  { date: "tomorrow", time: "All day",  title: "Site update",  color: "#0b57d0", link: "desktop.htm" },
-  { date: "+4",       time: "10:30 AM", title: "Check email",  color: "#33b679", link: "inbox.htm" },
-  { date: "2026-10-31", time: "8:00 PM", title: "Halloween",  color: "#8e24aa" }
+  { date: "today",    time: "7:00 PM",  title: "Burger night", color: "#f4511e", link: "/index.html" },
+//  { date: "tomorrow", time: "All day",  title: "Site update",  color: "#0b57d0", link: "desktop.htm" },
+//  { date: "+4",       time: "10:30 AM", title: "Check email",  color: "#33b679", link: "inbox.htm" },
+//  { date: "2026-10-31", time: "8:00 PM", title: "Halloween",  color: "#8e24aa" }
 ];
 
-// Where links open: "top" (whole window), "self" (this frame), "newtab"
+// Where links open when they leave the phone: "top" (whole window), "self" (this frame), "newtab"
 var OPEN_IN = "top";
+
+// true = apps, calendar events and call links open INSIDE the phone screen,
+// with a "Home" button to get back. Some outside sites refuse to be shown
+// inside another page and will appear blank - for those, give the app
+// inPhone: false (or use the arrow button at the top right to open it fully).
+var APPS_OPEN_IN_PHONE = true;
 
 // ------------------------------------------------------------
 // APPS
@@ -212,69 +378,195 @@ var OPEN_IN = "top";
 //   image   - your own icon picture instead of a glyph (optional)
 //   color   - icon background: one color "#34c759" or two for a gradient
 //             ["#5ac8fa", "#007aff"]
-//   link    - where tapping goes
+//   link    - the page the app opens
+//   inPhone - false = this app leaves the phone and opens its page normally
 //   alert   - instead of a link, pop up a message: { title: "...", text: "..." }
-//   action  - "call" makes the incoming call happen right away (for testing)
+//   action  - "phone"    the contact list and keypad
+//             "camera"   the visitor's camera; photos save to their Downloads
+//             "incoming" makes an automatic call ring right away (for testing)
 //   badge   - red number in the corner (optional)
 //   missedCalls - true adds a red badge here for each missed/declined call
 // ------------------------------------------------------------
 var PAGES = [
+//  [
+//    { name: "Terminal", glyph: "terminal", color: ["#3a3a3c", "#111"], link: "terminal.htm" },
+//    { name: "Media", glyph: "video", color: ["#aa5cc3", "#00a4dc"], link: "jellyfin.htm" },
+//    { name: "Desktop", glyph: "desktop", color: ["#1abc9c", "#008080"], link: "desktop.htm" },
+//    { name: "Mail", glyph: "mail", color: ["#5ac8fa", "#007aff"], link: "inbox.htm", badge: 3 },
+//    { name: "Photos", glyph: "photos", color: ["#fff", "#f2f2f7"], link: "https://example.com/photos" },
+//    { name: "Music", glyph: "music", color: ["#ff6b7f", "#fa2d48"], link: "https://example.com/music" },
+//    { name: "Maps", glyph: "maps", color: ["#7ed67e", "#30b350"], link: "https://example.com/map" },
+//    { name: "Calendar", glyph: "calendar", link: "https://example.com/calendar" },
+//    { name: "Notes", glyph: "notes", color: ["#ffe57f", "#ffd52e"],
+//      alert: { title: "Notes", text: "You don't have any notes yet." } },
+//    { name: "Clock", glyph: "clock", color: ["#1c1c1e", "#000"], link: "https://example.com/clock" },
+//    { name: "Games", glyph: "game", color: ["#ff9f0a", "#ff375f"], link: "https://example.com/games" },
+//    { name: "Settings", glyph: "settings", color: ["#9a9aa0", "#636366"],
+//      alert: { title: "Settings", text: "Settings are managed by your administrator." } }
+//  ],
   [
-    { name: "Terminal", glyph: "terminal", color: ["#3a3a3c", "#111"], link: "terminal.htm" },
-    { name: "Media", glyph: "video", color: ["#aa5cc3", "#00a4dc"], link: "jellyfin.htm" },
-    { name: "Desktop", glyph: "desktop", color: ["#1abc9c", "#008080"], link: "desktop.htm" },
-    { name: "Mail", glyph: "mail", color: ["#5ac8fa", "#007aff"], link: "inbox.htm", badge: 3 },
-    { name: "Photos", glyph: "photos", color: ["#fff", "#f2f2f7"], link: "https://example.com/photos" },
-    { name: "Music", glyph: "music", color: ["#ff6b7f", "#fa2d48"], link: "https://example.com/music" },
-    { name: "Maps", glyph: "maps", color: ["#7ed67e", "#30b350"], link: "https://example.com/map" },
-    { name: "Calendar", glyph: "calendar", link: "https://example.com/calendar" },
-    { name: "Notes", glyph: "notes", color: ["#ffe57f", "#ffd52e"],
-      alert: { title: "Notes", text: "You don't have any notes yet." } },
-    { name: "Clock", glyph: "clock", color: ["#1c1c1e", "#000"], link: "https://example.com/clock" },
-    { name: "Games", glyph: "game", color: ["#ff9f0a", "#ff375f"], link: "https://example.com/games" },
-    { name: "Settings", glyph: "settings", color: ["#9a9aa0", "#636366"],
-      alert: { title: "Settings", text: "Settings are managed by your administrator." } }
-  ],
-  [
-    { name: "Food", glyph: "cart", color: ["#ffb340", "#ff7a00"], link: "https://burgersandwich.jp" },
-    { name: "Favorites", glyph: "star", color: ["#ffd60a", "#ff9f0a"], link: "https://example.com/favorites" },
-    { name: "Files", glyph: "folder", color: ["#64d2ff", "#0a84ff"], link: "https://example.com/files" },
-    { name: "Health", glyph: "heart", color: ["#fff", "#f2f2f7"], link: "https://example.com/health" }
+//    { name: "Food", glyph: "cart", color: ["#ffb340", "#ff7a00"], link: "https://burgersandwich.jp" },
+//    { name: "Favorites", glyph: "star", color: ["#ffd60a", "#ff9f0a"], link: "https://example.com/favorites" },
+//    { name: "Files", glyph: "folder", color: ["#64d2ff", "#0a84ff"], link: "https://example.com/files" },
+//    { name: "Health", glyph: "heart", color: ["#fff", "#f2f2f7"], link: "https://example.com/health" }
   ]
 ];
 
 // The bar at the bottom (up to 4 apps, no labels).
 var DOCK = [
-  { name: "Phone", glyph: "phone", color: ["#65e07b", "#34c759"], action: "call", missedCalls: true },
-  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "https://example.com/messages" },
-  { name: "Browser", glyph: "globe", color: ["#5ac8fa", "#0a6cff"], link: "https://burgersandwich.jp" },
-  { name: "Camera", glyph: "camera", color: ["#c7c7cc", "#8e8e93"],
-    alert: { title: "Camera", text: "Camera access is not available." } }
+  { name: "Phone", glyph: "phone", color: ["#65e07b", "#34c759"], action: "phone", missedCalls: true },
+  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "http://chat.burgersandwich.jp" },
+  { name: "Browser", glyph: "globe", color: ["#5ac8fa", "#0a6cff"], link: "/index.html" },
+  { name: "Camera", glyph: "camera", color: ["#c7c7cc", "#8e8e93"], action: "camera" }
 ];
 
 // ------------------------------------------------------------
-// INCOMING CALL
+// CAMERA
 // ------------------------------------------------------------
-var CALL_ENABLED = true;
-var CALL_MIN_SECONDS = 10;      // the call comes at a random time between these
-var CALL_MAX_SECONDS = 180;
-var CALL_NAME = "Unknown";      // caller's name
-var CALL_SUBTITLE = "mobile";   // small text under the name while ringing
-var CALL_PHOTO = "";            // caller photo path, or "" for initials
-var RING_SECONDS = 30;          // how long it rings before becoming a missed call
-var CALL_AGAIN = false;         // true = after a call ends, schedule another one
+// Photos download as e.g.  bPhone_2026-10-18_23-15-04.jpg
+var PHOTO_NAME = "bPhone";
+var CAMERA_START = "user";      // "user" = front (selfie) camera, "environment" = back camera
 
-// What plays when the call is answered. The call hangs up when it finishes.
-var CALL_AUDIO = "audio/call.mp3";
-// If the audio file is missing or fails, the phone reads this text aloud instead
-// ("" to just end the call).
-var CALL_SPEECH = "Hello? Hello? Can you hear me? I'll call you back.";
+// ------------------------------------------------------------
+// DIALOGUE - what's said on a call. Used by contacts and incoming calls.
+//
+// Simplest form: a list of lines, played in order. The call hangs up after
+// the last one:
+//     [ { say: "Hey, it's John." }, { say: "Gotta go, bye!" } ]
+//
+// Each line can have:
+//   audio  - a sound file to play, e.g. "audio/john1.mp3"
+//   say    - the words. Shown as a caption, and read aloud by the phone's
+//            computer voice when there's no audio (or the audio won't play)
+//   pause  - seconds of silence after the line (default 0.5)
+//   link   - shows the blue button on the call screen from this line on.
+//            linkLabel sets its text. link: "" hides it again.
+//   open   - when this line finishes, hang up and open this page
+//   keys   - wait for the visitor to press a keypad button, and say where
+//            each button goes:  keys: { "1": "burgers", "2": "sandwiches" }
+//            Each value is the name of a part (see below), or "end" to hang
+//            up, or "repeat" to play this line again. Add "other" to catch
+//            any button you didn't list. Buttons can be pressed while the
+//            line is still playing.
+//   wait   - with keys: seconds to wait for a press (default 10)
+//   noKey  - with keys: the part to go to if nothing is pressed in time
+//            (if not set, the caller hangs up)
+//   next   - after this line, jump to another part
+//
+// Branching form: give each part a name. The call starts at "start". Each
+// part plays in order, and the call hangs up at the end of a part unless its
+// last line has keys or next:
+//     {
+//       start:      [ { say: "Press 1 for burgers, 2 for sandwiches.",
+//                       keys: { "1": "burgers", "2": "sandwiches" } } ],
+//       burgers:    [ { say: "Burgers! Good choice." } ],
+//       sandwiches: [ { say: "Sandwiches it is.", open: "/pages/sandwich.html" } ]
+//     }
+// ------------------------------------------------------------
 
-// Optional link during the call. Shows as a blue button on the call screen.
-var CALL_LINK = "https://burgersandwich.jp";
-var CALL_LINK_LABEL = "Open Link";
-// true = go to CALL_LINK automatically when the call ends
-var REDIRECT_WHEN_CALL_ENDS = false;
+// ------------------------------------------------------------
+// CONTACTS - listed in the Phone app. Tapping one calls them.
+//   name      - contact name (the list is sorted alphabetically)
+//   number    - their number. Visitors can also dial it on the keypad.
+//   photo     - picture path (optional; initials otherwise)
+//   label     - shown under the name while calling (default "mobile")
+//   pitch, rate - their computer voice: 0.5 (low/slow) to 2 (high/fast), default 1
+//   hidden    - true = not listed; only reachable by dialing their number
+//   calls     - their conversations, in order. The 1st time someone calls
+//               them they get the first one, the 2nd time the second, and
+//               so on. Once they're used up, calls go to voicemail.
+//   voicemail - their voicemail greeting, as dialogue lines (optional; a
+//               standard "You've reached..." greeting is used otherwise)
+// ------------------------------------------------------------
+var CONTACTS = [
+  {
+    name: "John Sandwich", number: "555-0100", rate: 1.05,
+    calls: [
+      // 1st call
+      [
+        { audio: "audio/john1.mp3", say: "John Sandwich here! Glad you called." },
+        { say: "Have you checked your bMail lately? I sent you something." }
+      ],
+      // 2nd call - with keypad choices
+      {
+        start: [ { say: "You again! Press 1 for a burger tip, or 2 for a sandwich tip.",
+                   keys: { "1": "burger", "2": "sandwich", "other": "huh" }, noKey: "quiet" } ],
+        burger:   [ { say: "Always toast the bun. Always." } ],
+        sandwich: [ { say: "There's a page you should see. Tap the button.", link: "/index.html", linkLabel: "Sandwich Tip" },
+                    { say: "Happy burgin!", pause: 4 } ],
+        huh:      [ { say: "That's not one of the options.", next: "start" } ],
+        quiet:    [ { say: "Hello? Guess you're busy. Bye!" } ]
+      }
+    ]
+  },
+  {
+    name: "John Wizard", number: "555-0142", pitch: 0.6, rate: 0.85,
+    calls: [
+      [ { say: "Who dares ring the wizard? Beware the evil magiks, traveler." } ]
+    ],
+    voicemail: [ { say: "The wizard is away on a quest. Speak your message to the crystal after the tone." } ]
+  },
+  {
+    name: "Mom", number: "555-0199",
+    calls: []          // no conversations: always goes to voicemail
+  },
+  {
+    name: "Evil Wizard", number: "666-6666", hidden: true, pitch: 1.4,
+    calls: [
+      [ { say: "heh. you found my number. meet me at the white rock.", open: "/pages/whiterock.html" } ]
+    ]
+  }
+];
+
+// ------------------------------------------------------------
+// AUTOMATIC CALLS - calls the visitor receives on their own.
+// ------------------------------------------------------------
+var AUTO_CALLS = 1;            // how many automatic calls per visit
+var CALL_MIN_SECONDS = 10;     // each one comes at a random time between these
+var CALL_MAX_SECONDS = 180;    //   (from page load, then from the end of the previous call)
+var RING_SECONDS = 30;         // how long it rings before becoming a missed call
+
+//   from     - caller name. If it matches a contact, their photo and voice are used.
+//   photo, label, pitch, rate - for callers who aren't contacts (optional)
+//   weight   - how likely this call is to be picked (default 1). Weight 3 is
+//              three times as likely as weight 1; 0 never rings.
+//              The same call won't ring twice in one visit.
+//   dialogue - what they say when answered (see DIALOGUE above)
+//   callBack - what they say if the visitor MISSES the call and then calls back
+//              from the Missed list (optional; same as dialogue if not set)
+// Missed and declined automatic calls appear under "Missed" in the Phone app.
+// Calling back plays that call's dialogue, not the contact's normal conversations.
+var INCOMING_CALLS = [
+  {
+    from: "Unknown", weight: 1,
+    dialogue: [
+      { audio: "audio/call.mp3", say: "Hello? Hello? Can you hear me? I'll call you back.",
+        link: "https://burgersandwich.jp", linkLabel: "Open Link" }
+    ]
+  },
+  {
+    from: "John Sandwich", weight: 3,
+    dialogue: {
+      start:    [ { say: "Hey, it's John Sandwich! Quick survey. Press 1 if you like burgers, or 2 if you like sandwiches.",
+                    keys: { "1": "burger", "2": "sandwich" }, noKey: "bye" } ],
+      burger:   [ { say: "A person of taste!" } ],
+      sandwich: [ { say: "A classic. Respect." } ],
+      bye:      [ { say: "Too slow! Talk later." } ]
+    }
+  }
+];
+
+// ------------------------------------------------------------
+// OTHER CALL SETTINGS
+// ------------------------------------------------------------
+var SHOW_CAPTIONS = true;            // show what the caller says as text
+var REMEMBER_PROGRESS = true;        // true = which conversations were heard is remembered between visits
+var RESET_CODE = "*#0#";             // dial this on the keypad to reset everyone's conversations
+var VOICEMAIL_RECORD_SECONDS = 8;    // how long voicemail "records" after the beep before hanging up
+// What plays when someone dials a number that isn't a contact:
+var NOT_IN_SERVICE = [
+  { say: "We're sorry. The number you have dialed is not in service. Please check the number and try again." }
+];
 
 /* ============================================================
    PAGE CODE (no need to edit below)
@@ -286,32 +578,67 @@ var REDIRECT_WHEN_CALL_ENDS = false;
     <span id="sbTime">9:41</span>
     <div id="island"></div>
     <div class="sbIcons">
-      <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#fff"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
-      <svg viewBox="0 0 16 12"><path d="M8 11.5l2.3-2.6a3.3 3.3 0 00-4.6 0zM3.4 6.6a6.6 6.6 0 019.2 0l1.6-1.7a9 9 0 00-12.4 0zM.3 3.2a11 11 0 0115.4 0L16 2.9A12 12 0 000 2.9z" fill="#fff"/></svg>
-      <svg viewBox="0 0 27 12"><rect x="0.5" y="0.5" width="23" height="11" rx="3" fill="none" stroke="rgba(255,255,255,.5)"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="#fff"/><path d="M25 4v4a2 2 0 000-4z" fill="rgba(255,255,255,.5)"/></svg>
+      <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+      <span id="carrier"></span>
+      <svg id="sbWifi" viewBox="0 0 16 12"><path d="M8 11.5l2.3-2.6a3.3 3.3 0 00-4.6 0zM3.4 6.6a6.6 6.6 0 019.2 0l1.6-1.7a9 9 0 00-12.4 0zM.3 3.2a11 11 0 0115.4 0L16 2.9A12 12 0 000 2.9z" fill="currentColor"/></svg>
+      <svg viewBox="0 0 27 12"><rect x="0.5" y="0.5" width="23" height="11" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="currentColor"/><path d="M25 4v4a2 2 0 000-4z" fill="currentColor" fill-opacity=".5"/></svg>
     </div>
   </div>
   <div id="pages"></div>
+  <div id="dots" title="Next page"></div>
   <div id="dock"></div>
-  <div id="homeBar"></div>
+  <div id="homeBar" title="Home"></div>
   <div id="launch"></div>
+
+  <div id="appView">
+    <div id="appHead">
+      <button id="appBack"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</button>
+      <div id="appTitleBox"><div id="appTitle"></div><div id="appSub"></div></div>
+      <button id="appExt" title="Open the full page"><svg viewBox="0 0 20 20"><path d="M8 4H4v12h12v-4M11 3h6v6M17 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div id="appBody"></div>
+  </div>
+
+  <div id="camera">
+    <div id="camView">
+      <video id="camVideo" playsinline autoplay muted></video>
+      <div id="camMsg"></div>
+      <div id="camFlash"></div>
+      <button id="camClose" title="Close">&#x2715;</button>
+    </div>
+    <div id="camBar">
+      <div id="camMode">PHOTO</div>
+      <div id="camRow">
+        <div id="camThumb"></div>
+        <button id="shutter" title="Take photo"></button>
+        <button id="camFlip" title="Switch camera"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 13a3 3 0 015.2-2M15 13a3 3 0 01-5.2 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14.5 9.5l-.2 1.7-1.7-.3M9.5 16.5l.2-1.7 1.7.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+
   <div id="alertWrap"><div class="alert"><h3 id="alertTitle"></h3><p id="alertText"></p><button id="alertOk">OK</button></div></div>
 
   <div id="call">
     <div class="avatar" id="callAvatar"></div>
     <div id="callName"></div>
+    <div id="dtmfShow"></div>
     <div id="callSub"></div>
+    <div id="caption"></div>
     <div class="spacer"></div>
     <div id="inCall">
       <div class="grid6">
         <div class="round"><button id="muteBtn"></button><span>mute</span></div>
-        <div class="round"><button class="toggle" data-g="keypad"></button><span>keypad</span></div>
+        <div class="round"><button id="kpBtn" data-g="keypad"></button><span>keypad</span></div>
         <div class="round"><button class="toggle" data-g="speaker"></button><span>speaker</span></div>
         <div class="round"><button disabled data-g="plus"></button><span>add call</span></div>
-        <div class="round link" id="linkWrap"><button id="linkBtn" data-g="link"></button><span id="linkLabel"></span></div>
+        <div class="round" id="linkWrap"><button id="linkBtn" data-g="link"></button><span id="linkLabel"></span></div>
         <div class="round"><button disabled data-g="user"></button><span>contacts</span></div>
       </div>
-      <div class="round"><button id="endBtn"></button></div>
+      <div class="kpPad" id="kpPad"></div>
+      <div class="endRow">
+        <div class="round"><button id="endBtn"></button></div>
+        <button id="kpHide">Hide</button>
+      </div>
     </div>
     <div id="incoming">
       <div class="callBtns">
@@ -320,6 +647,8 @@ var REDIRECT_WHEN_CALL_ENDS = false;
       </div>
     </div>
   </div>
+
+  <div id="callPill"></div>
 </div>
 
 <script>
@@ -343,16 +672,20 @@ var G = {
   game: '<path d="M7 8h10a5 5 0 014.8 6.4l-.6 2a2.5 2.5 0 01-4.3.8L15 15H9l-1.9 2.2a2.5 2.5 0 01-4.3-.8l-.6-2A5 5 0 017 8z" fill="#fff"/><path d="M7.5 10.5v3M6 12h3" stroke="#ff5a3c" stroke-width="1.5"/><circle cx="16" cy="11" r="1" fill="#ff5a3c"/><circle cx="17.5" cy="13" r="1" fill="#ff5a3c"/>',
   star: '<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" fill="#fff"/>',
   heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0112 7.6 4.3 4.3 0 0119.5 10c0 5.4-7.5 10-7.5 10z" fill="#ff375f"/>',
-  user: '<circle cx="12" cy="8.5" r="3.8" fill="#fff"/><path d="M4.5 20c.5-4 3.6-6 7.5-6s7 2 7.5 6z" fill="#fff"/>',
+  user: '<circle cx="12" cy="8.5" r="3.8" fill="currentColor"/><path d="M4.5 20c.5-4 3.6-6 7.5-6s7 2 7.5 6z" fill="currentColor"/>',
   cart: '<path d="M3 4h2.5l2.2 10.5h10.5L20.5 7H7" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.6" fill="#fff"/><circle cx="17" cy="19" r="1.6" fill="#fff"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0012 0M12 17v4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 3l16 18" stroke="currentColor" stroke-width="1.8"/>',
   keypad: '<g fill="currentColor"><circle cx="6" cy="5" r="1.8"/><circle cx="12" cy="5" r="1.8"/><circle cx="18" cy="5" r="1.8"/><circle cx="6" cy="11" r="1.8"/><circle cx="12" cy="11" r="1.8"/><circle cx="18" cy="11" r="1.8"/><circle cx="6" cy="17" r="1.8"/><circle cx="12" cy="17" r="1.8"/><circle cx="18" cy="17" r="1.8"/><circle cx="12" cy="22" r="1.5"/></g>',
   speaker: '<path d="M3 9.5h4l5-4.5v14l-5-4.5H3z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   plus: '<path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   link: '<path d="M10 14a4 4 0 005.7 0l3.5-3.5a4 4 0 00-5.7-5.7L12 6.3M14 10a4 4 0 00-5.7 0l-3.5 3.5a4 4 0 005.7 5.7l1.5-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-  ring: '<path d="M6.6 2.5l2.6 3.2c.4.5.4 1.2-.1 1.7L7.6 8.8a12 12 0 007.6 7.6l1.4-1.5c.5-.5 1.2-.5 1.7-.1l3.2 2.6c.5.4.6 1.2.1 1.7l-1.5 1.7c-.7.8-1.9 1.1-2.9.7C10.4 19.4 4.6 13.6 2.5 6.8c-.3-1 0-2.2.7-2.9l1.7-1.5c.5-.5 1.3-.4 1.7.1z" fill="currentColor"/>'
+  videoBtn: '<rect x="2.5" y="7" width="13" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 11l5-3v8l-5-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+  ring: '<path d="M6.6 2.5l2.6 3.2c.4.5.4 1.2-.1 1.7L7.6 8.8a12 12 0 007.6 7.6l1.4-1.5c.5-.5 1.2-.5 1.7-.1l3.2 2.6c.5.4.6 1.2.1 1.7l-1.5 1.7c-.7.8-1.9 1.1-2.9.7C10.4 19.4 4.6 13.6 2.5 6.8c-.3-1 0-2.2.7-2.9l1.7-1.5c.5-.5 1.3-.4 1.7.1z" fill="currentColor"/>',
+  person: '<circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="3.5" fill="currentColor"/><path d="M5.5 19c1.3-3 3.6-4.3 6.5-4.3s5.2 1.3 6.5 4.3" fill="currentColor"/>',
+  recents: '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 6.5V12l3.8 2.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  backspace: '<path d="M9 2h18a2 2 0 012 2v16a2 2 0 01-2 2H9L1 12z" fill="currentColor"/><path d="M14 8l8 8M22 8l-8 8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'
 };
-function glyph(name) { return '<svg viewBox="0 0 24 24">' + (G[name] || "") + '</svg>'; }
+function glyph(name, vb) { return '<svg viewBox="0 0 ' + (vb || "24 24") + '">' + (G[name] || "") + '</svg>'; }
 
 function esc(t) {
   return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) {
@@ -360,6 +693,7 @@ function esc(t) {
   });
 }
 
+// Leave the phone and go to a page
 function go(url) {
   if (!url || url === "#") return;
   if (OPEN_IN === "newtab") window.open(url, "_blank");
@@ -367,11 +701,40 @@ function go(url) {
   else top.location.href = url;
 }
 
+// Open a page: inside the phone, or by leaving (APPS_OPEN_IN_PHONE)
+function openLink(url, title) {
+  if (!url || url === "#") return;
+  if (APPS_OPEN_IN_PHONE) openInPhone(url, title); else go(url);
+}
+
+function initials(name) {
+  return (String(name || "").trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join("").slice(0, 2) || "?").toUpperCase();
+}
+function avatarHtml(who, cls) {
+  if (who.photo) return '<div class="' + cls + '" style="background-image:url(\'' + esc(who.photo) + '\')"></div>';
+  return '<div class="' + cls + '">' + esc(initials(who.name)) + '</div>';
+}
+
 var phone = document.getElementById("phone");
 phone.style.backgroundImage = WALLPAPER ? "url('" + WALLPAPER + "')"
   : "radial-gradient(120% 70% at 20% 0%, #ff8a5c 0%, transparent 55%), " +
     "radial-gradient(100% 70% at 100% 30%, #c04ad6 0%, transparent 60%), " +
     "radial-gradient(120% 80% at 30% 100%, #1f3fd6 0%, transparent 60%), linear-gradient(#3b1d78, #0d1449)";
+
+// Background around the phone
+if (OUTSIDE_BACKGROUND) {
+  document.body.style.background = (OUTSIDE_COLOR || "#000") + " url('" + OUTSIDE_BACKGROUND + "') center / cover no-repeat";
+} else if (OUTSIDE_COLOR) {
+  document.body.style.background = OUTSIDE_COLOR;
+}
+
+// ---------- Status bar ----------
+if (CARRIER_NAME) {
+  document.getElementById("carrier").textContent = CARRIER_NAME;
+  document.getElementById("sbWifi").style.display = "none";
+} else {
+  document.getElementById("carrier").style.display = "none";
+}
 
 // ---------- Build the home screen ----------
 var allApps = [];
@@ -382,7 +745,7 @@ function iconHtml(a) {
   var inner;
   if (a.image) inner = '<div class="art" style="background-image:url(\'' + esc(a.image) + '\')"></div>';
   else if (a.glyph === "calendar") inner = '<div class="cal"><b class="calDay"></b><span class="calNum"></span></div>';
-  else inner = '<div class="art" style="background:' + bg + '">' + glyph(a.glyph) + '</div>';
+  else inner = '<div class="art" style="background:' + bg + ';color:#fff">' + glyph(a.glyph) + '</div>';
   return '<div class="icon">' + inner + '<div class="badge">' + (a.badge || "") + '</div></div>';
 }
 
@@ -398,6 +761,29 @@ pagesEl.innerHTML = PAGES.map(function (page, i) {
   return '<div class="page">' + widget + page.map(appHtml).join("") + '</div>';
 }).join("");
 document.getElementById("dock").innerHTML = DOCK.map(appHtml).join("");
+
+// ---------- Page dots ----------
+// One dot per page; the current page's dot is white. Clicking a dot goes to
+// that page, and clicking the current one moves on to the next (wrapping round).
+var dots = document.getElementById("dots");
+dots.innerHTML = PAGES.map(function (_, i) { return '<i data-p="' + i + '"' + (i ? "" : ' class="on"') + '></i>'; }).join("");
+dots.classList.toggle("hide", PAGES.length < 2);
+
+function currentPage() { return Math.round(pagesEl.scrollLeft / pagesEl.clientWidth) || 0; }
+function showPage(i) { pagesEl.scrollTo({ left: i * pagesEl.clientWidth, behavior: "smooth" }); }
+
+pagesEl.addEventListener("scroll", function () {
+  var cur = currentPage();
+  for (var j = 0; j < dots.children.length; j++) dots.children[j].classList.toggle("on", j === cur);
+}, { passive: true });
+
+dots.addEventListener("click", function (e) {
+  var cur = currentPage();
+  var d = e.target.closest("[data-p]");
+  var target = d ? Number(d.getAttribute("data-p")) : cur;
+  if (target === cur) target = (cur + 1) % PAGES.length;
+  showPage(target);
+});
 
 // ---------- Calendar widget ----------
 var MONTHS = ["January", "February", "March", "April", "May", "June", "July",
@@ -427,14 +813,12 @@ function renderWidget() {
   var now = new Date(), today = dayStart(now);
   var y = today.getFullYear(), m = today.getMonth();
 
-  // Which days this month have events
   var marked = {};
   EVENTS.forEach(function (ev) {
     var d = eventDate(ev.date);
     if (d) marked[d.toDateString()] = true;
   });
 
-  // Month grid
   var heads = WEEK_STARTS_MONDAY ? ["M", "T", "W", "T", "F", "S", "S"] : ["S", "M", "T", "W", "T", "F", "S"];
   var first = new Date(y, m, 1);
   var lead = (first.getDay() - (WEEK_STARTS_MONDAY ? 1 : 0) + 7) % 7;
@@ -450,7 +834,6 @@ function renderWidget() {
   }
   var html = '<div class="calPart"><div class="calMonth">' + MONTHS[m] + '</div><div class="calGrid">' + grid + '</div></div>';
 
-  // Upcoming events
   if (SHOW_EVENTS) {
     shownEvents = EVENTS
       .map(function (ev) { return { ev: ev, d: eventDate(ev.date) }; })
@@ -479,10 +862,9 @@ renderWidget();
 var calW = document.getElementById("calWidget");
 if (calW) calW.addEventListener("click", function (e) {
   var ev = e.target.closest("[data-e]");
-  if (ev) { var x = shownEvents[ev.getAttribute("data-e")]; if (x && x.ev.link) go(x.ev.link); return; }
-  if (CALENDAR_LINK) go(CALENDAR_LINK);
+  if (ev) { var x = shownEvents[ev.getAttribute("data-e")]; if (x && x.ev.link) openLink(x.ev.link, x.ev.title); return; }
+  if (CALENDAR_LINK) openLink(CALENDAR_LINK, "Calendar");
 });
-
 
 // ---------- Clock ----------
 function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -491,7 +873,6 @@ function tick() {
   var d = new Date();
   var hm = ((d.getHours() % 12) || 12) + ":" + pad(d.getMinutes());
   document.getElementById("sbTime").textContent = hm;
-  // Redraw the calendar when the date changes (e.g. left open past midnight)
   if (d.toDateString() !== widgetDay) { widgetDay = d.toDateString(); renderWidget(); }
   var days = document.querySelectorAll(".calDay"), nums = document.querySelectorAll(".calNum");
   for (var i = 0; i < days.length; i++) { days[i].textContent = DAYS[d.getDay()].slice(0, 3); nums[i].textContent = d.getDate(); }
@@ -503,16 +884,27 @@ setInterval(tick, 5000);
 var launch = document.getElementById("launch");
 
 function openApp(a, el) {
-  if (a.action === "call") { startCall(); return; }
+  if (a.action === "phone" || a.action === "call") { zoomFrom(el, openPhoneApp); return; }
+  if (a.action === "camera") { zoomFrom(el, openCamera); return; }
+  if (a.action === "incoming") { ringTestCall(); return; }
   if (a.alert) { showAlert(a.alert.title, a.alert.text); return; }
   if (!a.link) return;
-  // Icon zooms to fill the screen, then the link opens
+  if (APPS_OPEN_IN_PHONE && a.inPhone !== false) {
+    zoomFrom(el, function () { openInPhone(a.link, a.name); });
+  } else {
+    zoomFrom(el, function () { go(a.link); }, true);
+  }
+}
+
+// The app icon zooms up to fill the screen, then "then" runs
+function zoomFrom(el, then, leaving) {
   var icon = el.querySelector(".icon").getBoundingClientRect();
   var box = phone.getBoundingClientRect();
   var art = el.querySelector(".art, .cal");
   launch.style.background = art ? getComputedStyle(art).background : "#000";
   launch.style.transition = "none";
   launch.style.display = "block";
+  launch.style.opacity = "1";
   launch.style.left = (icon.left - box.left) + "px";
   launch.style.top = (icon.top - box.top) + "px";
   launch.style.width = icon.width + "px";
@@ -524,9 +916,8 @@ function openApp(a, el) {
   launch.style.width = box.width + "px"; launch.style.height = box.height + "px";
   launch.style.borderRadius = "0";
   setTimeout(function () {
-    go(a.link);
-    // If the page didn't leave (e.g. new tab), put the home screen back
-    setTimeout(function () { launch.style.display = "none"; }, 600);
+    then();
+    setTimeout(function () { launch.style.display = "none"; }, leaving ? 600 : 60);
   }, 330);
 }
 
@@ -549,9 +940,307 @@ document.getElementById("alertOk").addEventListener("click", function () {
   document.getElementById("alertWrap").classList.remove("on");
 });
 
+// ---------- Apps inside the phone ----------
+var appView = document.getElementById("appView");
+var appBody = document.getElementById("appBody");
+var appExt = document.getElementById("appExt");
+var appExtUrl = null;
+
+function showApp(title, sub, build, extUrl) {
+  closeCamera();
+  document.getElementById("appTitle").textContent = title || "";
+  document.getElementById("appSub").textContent = sub || "";
+  appExtUrl = extUrl || null;
+  appExt.classList.toggle("hide", !appExtUrl);
+  appBody.innerHTML = "";
+  build(appBody);
+  appView.classList.add("on");
+  phone.classList.add("lightApp");
+}
+
+function goHome() {
+  appView.classList.remove("on");
+  appBody.innerHTML = "";
+  phone.classList.remove("lightApp");
+  closeCamera();
+}
+
+function shortUrl(url) {
+  try {
+    var u = new URL(url, location.href);
+    if (u.protocol === "file:") return u.pathname.split("/").pop();
+    return u.host + (u.pathname !== "/" ? u.pathname : "");
+  } catch (e) { return url; }
+}
+
+function openInPhone(url, title) {
+  showApp(title || shortUrl(url), shortUrl(url), function (body) {
+    var f = document.createElement("iframe");
+    f.src = url;
+    f.setAttribute("allow", "camera; microphone; autoplay; fullscreen");
+    body.appendChild(f);
+  }, url);
+}
+
+document.getElementById("appBack").addEventListener("click", goHome);
+document.getElementById("homeBar").addEventListener("click", goHome);
+appExt.addEventListener("click", function () { if (appExtUrl) go(appExtUrl); });
+
+// ---------- Phone app: contacts & keypad ----------
+var phoneTab = "contacts";
+var missedCalls = [];        // { ic, who, time, reason } - newest first
+var unseenMissed = false;
+var dialed = "";
+var PHONE_SVG = '<svg viewBox="0 0 24 24">' + G.ring + '</svg>';
+
+function openPhoneApp() {
+  if (unseenMissed) phoneTab = "recents";   // show new missed calls first
+  unseenMissed = false;
+  missed = 0;
+  updateMissedBadge();
+  showApp("Phone", "", function (body) {
+    body.innerHTML =
+      '<div class="phWrap"><div class="phScroll" id="phScroll"></div>' +
+      '<div class="phTabs">' +
+        '<button class="phTab" data-tab="recents">' + glyph("recents") + 'Missed</button>' +
+        '<button class="phTab" data-tab="contacts">' + glyph("person") + 'Contacts</button>' +
+        '<button class="phTab" data-tab="keypad">' + glyph("keypad") + 'Keypad</button>' +
+      '</div></div>';
+    body.querySelector(".phTabs").addEventListener("click", function (e) {
+      var t = e.target.closest("[data-tab]");
+      if (t) { phoneTab = t.getAttribute("data-tab"); renderPhoneTab(); }
+    });
+    renderPhoneTab();
+  });
+}
+
+var DIAL_KEYS = [["1", ""], ["2", "ABC"], ["3", "DEF"], ["4", "GHI"], ["5", "JKL"], ["6", "MNO"],
+                 ["7", "PQRS"], ["8", "TUV"], ["9", "WXYZ"], ["*", ""], ["0", "+"], ["#", ""]];
+function padHtml(dark) {
+  return DIAL_KEYS.map(function (k) {
+    return '<button class="dk' + (dark ? " dark" : "") + '" data-d="' + k[0] + '"><b>' + k[0] + '</b><small>' + k[1] + '</small></button>';
+  }).join("");
+}
+
+function renderPhoneTab() {
+  var box = document.getElementById("phScroll");
+  if (!box) return;
+  document.querySelectorAll(".phTab").forEach(function (t) {
+    t.classList.toggle("on", t.getAttribute("data-tab") === phoneTab);
+  });
+  box.onclick = null;
+  if (phoneTab === "keypad") {
+    box.innerHTML =
+      '<div class="dialWrap"><div class="dialNum" id="dialNum"></div>' +
+      '<div class="dialPad">' + padHtml(false) + '</div>' +
+      '<div class="dialRow"><span></span><button class="dialCall" id="dialCall">' + PHONE_SVG + '</button>' +
+      '<button class="dialDel" id="dialDel">' + glyph("backspace", "0 0 30 24") + '</button></div></div>';
+    box.querySelector(".dialPad").addEventListener("click", function (e) {
+      var k = e.target.closest("[data-d]");
+      if (k) dialKey(k.getAttribute("data-d"));
+    });
+    document.getElementById("dialDel").addEventListener("click", function () { dialed = dialed.slice(0, -1); showDialed(); });
+    document.getElementById("dialCall").addEventListener("click", dialCall);
+    showDialed();
+    return;
+  }
+  if (phoneTab === "recents") {
+    var rh = '<div class="phTitle">Missed</div>';
+    if (!missedCalls.length) rh += '<div class="phEmpty">No Missed Calls</div>';
+    missedCalls.forEach(function (m, i) {
+      rh += '<div class="phRow" data-m="' + i + '">' + avatarHtml(m.who, "phAv") +
+        '<div class="phText"><div><div class="phName phMissedName">' + esc(m.who.name) + '</div>' +
+        '<div class="phSub">' + (m.reason === "declined" ? "declined call" : "missed call") + '</div></div>' +
+        '<span class="phWhen">' + esc(clockTime(m.time)) + '</span>' +
+        '<span class="phCall">' + PHONE_SVG + '</span></div></div>';
+    });
+    box.innerHTML = rh;
+    box.onclick = function (e) {
+      var row = e.target.closest("[data-m]");
+      if (row) callBack(missedCalls[row.getAttribute("data-m")]);
+    };
+    return;
+  }
+  // Contacts
+  var list = CONTACTS.filter(function (c) { return !c.hidden; })
+    .sort(function (a, b) { return a.name.localeCompare(b.name); });
+  var html = '<div class="phTitle">Contacts</div>';
+  if (!list.length) html += '<div class="phEmpty">No Contacts</div>';
+  var letter = "";
+  list.forEach(function (c) {
+    var L = c.name.charAt(0).toUpperCase();
+    if (!/[A-Z]/.test(L)) L = "#";
+    if (L !== letter) { html += '<div class="phLetter">' + L + '</div>'; letter = L; }
+    html += '<div class="phRow" data-c="' + CONTACTS.indexOf(c) + '">' + avatarHtml(c, "phAv") +
+      '<div class="phText"><div><div class="phName">' + esc(c.name) + '</div>' +
+      (c.number ? '<div class="phNum">' + esc(c.number) + '</div>' : "") + '</div>' +
+      '<span class="phCall">' + PHONE_SVG + '</span></div></div>';
+  });
+  box.innerHTML = html;
+  box.onclick = function (e) {
+    var row = e.target.closest("[data-c]");
+    if (row) callContact(CONTACTS[row.getAttribute("data-c")]);
+  };
+}
+
+function dialKey(d) {
+  unlockAudio();
+  dtmf(d);
+  if (dialed.length < 20) dialed += d;
+  showDialed();
+}
+function showDialed() {
+  var n = document.getElementById("dialNum"), del = document.getElementById("dialDel");
+  if (n) n.textContent = dialed;
+  if (del) del.classList.toggle("on", dialed.length > 0);
+}
+function digitsOf(s) { return String(s || "").replace(/[^0-9*#]/g, ""); }
+
+function dialCall() {
+  var d = digitsOf(dialed);
+  if (!d) return;
+  if (RESET_CODE && d === digitsOf(RESET_CODE)) {
+    resetProgress();
+    dialed = ""; showDialed();
+    showAlert("Reset", "Everyone's conversations will start from the beginning again.");
+    return;
+  }
+  for (var i = 0; i < CONTACTS.length; i++) {
+    if (CONTACTS[i].number && digitsOf(CONTACTS[i].number) === d) { callContact(CONTACTS[i]); return; }
+  }
+  // Not a known number
+  primeMedia();
+  placeCall({ name: dialed, label: "" }, {
+    ring: 1.2, noRingback: true,
+    dialogue: [{ tone: "sit" }].concat(NOT_IN_SERVICE)
+  });
+}
+
+// ---------- Camera ----------
+var camEl = document.getElementById("camera");
+var camVideo = document.getElementById("camVideo");
+var camMsgEl = document.getElementById("camMsg");
+var camThumb = document.getElementById("camThumb");
+var camFlip = document.getElementById("camFlip");
+var shutter = document.getElementById("shutter");
+var camStream = null, camFacing = CAMERA_START, lastPhotoUrl = null;
+
+function camMsg(text) {
+  camMsgEl.textContent = text || "";
+  camMsgEl.classList.toggle("on", !!text);
+  shutter.disabled = !!text;
+}
+
+function openCamera() {
+  appView.classList.remove("on");
+  appBody.innerHTML = "";
+  phone.classList.remove("lightApp");
+  camEl.classList.add("on");
+  startStream();
+}
+
+function stopStream() {
+  if (camStream) camStream.getTracks().forEach(function (t) { t.stop(); });
+  camStream = null;
+  camVideo.srcObject = null;
+}
+
+function closeCamera() {
+  stopStream();
+  camEl.classList.remove("on");
+}
+
+function startStream() {
+  stopStream();
+  camMsg("Starting camera…");
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    camMsg(window.isSecureContext === false
+      ? "The camera only works when this page is opened over https://."
+      : "This browser doesn't support camera access.");
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: camFacing, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false
+  }).then(function (s) {
+    if (!camEl.classList.contains("on")) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+    camStream = s;
+    camVideo.srcObject = s;
+    camVideo.classList.toggle("mirror", camFacing === "user");
+    var p = camVideo.play();
+    if (p && p.catch) p.catch(function () {});
+    camMsg("");
+    // Only offer the flip button when there's more than one camera
+    if (navigator.mediaDevices.enumerateDevices) {
+      navigator.mediaDevices.enumerateDevices().then(function (list) {
+        var cams = list.filter(function (d) { return d.kind === "videoinput"; }).length;
+        camFlip.classList.toggle("hide", cams < 2);
+      });
+    }
+  }).catch(function (e) {
+    var n = e && e.name;
+    camMsg(n === "NotAllowedError" || n === "SecurityError"
+      ? "Camera access was blocked. Allow camera access for this site in your browser's settings, then try again."
+      : n === "NotFoundError" || n === "OverconstrainedError"
+      ? "No camera was found on this device."
+      : n === "NotReadableError"
+      ? "The camera is being used by another app."
+      : "The camera couldn't be started.");
+  });
+}
+
+function stamp() {
+  var d = new Date();
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "_" +
+    pad(d.getHours()) + "-" + pad(d.getMinutes()) + "-" + pad(d.getSeconds());
+}
+
+function snap() {
+  if (!camStream || !camVideo.videoWidth) return;
+  // Save only the part of the camera picture that's visible on the phone screen.
+  // The preview fills the screen and trims the overflow, so work out that same
+  // centered crop from the full camera image.
+  var vw = camVideo.videoWidth, vh = camVideo.videoHeight;
+  var box = document.getElementById("camView").getBoundingClientRect();
+  var scale = Math.max(box.width / vw, box.height / vh);
+  var sw = Math.round(Math.min(vw, box.width / scale));
+  var sh = Math.round(Math.min(vh, box.height / scale));
+  var sx = Math.round((vw - sw) / 2), sy = Math.round((vh - sh) / 2);
+  var c = document.createElement("canvas");
+  c.width = sw;
+  c.height = sh;
+  var g = c.getContext("2d");
+  if (camFacing === "user") { g.translate(c.width, 0); g.scale(-1, 1); }   // save it the way it looked
+  g.drawImage(camVideo, sx, sy, sw, sh, 0, 0, sw, sh);
+  var fl = document.getElementById("camFlash");
+  fl.classList.remove("go"); fl.offsetWidth; fl.classList.add("go");
+  unlockAudio();
+  tone([2400, 1700], 0.04, 0.06);
+  c.toBlob(function (blob) {
+    if (!blob) return;
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = PHOTO_NAME + "_" + stamp() + ".jpg";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    camThumb.style.backgroundImage = "url('" + url + "')";
+    var old = lastPhotoUrl;
+    lastPhotoUrl = url;
+    if (old) setTimeout(function () { URL.revokeObjectURL(old); }, 60000);
+  }, "image/jpeg", 0.92);
+}
+
+shutter.addEventListener("click", snap);
+camFlip.addEventListener("click", function () {
+  camFacing = camFacing === "user" ? "environment" : "user";
+  startStream();
+});
+document.getElementById("camClose").addEventListener("click", closeCamera);
+
 // ---------- Sound ----------
-// iPhones only allow sound after the visitor has touched the page once, so the
-// ringtone is "unlocked" on the first tap anywhere.
+// iPhones only allow sound after the visitor has touched the page, so sound
+// is "unlocked" on the first tap anywhere.
 var actx = null;
 function unlockAudio() {
   try {
@@ -564,6 +1253,32 @@ function unlockAudio() {
 document.addEventListener("touchend", unlockAudio, { passive: true });
 document.addEventListener("click", unlockAudio);
 
+// Play one or more pitches together for "dur" seconds
+function tone(freqs, dur, vol, delay) {
+  if (!actx || actx.state !== "running") return null;
+  var t0 = actx.currentTime + (delay || 0);
+  var g = actx.createGain();
+  g.connect(actx.destination);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+  g.gain.setValueAtTime(vol, t0 + Math.max(0.02, dur - 0.02));
+  g.gain.linearRampToValueAtTime(0, t0 + dur);
+  freqs.forEach(function (f) {
+    var o = actx.createOscillator();
+    o.frequency.value = f;
+    o.connect(g);
+    o.start(t0);
+    o.stop(t0 + dur + 0.05);
+  });
+  return g;
+}
+
+// Keypad beeps (real touch-tone pitches)
+var DTMF = { "1": [697, 1209], "2": [697, 1336], "3": [697, 1477], "4": [770, 1209], "5": [770, 1336], "6": [770, 1477],
+             "7": [852, 1209], "8": [852, 1336], "9": [852, 1477], "*": [941, 1209], "0": [941, 1336], "#": [941, 1477] };
+function dtmf(d) { if (DTMF[d]) tone(DTMF[d], 0.15, 0.08); }
+
+// Incoming ringtone
 var ringTimer = null;
 function ringOnce() {
   if (!actx || actx.state !== "running") return;
@@ -571,7 +1286,6 @@ function ringOnce() {
   var gain = actx.createGain();
   gain.connect(actx.destination);
   gain.gain.setValueAtTime(0, t0);
-  // Two short trills, like a phone ringing
   for (var burst = 0; burst < 2; burst++) {
     var s = t0 + burst * 0.45;
     for (var i = 0; i < 8; i++) {
@@ -596,153 +1310,478 @@ function startRinging() {
 }
 function stopRinging() { clearInterval(ringTimer); ringTimer = null; }
 
-// ---------- Incoming call ----------
+// Outgoing "brrr... brrr..." while waiting for an answer
+var rbTimer = null, rbGain = null;
+function ringbackOnce() { rbGain = tone([440, 480], 2, 0.06); }
+function startRingback() { ringbackOnce(); rbTimer = setInterval(ringbackOnce, 6000); }
+function stopRingback() {
+  clearInterval(rbTimer); rbTimer = null;
+  if (rbGain && actx) { try { rbGain.gain.cancelScheduledValues(actx.currentTime); rbGain.gain.setValueAtTime(0, actx.currentTime); } catch (e) {} }
+  rbGain = null;
+}
+
+// The voice: one shared audio player, plus the computer voice as a fallback
+var SILENT = "data:audio/wav;base64,UklGRiwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQgAAACAgICAgICAgA==";
+var voiceAudio = new Audio();
+voiceAudio.preload = "auto";
+voiceAudio.setAttribute("playsinline", "");
+
+// Called from a tap, so iPhones let the call's audio and speech play later
+function primeMedia() {
+  unlockAudio();
+  try {
+    voiceAudio.src = SILENT;
+    var p = voiceAudio.play();
+    if (p && p.catch) p.catch(function () {});
+  } catch (e) {}
+  if (window.speechSynthesis) { try { speechSynthesis.speak(new SpeechSynthesisUtterance("")); } catch (e) {} }
+}
+
+// ---------- Calls ----------
 var callEl = document.getElementById("call");
 var callSub = document.getElementById("callSub");
+var captionEl = document.getElementById("caption");
+var dtmfShow = document.getElementById("dtmfShow");
+var pill = document.getElementById("callPill");
+var kpBtn = document.getElementById("kpBtn");
 var missed = 0;
-var callState = "idle";        // idle, ringing, active, ending
-var missTimer = null, durTimer = null, callStart = 0;
-var audio = null, speaking = false;
-
-document.getElementById("callName").textContent = CALL_NAME;
-var avatar = document.getElementById("callAvatar");
-if (CALL_PHOTO) avatar.style.backgroundImage = "url('" + CALL_PHOTO + "')";
-else avatar.textContent = (CALL_NAME.trim().split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2) || "?").toUpperCase();
+var callState = "idle";        // idle, ringing (incoming), dialing (outgoing), active, ending
+var current = null;            // { who, plan, kind: "in"/"out", auto }
+var missTimer = null, dialTimer = null, durTimer = null, waitTimer = null, pauseTimer = null;
+var callStart = 0, muted = false, pendingOpen = null;
+var lineToken = 0;             // changes whenever a line is cut short, so old callbacks are ignored
+var run = null;                // the dialogue being played
 
 document.getElementById("acceptBtn").innerHTML = glyph("ring");
 document.getElementById("declineBtn").innerHTML = glyph("ring");
 document.getElementById("endBtn").innerHTML = glyph("ring");
 document.getElementById("muteBtn").innerHTML = glyph("mic");
 document.querySelectorAll("[data-g]").forEach(function (b) { b.innerHTML = glyph(b.getAttribute("data-g")); });
-document.getElementById("linkLabel").textContent = CALL_LINK_LABEL;
-if (!CALL_LINK) {
-  var lw = document.getElementById("linkWrap");
-  lw.classList.remove("link");
-  lw.querySelector("button").disabled = true;
-  lw.querySelector("button").innerHTML = glyph("video");
-  document.getElementById("linkLabel").textContent = "video";
+document.getElementById("kpPad").innerHTML = padHtml(true);
+
+function updateMissedBadge() {
+  document.querySelectorAll(".app").forEach(function (el) {
+    if (allApps[el.getAttribute("data-k")].missedCalls) el.querySelector(".badge").textContent = missed || "";
+  });
 }
 
-// Preload the call audio so it starts instantly when answered
-if (CALL_AUDIO) {
-  audio = new Audio();
-  audio.preload = "auto";
-  audio.src = CALL_AUDIO;
-  audio.setAttribute("playsinline", "");
+function findContact(name) {
+  for (var i = 0; i < CONTACTS.length; i++) if (CONTACTS[i].name === name) return CONTACTS[i];
+  return null;
+}
+function whoFrom(c) {
+  return { name: c.name, photo: c.photo, label: c.label || "mobile", pitch: c.pitch, rate: c.rate, lang: c.lang };
 }
 
-function scheduleCall() {
-  if (!CALL_ENABLED) return;
-  var lo = Math.min(CALL_MIN_SECONDS, CALL_MAX_SECONDS), hi = Math.max(CALL_MIN_SECONDS, CALL_MAX_SECONDS);
-  var secs = lo + Math.random() * (hi - lo);
-  setTimeout(function () {
-    // Wait until the visitor is actually looking at the page
-    if (document.hidden) {
-      document.addEventListener("visibilitychange", function wait() {
-        if (!document.hidden) { document.removeEventListener("visibilitychange", wait); startCall(); }
-      });
-    } else startCall();
-  }, secs * 1000);
+function showCaller(who) {
+  document.getElementById("callName").textContent = who.name || "Unknown";
+  var av = document.getElementById("callAvatar");
+  if (who.photo) { av.style.backgroundImage = "url('" + who.photo + "')"; av.textContent = ""; }
+  else { av.style.backgroundImage = ""; av.textContent = initials(who.name); }
+  muted = false;
+  document.getElementById("muteBtn").classList.remove("on");
+  document.querySelectorAll(".toggle").forEach(function (b) { b.classList.remove("on"); });
+  dtmfShow.textContent = "";
+  setCaption("");
+  setLink("");
+  callEl.classList.remove("kp", "min", "active");
+  pill.classList.remove("on");
 }
 
-function startCall() {
+function setCaption(text) { captionEl.textContent = SHOW_CAPTIONS ? (text || "") : ""; }
+
+var linkUrl = "";
+function setLink(url, label) {
+  linkUrl = url || "";
+  var wrap = document.getElementById("linkWrap"), btn = document.getElementById("linkBtn");
+  wrap.classList.toggle("link", !!linkUrl);
+  btn.disabled = !linkUrl;
+  btn.innerHTML = glyph(linkUrl ? "link" : "videoBtn");
+  document.getElementById("linkLabel").textContent = linkUrl ? (label || "Open Link") : "video";
+}
+
+function startTimer() {
+  callStart = Date.now();
+  function show() {
+    var s = Math.floor((Date.now() - callStart) / 1000);
+    var t = pad(Math.floor(s / 60)) + ":" + pad(s % 60);
+    callSub.textContent = t;
+    pill.textContent = t;
+  }
+  show();
+  durTimer = setInterval(show, 250);
+}
+
+// ----- Outgoing -----
+var PROG_KEY = "bphone:calls";
+var progress = {};
+if (REMEMBER_PROGRESS) { try { progress = JSON.parse(localStorage.getItem(PROG_KEY)) || {}; } catch (e) {} }
+function saveProgress() { if (REMEMBER_PROGRESS) { try { localStorage.setItem(PROG_KEY, JSON.stringify(progress)); } catch (e) {} } }
+function resetProgress() { progress = {}; try { localStorage.removeItem(PROG_KEY); } catch (e) {} }
+
+function callContact(c) {
   if (callState !== "idle") return;
-  callState = "ringing";
-  callEl.classList.remove("active");
+  primeMedia();
+  var n = progress[c.name] || 0;
+  var convs = c.calls || [];
+  if (n < convs.length) {
+    placeCall(whoFrom(c), {
+      ring: 2.5 + Math.random() * 3.5,
+      dialogue: convs[n],
+      onConnect: function () { progress[c.name] = n + 1; saveProgress(); }   // counts once answered
+    });
+  } else {
+    var greeting = c.voicemail || [{ say: "Hi, you've reached " + c.name + ". Please leave a message after the tone." }];
+    placeCall(whoFrom(c), {
+      ring: 8 + Math.random() * 4,
+      dialogue: [].concat(greeting, [{ tone: "beep" }, { hold: VOICEMAIL_RECORD_SECONDS, caption: "● Recording" }])
+    });
+  }
+}
+
+function clockTime(d) {
+  return ((d.getHours() % 12) || 12) + ":" + pad(d.getMinutes()) + " " + (d.getHours() < 12 ? "AM" : "PM");
+}
+
+// Call back a missed call: plays that call's dialogue (or its callBack),
+// and takes it off the Missed list once answered
+function callBack(m) {
+  if (!m || callState !== "idle") return;
+  primeMedia();
+  placeCall(m.who, {
+    ring: 2.5 + Math.random() * 3.5,
+    dialogue: m.ic.callBack || m.ic.dialogue,
+    onConnect: function () {
+      var i = missedCalls.indexOf(m);
+      if (i !== -1) missedCalls.splice(i, 1);
+    }
+  });
+}
+
+function placeCall(who, plan) {
+  if (callState !== "idle") return;
+  current = { who: who, plan: plan, kind: "out" };
+  showCaller(who);
+  callEl.classList.add("on", "active");
+  callState = "dialing";
+  callSub.textContent = "calling" + (who.label ? " " + who.label : "") + "…";
+  if (!plan.noRingback) startRingback();
+  dialTimer = setTimeout(function () { stopRingback(); connect(); }, (plan.ring || 3) * 1000);
+}
+
+// ----- Incoming -----
+var autoLeft = AUTO_CALLS;
+var usedIncoming = [];
+
+function pickIncoming(allowRepeats) {
+  var pool = INCOMING_CALLS.filter(function (ic) {
+    return (ic.weight == null ? 1 : ic.weight) > 0 && (allowRepeats || usedIncoming.indexOf(ic) === -1);
+  });
+  if (!pool.length) return null;
+  var total = 0;
+  pool.forEach(function (ic) { total += (ic.weight == null ? 1 : ic.weight); });
+  var roll = Math.random() * total;
+  for (var i = 0; i < pool.length; i++) {
+    roll -= (pool[i].weight == null ? 1 : pool[i].weight);
+    if (roll < 0) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+function scheduleNextAuto() {
+  if (autoLeft <= 0 || !INCOMING_CALLS.length) return;
+  var lo = Math.min(CALL_MIN_SECONDS, CALL_MAX_SECONDS), hi = Math.max(CALL_MIN_SECONDS, CALL_MAX_SECONDS);
+  setTimeout(fireAuto, (lo + Math.random() * (hi - lo)) * 1000);
+}
+
+function fireAuto() {
+  if (autoLeft <= 0) return;
+  // Wait until the visitor is looking at the page and not already on a call
+  if (document.hidden || callState !== "idle") { setTimeout(fireAuto, 3000); return; }
+  var ic = pickIncoming(false);
+  if (!ic) return;
+  autoLeft--;
+  usedIncoming.push(ic);
+  incomingCall(ic, true);
+}
+
+function ringTestCall() {
+  var ic = pickIncoming(true);
+  if (ic) incomingCall(ic, false);
+}
+
+function incomingCall(ic, auto) {
+  if (callState !== "idle") return;
+  var c = findContact(ic.from);
+  var who = {
+    name: ic.from || "Unknown",
+    photo: ic.photo || (c && c.photo),
+    label: ic.label || (c && c.label) || "mobile",
+    pitch: ic.pitch != null ? ic.pitch : c && c.pitch,
+    rate: ic.rate != null ? ic.rate : c && c.rate,
+    lang: ic.lang || (c && c.lang)
+  };
+  current = { who: who, plan: { dialogue: ic.dialogue }, kind: "in", auto: auto, ic: ic };
+  showCaller(who);
   callEl.classList.add("on");
-  callSub.textContent = CALL_SUBTITLE;
+  callState = "ringing";
+  callSub.textContent = who.label;
   document.getElementById("alertWrap").classList.remove("on");
   startRinging();
-  missTimer = setTimeout(function () { finishCall(true); }, RING_SECONDS * 1000);
+  missTimer = setTimeout(function () { finishCall("missed"); }, RING_SECONDS * 1000);
 }
 
 function answer() {
   if (callState !== "ringing") return;
+  primeMedia();
+  stopRinging();
+  clearTimeout(missTimer);
+  connect();
+}
+
+// ----- Connected -----
+function connect() {
+  if (callState !== "ringing" && callState !== "dialing") return;
   callState = "active";
-  stopRinging();
-  clearTimeout(missTimer);
   callEl.classList.add("active");
-  callSub.textContent = "00:00";
-  callStart = Date.now();
-  durTimer = setInterval(function () {
-    var s = Math.floor((Date.now() - callStart) / 1000);
-    callSub.textContent = pad(Math.floor(s / 60)) + ":" + pad(s % 60);
-  }, 250);
-
-  // Wake up speech now, during the tap, in case the audio fails later and the
-  // fallback has to talk (iPhones block speech that doesn't start from a tap)
-  if (CALL_SPEECH && window.speechSynthesis) {
-    try { speechSynthesis.speak(new SpeechSynthesisUtterance("")); } catch (e) {}
-  }
-
-  // Play the audio (allowed because this runs from the Accept tap)
-  if (audio && !audio.error) {
-    audio.currentTime = 0;
-    audio.onended = function () { hangUp(); };
-    audio.onerror = function () { if (callState === "active" && !speaking) speakInstead(); };
-    var p = audio.play();
-    if (p && p.catch) p.catch(function () { if (callState === "active" && !speaking) speakInstead(); });
-  } else speakInstead();
+  startTimer();
+  if (current.plan.onConnect) current.plan.onConnect();
+  runDialogue(current.plan.dialogue);
 }
 
-// Fallback when there's no audio file: read CALL_SPEECH aloud
-function speakInstead() {
-  if (!CALL_SPEECH || !window.speechSynthesis) { setTimeout(hangUp, 2500); return; }
-  speaking = true;
-  var started = false;
-  var u = new SpeechSynthesisUtterance(CALL_SPEECH);
-  u.onstart = function () { started = true; };
-  u.onend = function () { speaking = false; hangUp(); };
-  u.onerror = function () { speaking = false; hangUp(); };
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-  // If the browser refuses to speak, don't leave the call hanging forever
-  setTimeout(function () { if (!started && speaking) { speaking = false; hangUp(); } }, 4000);
-}
+function hangUp() { finishCall("ended"); }
 
-function hangUp() { finishCall(false); }
-
-function finishCall(wasMissed) {
+function finishCall(reason) {
   if (callState === "idle" || callState === "ending") return;
-  var wasActive = callState === "active";
+  var answered = callState === "active";
+  var wasIncoming = current && current.kind === "in";
+  var wasAuto = current && current.auto;
+  var wasMin = callEl.classList.contains("min");
   callState = "ending";
-  stopRinging();
-  clearTimeout(missTimer);
+  lineToken++;
+  run = null;
+  stopRinging(); stopRingback(); stopVoice();
+  clearTimeout(missTimer); clearTimeout(dialTimer); clearTimeout(waitTimer); clearTimeout(pauseTimer);
   clearInterval(durTimer);
-  if (audio) { audio.onended = null; audio.onerror = null; audio.pause(); }
-  if (speaking && window.speechSynthesis) { speaking = false; speechSynthesis.cancel(); }
-
-  if (!wasActive) {
+  if (wasIncoming && !answered) {
     missed++;
-    document.querySelectorAll(".app").forEach(function (el) {
-      if (allApps[el.getAttribute("data-k")].missedCalls) el.querySelector(".badge").textContent = missed;
-    });
+    updateMissedBadge();
+    missedCalls.unshift({ ic: current.ic, who: current.who, time: new Date(), reason: reason });
+    unseenMissed = true;
   }
-  callSub.textContent = wasActive ? "Call Ended" : (wasMissed ? "Missed Call" : "Call Declined");
+  callEl.classList.remove("kp");
+  updateKeyHint();
+  setCaption("");
+  callSub.textContent = { missed: "Missed Call", declined: "Call Declined" }[reason] || "Call Ended";
+  pill.classList.remove("on");
 
   setTimeout(function () {
-    callEl.classList.remove("on", "active");
+    callEl.classList.remove("on", "active", "min", "kp");
     callState = "idle";
-    if (wasActive && REDIRECT_WHEN_CALL_ENDS && CALL_LINK) { go(CALL_LINK); return; }
-    if (CALL_AGAIN) scheduleCall();
-  }, wasActive ? 1200 : 700);
+    current = null;
+    if (appView.classList.contains("on") && document.getElementById("phScroll") && phoneTab === "recents") renderPhoneTab();
+    if (pendingOpen) { var u = pendingOpen; pendingOpen = null; openLink(u); }
+    if (wasAuto) scheduleNextAuto();
+  }, wasMin ? 0 : (answered ? 1200 : 700));
 }
 
+// ----- Dialogue -----
+function runDialogue(d) {
+  var parts = !d ? { start: [] } : Array.isArray(d) ? { start: d } : d;
+  run = { parts: parts, part: null, idx: 0, line: null };
+  goPart("start");
+}
+
+function goPart(name) {
+  if (!run || callState !== "active") return;
+  if (name === "end") { hangUp(); return; }
+  var lines = run.parts[name];
+  if (!lines || !lines.length) { hangUp(); return; }
+  run.part = name;
+  run.idx = 0;
+  playLine();
+}
+
+function playLine() {
+  if (!run || callState !== "active") return;
+  var lines = run.parts[run.part];
+  if (run.idx >= lines.length) { hangUp(); return; }     // end of this part
+  var line = lines[run.idx];
+  run.line = line;
+  var my = ++lineToken;
+  clearTimeout(waitTimer); clearTimeout(pauseTimer);
+  if ("link" in line) setLink(line.link, line.linkLabel);
+  setCaption(line.caption != null ? line.caption : (line.say || ""));
+  updateKeyHint();
+  sayLine(line, my, function () {
+    if (my !== lineToken || callState !== "active") return;
+    lineDone(line, my);
+  });
+}
+
+function lineDone(line, my) {
+  if (line.open) { pendingOpen = line.open; hangUp(); return; }
+  if (line.keys) {
+    // Wait for a button press
+    waitTimer = setTimeout(function () {
+      if (my !== lineToken || callState !== "active") return;
+      if (line.noKey) goPart(line.noKey); else hangUp();
+    }, (line.wait != null ? line.wait : 10) * 1000);
+    return;
+  }
+  pauseTimer = setTimeout(function () {
+    if (my !== lineToken || callState !== "active") return;
+    if (line.next) goPart(line.next);
+    else { run.idx++; playLine(); }
+  }, (line.pause != null ? line.pause : 0.5) * 1000);
+}
+
+// A keypad button pressed during a call
+function keyPressed(d) {
+  dtmf(d);
+  dtmfShow.textContent = (dtmfShow.textContent + d).slice(-16);
+  if (callState !== "active" || !run || !run.line || !run.line.keys) return;
+  var keys = run.line.keys;
+  var target = keys[d] != null ? keys[d] : keys.other;
+  if (target == null) return;
+  var my = ++lineToken;
+  stopVoice();
+  clearTimeout(waitTimer); clearTimeout(pauseTimer);
+  updateKeyHint();
+  setTimeout(function () {
+    if (my !== lineToken || callState !== "active") return;
+    if (target === "repeat") playLine(); else goPart(target);
+  }, 400);
+}
+
+// Make the keypad button pulse when the caller is waiting for a press
+function updateKeyHint() {
+  var waiting = callState === "active" && run && run.line && run.line.keys && !callEl.classList.contains("kp");
+  kpBtn.classList.toggle("attn", !!waiting);
+}
+
+// Play one line: special tones, audio file, or the computer voice
+function sayLine(line, my, done) {
+  var finished = false;
+  function fin() { if (!finished) { finished = true; done(); } }
+  if (line.tone === "beep") { tone([1000], 0.5, 0.1); setTimeout(fin, 700); return; }
+  if (line.tone === "sit") {
+    tone([913.8], 0.274, 0.1, 0); tone([1370.6], 0.274, 0.1, 0.28); tone([1776.7], 0.38, 0.1, 0.56);
+    setTimeout(fin, 1100); return;
+  }
+  if (line.hold) { setTimeout(fin, line.hold * 1000); return; }
+  if (line.audio) {
+    var fell = false;
+    var fallback = function () {
+      if (fell || my !== lineToken) return;
+      fell = true;
+      voiceAudio.onended = null;
+      speak(line.say, fin);
+    };
+    voiceAudio.onended = fin;
+    voiceAudio.onerror = fallback;
+    voiceAudio.muted = muted;
+    voiceAudio.src = line.audio;
+    var p = voiceAudio.play();
+    if (p && p.catch) p.catch(function (e) { if (!e || e.name !== "AbortError") fallback(); });
+    return;
+  }
+  speak(line.say, fin);
+}
+
+// The computer voice. If the browser won't speak, the caption stays up for
+// about as long as it takes to read, so the call still moves along.
+function speak(text, done) {
+  var who = (current && current.who) || {};
+  var rate = who.rate || 1;
+  var readMs = Math.max(1500, String(text || "").length * 65 / rate);
+  if (!text) { setTimeout(done, 300); return; }
+  if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) { setTimeout(done, readMs); return; }
+  var started = false, ended = false, t1, t2, t3;
+  function end() {
+    if (ended) return;
+    ended = true;
+    clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
+    done();
+  }
+  var u = new SpeechSynthesisUtterance(text);
+  u.pitch = who.pitch || 1;
+  u.rate = rate;
+  u.volume = muted ? 0 : 1;
+  if (who.lang) u.lang = who.lang;
+  u.onstart = function () { started = true; };
+  u.onend = end;
+  // No voice available? Keep the caption up for reading time instead of skipping it
+  u.onerror = function () {
+    if (started) { end(); return; }
+    clearTimeout(t1); clearTimeout(t2);
+    t2 = setTimeout(end, readMs);
+  };
+  speechSynthesis.cancel();
+  setTimeout(function () { if (!ended) speechSynthesis.speak(u); }, 60);
+  t1 = setTimeout(function () { if (!started) t2 = setTimeout(end, readMs); }, 2000);
+  t3 = setTimeout(end, readMs * 2.5 + 8000);    // safety net if the browser never says it finished
+}
+
+function stopVoice() {
+  voiceAudio.onended = null;
+  voiceAudio.onerror = null;
+  try { voiceAudio.pause(); } catch (e) {}
+  if (window.speechSynthesis) { try { speechSynthesis.cancel(); } catch (e) {} }
+}
+
+// ----- Call screen buttons -----
 document.getElementById("acceptBtn").addEventListener("click", answer);
-document.getElementById("declineBtn").addEventListener("click", function () { finishCall(false); });
+document.getElementById("declineBtn").addEventListener("click", function () { finishCall("declined"); });
 document.getElementById("endBtn").addEventListener("click", hangUp);
 document.getElementById("muteBtn").addEventListener("click", function () {
   this.classList.toggle("on");
-  if (audio) audio.muted = this.classList.contains("on");
+  muted = this.classList.contains("on");
+  voiceAudio.muted = muted;
 });
 document.querySelectorAll(".toggle").forEach(function (b) {
   b.addEventListener("click", function () { b.classList.toggle("on"); });
 });
-document.getElementById("linkBtn").addEventListener("click", function () {
-  if (CALL_LINK) go(CALL_LINK);
+kpBtn.addEventListener("click", function () {
+  callEl.classList.add("kp");
+  updateKeyHint();
+});
+document.getElementById("kpHide").addEventListener("click", function () {
+  callEl.classList.remove("kp");
+  updateKeyHint();
+});
+document.getElementById("kpPad").addEventListener("click", function (e) {
+  var k = e.target.closest("[data-d]");
+  if (k) keyPressed(k.getAttribute("data-d"));
 });
 
-scheduleCall();
+// The blue link button: the call keeps going in the background while the
+// page opens in the phone. Tap the green pill at the top to go back to it.
+document.getElementById("linkBtn").addEventListener("click", function () {
+  if (!linkUrl) return;
+  if (!APPS_OPEN_IN_PHONE) { go(linkUrl); return; }
+  if (callState === "active") { callEl.classList.add("min"); pill.classList.add("on"); }
+  openInPhone(linkUrl, document.getElementById("linkLabel").textContent);
+});
+pill.addEventListener("click", function () {
+  callEl.classList.remove("min");
+  pill.classList.remove("on");
+});
+
+// Computer keyboard: number keys work on the keypads, Escape goes home
+document.addEventListener("keydown", function (e) {
+  var k = e.key;
+  var isDigit = /^[0-9*#]$/.test(k);
+  if (callState === "active" && !callEl.classList.contains("min") && isDigit) { keyPressed(k); return; }
+  if (callState === "idle" && appView.classList.contains("on") && phoneTab === "keypad" && document.getElementById("dialNum")) {
+    if (isDigit) { dialKey(k); return; }
+    if (k === "Backspace") { dialed = dialed.slice(0, -1); showDialed(); return; }
+    if (k === "Enter") { primeMedia(); dialCall(); return; }
+  }
+  if (k === "Escape" && callState === "idle") goHome();
+});
+
+scheduleNextAuto();
 </script>
 </body>
 </html>

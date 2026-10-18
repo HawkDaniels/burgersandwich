@@ -58,7 +58,20 @@ var PROMPT = "guest@burgersandwich:~$";
 
 // The message shown when the page loads. One line per entry.
 var WELCOME = [
-  "burgersandwich terminal v0.1b",
+"⠀⠀⠀⠀⠀⠀⠀⣀⡤⠔⢒⢏⢉⡙⢛⣶⡻⣟⠛⠶⠶⢦⣤⣀⠀⠀⠀⠀⠀⠀",
+"⠀⠀⠀⠀⣠⠔⢫⡅⢀⠚⢠⡍⠀⣪⠂⠸⠿⡄⠘⠆⠈⠰⠀⣭⠳⣦⡀⠀⠀⠀",
+"⠀⠀⢠⡞⠁⢁⠀⠀⠉⠀⠒⢀⠀⠋⠀⠛⡀⠈⣠⠈⠀⠲⠂⠀⣠⠈⢳⡀⠀⠀",
+"⠀⢰⡏⡄⠀⠀⠀⠀⠘⠀⢠⠉⠀⣉⠀⠈⢁⠀⠈⠀⠒⠀⠀⠒⠀⠀⠀⠹⡄⠀",
+"⠀⢸⡀⣴⠄⣢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠂⠀⠈⠁⠐⠀⠀⠀⠀⢹⠀",
+"⠀⢈⡷⠮⢤⣙⡓⠷⠤⢠⣄⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⡜⠀",
+"⠼⠷⣾⣀⠀⢀⣍⠑⠒⣢⠤⠤⠤⠤⠤⠤⠤⠖⠲⠶⣒⠒⠀⠉⠉⠀⢀⣈⣻⣦",
+"⠀⠀⣩⣿⣤⣗⠺⠭⠭⠧⢤⠀⣠⣏⠱⠦⣀⣴⣝⣒⠉⠑⡤⠒⣉⣙⣬⣿⠀",
+"⠀⠐⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣶⣄⠀⠀⢀⡠⢔⣪⡿⣿⠟⠿⠚⠃⠉⢸⡇⠀",
+"⠀⠀⢻⣿⣿⣿⣿⣿⣾⣿⣾⣿⣿⣿⢧⣯⠵⠒⠟⡉⡇⢬⠦⢥⣴⣄⣠⣼⠃⠀",
+"⠀⠀⡏⡓⠐⠛⠋⠉⠛⢿⡛⠻⠾⣾⠾⠽⣟⣋⣲⠿⠛⠛⠛⠓⠤⢤⠇⠘⡇⠀",
+"⠀⠀⣷⢻⣂⢄⢀⠀⡀⠀⠑⠒⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀⠀⠀⢠⡇⠀",
+"⠀⠀⠈⠓⠾⢿⣤⣵⣮⣄⣀⣒⣒⣂⣀⣀⣀⣀⣒⣀⣠⣭⡤⠤⠤⠔⠒⠉⠀⠀",
+  "burgersandwich terminal v0.2a",
   "Last login: " + new Date().toString(),
   "",
   "Type 'help' to see available commands.",
@@ -67,12 +80,12 @@ var WELCOME = [
 
 // Commands that go to a page: "command": ["URL", "description shown in help"]
 var PAGES = {
-  "home":    ["/altindex.html",          "Return home"],
   "log":    ["/pages/captainslog.html",         "Visit The Captain's Log"],
   "chris":    ["/pages/chriscorner.html",         "Visit Chris's Corner"],
   "barak":    ["/pages/barakdomain.html",         "Visit Barak's Domain"],
   "download":    ["/pages/downloads.html",         "Visit Downloads"],
   "404":    ["/pages/example404.html",         "404"],
+  "exit":    ["/index.html",         "Exit terminal"],
   "tag":    ["/tags/tags.html",         "Visit #code ***Incomplete"],
   //"":    ["",         ""],
 };

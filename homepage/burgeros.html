@@ -272,10 +272,11 @@ var DESKTOP = [
       ]}
   ]},
   { title: "Internet", icon: "globe", link: "https://burgersandwich.jp", inWindow: "true" },
-  { title: "Readme.txt", type: "text",
-    text: "Welcome!\r\n\r\nDouble-click the icons to look around.\r\n\r\nEverything on this desktop leads somewhere on the site." },
+  { title: "BS Messenger", icon: "globe", link: "https://chat.burgersandwich.jp", inWindow: "true" },
+//  { title: "Readme.txt", type: "text",
+//    text: "Welcome!\r\n\r\nDouble-click the icons to look around.\r\n\r\nEverything on this desktop leads somewhere on the site." },
   { title: "Recycle Bin", icon: "recycle", type: "folder", children: [
-      { title: "old_homepage.htm", icon: "document", type: "link", link: "/homepage/ogburgersandwich.html" }
+      { title: "index.html", icon: "document", type: "link", link: "/homepage/ogburgersandwich.html" }
   ]},
   { title: "song.mp3", type: "music", src: "music/song.mp3" },
   { title: "Do Not Click", icon: "warning", type: "link", link: "/pages/banned.html"}
@@ -285,15 +286,15 @@ var DESKTOP = [
 // Special entries: { separator: true }, { type: "run" }, { type: "shutdown" }
 var START_MENU = [
   { title: "Programs", icon: "folder", type: "folder", children: [
-      { title: "Terminal", icon: "document", link: "terminal.htm" },
-      { title: "Media Server", icon: "document", link: "jellyfin.htm" }
+      { title: "Internet", icon: "globe", link: "https://burgersandwich.jp", inWindow: "true" },
+      { title: "BS Messenger", icon: "globe", link: "https://chat.burgersandwich.jp", inWindow: "true" }
   ]},
-  { title: "Documents", icon: "folder", type: "folder", children: [
-      { title: "Readme.txt", type: "text",
-        text: "Welcome!\r\n\r\nDouble-click the icons to look around." }
-  ]},
+//  { title: "Documents", icon: "folder", type: "folder", children: [
+//      { title: "Readme.txt", type: "text",
+//        text: "Welcome!\r\n\r\nDouble-click the icons to look around." }
+//  ]},
   { title: "Help", icon: "help", type: "dialog", dialogIcon: "info",
-    text: "Double-click an icon to open it. Drag windows by their title bars." },
+    text: "Double-click to open files." },
   { separator: true },
   { title: "Run...", icon: "run", type: "run" },
   { separator: true },
