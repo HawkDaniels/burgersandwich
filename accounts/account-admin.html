@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Account admin</title>
+<!-- For the site owner. Needs the ADMIN_TOKEN secret. The token is kept only in this page's memory. -->
+</head>
+<body>
+<h1>Account admin</h1>
+<p id="msg" role="status"></p>
+
+<form id="tokenForm">
+  <label>Admin token <input id="token" type="password" autocomplete="off" required></label>
+  <button>Load accounts</button>
+</form>
+
+<div id="panel" hidden>
+  <p><span id="count"></span> accounts <button id="reload">Reload</button></p>
+  <table border="1" cellpadding="3">
+    <thead><tr><th>id</th><th>username</th><th>registered</th><th>last login</th><th></th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <h2>Reset a password</h2>
+  <form id="resetForm">
+    <label>Username <input id="ru" maxlength="16" required></label>
+    <label>New password <input id="rp" type="text" autocomplete="off" minlength="8" maxlength="128" required></label>
+    <button>Reset</button>
+  </form>
+  <p><small>Resetting logs the account out everywhere and clears any lockout. Tell the person the new password yourself.</small></p>
+</div>
+
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  var token = "";
+  function say(t) { $("msg").textContent = t || ""; }
+  function call(method, path, body) {
+    var opts = { method: method, headers: { Authorization: "Bearer " + token }, cache: "no-store" };
+    if (body !== undefined) { opts.headers["Content-Type"] = "application/json"; opts.body = JSON.stringify(body); }
+    return fetch("/api" + path, opts).then(function (r) { return r.json().catch(function () { return { ok: false, error: "server_error" }; }); },
+      function () { return { ok: false, error: "network" }; });
+  }
+  var day = function (ms) { return ms ? new Date(ms).toISOString().slice(0, 10) : ""; };
+  function load() {
+    return call("GET", "/admin/users").then(function (r) {
+      if (!r.ok) { $("panel").hidden = true; say(r.error === "forbidden" ? "Wrong token." : "Couldn't load (" + r.error + ")."); return; }
+      say(""); $("panel").hidden = false; $("count").textContent = r.total;
+      var tb = $("rows"); tb.textContent = "";
+      r.users.forEach(function (u) {
+        var tr = document.createElement("tr");
+        [u.id, u.username, day(u.createdAt), day(u.lastLogin)].forEach(function (v) {
+          var td = document.createElement("td"); td.textContent = v; tr.appendChild(td);   // textContent: never HTML
+        });
+        var td = document.createElement("td"), b = document.createElement("button");
+        b.textContent = "Delete";
+        b.onclick = function () {
+          if (!confirm("Delete account " + u.username + " and all its achievements and progress? This cannot be undone.")) return;
+          call("POST", "/admin/delete-user", { id: u.id }).then(function (r) { say(r.ok ? "Deleted " + u.username + "." : "Failed (" + r.error + ")."); load(); });
+        };
+        td.appendChild(b); tr.appendChild(td); tb.appendChild(tr);
+      });
+    });
+  }
+  $("tokenForm").onsubmit = function (e) { e.preventDefault(); token = $("token").value; load(); };
+  $("reload").onclick = load;
+  $("resetForm").onsubmit = function (e) {
+    e.preventDefault();
+    call("POST", "/admin/reset-password", { username: $("ru").value, password: $("rp").value }).then(function (r) {
+      say(r.ok ? "Password reset for " + $("ru").value + "." : r.error === "not_found" ? "No such account." : r.error === "bad_password" ? "Passwords must be 8 to 128 characters." : "Failed (" + r.error + ").");
+      if (r.ok) { $("rp").value = ""; load(); }
+    });
+  };
+</script>
+</body>
+</html>

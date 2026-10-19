@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000080">
+<meta name="color-scheme" content="light">
+<title>Chat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root { --app-h: 100vh; --app-top: 0px; }
+  @supports (height: 100dvh) { :root { --app-h: 100dvh; } }
+
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    /* Pinned to the visible area. On a phone the script keeps --app-h / --app-top
+       in step with the on-screen keyboard (see "keyboard" below). */
+    position: fixed; left: 0; right: 0;
+    top: var(--app-top); height: var(--app-h);
+    margin: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    display: flex; flex-direction: column; overflow: hidden;
+    overscroll-behavior: none; touch-action: manipulation;
+    background: #c0c0c0; color: #000;
+    font: 12px Tahoma, Verdana, sans-serif;
+  }
+  body.kb { padding-bottom: 0; } /* keyboard open: no home-indicator gap */
+
+  .titlebar {
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff; font-weight: bold; padding: 3px 6px;
+  }
+
+  #msgwrap { flex: 1; min-height: 0; position: relative; display: flex; margin: 4px; }
+  #messages {
+    flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 4px 6px;
+    background: #fff;
+    border: 2px solid; border-color: #808080 #fff #fff #808080;
+    box-shadow: inset 1px 1px 0 #000;
+    font: 15px/1.3 "Times New Roman", Times, serif;
+    overflow-wrap: anywhere; word-break: break-word;
+    overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+  #messages .id { display: none; color: #808080; font: 11px Tahoma, Verdana, sans-serif; margin-right: 4px; }
+  body.admin #messages .id { display: inline; }
+  #messages .time { color: #6b6b6b; font: 11px Tahoma, Verdana, sans-serif; margin-right: 5px; white-space: nowrap; }
+  #messages .name { font-weight: bold; }
+  #messages .mention { background: #ffffcc; box-shadow: inset 3px 0 0 #e0c000; margin: 0 -6px; padding: 0 6px 0 9px; }
+  #earlierRow { text-align: center; padding: 2px 0 6px; }
+  #earlierRow[hidden] { display: none; }
+  #earlier { padding: 2px 12px; font-size: 11px; }
+  #earlier:disabled { color: #6b6b6b; cursor: default; }
+  #jump {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 3;
+    padding: 3px 14px; white-space: nowrap; font-size: 12px;
+  }
+  #jump[hidden] { display: none; }
+
+  /* local-only output window (/help, /users, /filter list, ...): never part of the chat */
+  #panel {
+    position: absolute; left: 6px; right: 6px; top: 6px; z-index: 4;
+    max-height: calc(100% - 12px); display: flex; flex-direction: column; padding: 3px;
+    background: #c0c0c0; border: 2px solid; border-color: #fff #000 #000 #fff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+  #panel[hidden] { display: none; }
+  #panel .ptitle {
+    display: flex; align-items: center; gap: 4px; padding: 1px 2px 1px 5px;
+    background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold;
+  }
+  #panelTitle { flex: 1; min-width: 0; }
+  #panelClose { padding: 0 7px; line-height: 16px; font-size: 13px; }
+  #panelBody {
+    overflow-y: auto; margin-top: 3px; padding: 4px 6px; background: #fff;
+    border: 2px solid; border-color: #808080 #fff #fff #808080; box-shadow: inset 1px 1px 0 #000;
+    font: 13px/1.4 Tahoma, Verdana, sans-serif; overscroll-behavior: contain;
+  }
+  #panelBody div { white-space: pre-wrap; overflow-wrap: anywhere; }
+  #panelBody .head { font-weight: bold; margin-top: 8px; }
+  #panelBody .head:first-child { margin-top: 0; }
+
+  /* ---- entry row: [colour] [name] [message ........] [Send] ---- */
+  form {
+    display: grid;
+    grid-template-columns: auto 130px 1fr auto;
+    grid-template-areas: "color name text send";
+    gap: 4px; padding: 4px; align-items: stretch;
+    border-top: 2px solid #fff;
+  }
+  .colorwrap { grid-area: color; position: relative; display: flex; }
+  #name { grid-area: name; }
+  #text { grid-area: text; }
+  #send { grid-area: send; }
+
+  input {
+    -webkit-appearance: none; appearance: none; border-radius: 0;
+    width: 100%; min-width: 0;
+    font: 16px "Times New Roman", Times, serif; /* 16px stops iOS zooming in on focus */
+    border: 2px solid; border-color: #808080 #fff #fff #808080;
+    box-shadow: inset 1px 1px 0 #000; padding: 3px 4px; background: #fff; color: #000;
+  }
+  input:focus, input:focus-visible { outline: none; }
+  input[readonly] { background: #ece9d8; color: #333; }
+
+  button {
+    -webkit-appearance: none; appearance: none; border-radius: 0;
+    font: bold 12px Tahoma, Verdana, sans-serif; color: #000;
+    background: #c0c0c0; padding: 4px 14px; cursor: pointer;
+    border: 2px solid; border-color: #fff #000 #000 #fff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+  }
+  button:active { border-color: #000 #fff #fff #000; box-shadow: inset 1px 1px 0 #808080; }
+  button:focus-visible { outline: 2px dotted #000; outline-offset: 1px; }
+
+  /* name colour picker */
+  .colorbtn { padding: 3px 5px; display: flex; align-items: center; justify-content: center; min-width: 30px; }
+  #colorChip { display: block; width: 16px; height: 16px; border: 1px solid #000; }
+  .palette {
+    position: absolute; bottom: calc(100% + 4px); left: 0; z-index: 5;
+    display: grid; grid-template-columns: repeat(7, 22px); gap: 3px; padding: 5px;
+    background: #c0c0c0;
+    border: 2px solid; border-color: #fff #000 #000 #fff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+  .palette[hidden] { display: none; }
+  .swatch {
+    width: 22px; height: 22px; padding: 0; box-shadow: none;
+    border: 2px solid; border-color: #808080 #fff #fff #808080;
+  }
+  .swatch.selected { outline: 2px solid #000; outline-offset: 1px; }
+
+  #foot { display: flex; align-items: center; gap: 6px; padding: 0 6px 4px; }
+  #status { flex: 1; min-width: 0; color: #444; min-height: 16px; }
+
+  /* online count (bottom right) and its list */
+  .onlinewrap { position: relative; flex: none; }
+  #onlineBtn { padding: 1px 8px; font-size: 11px; white-space: nowrap; }
+  .onlinelist {
+    position: absolute; right: 0; bottom: calc(100% + 4px); z-index: 5;
+    min-width: 150px; max-width: min(260px, 80vw); max-height: 40vh; overflow-y: auto;
+    padding: 4px; background: #c0c0c0;
+    border: 2px solid; border-color: #fff #000 #000 #fff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 2px 2px 0 rgba(0, 0, 0, 0.3);
+    overscroll-behavior: contain;
+  }
+  .onlinelist[hidden] { display: none; }
+  .onlinelist h2 { margin: 0 0 3px; padding: 1px 4px; font: bold 11px Tahoma, Verdana, sans-serif;
+    color: #fff; background: linear-gradient(90deg, #000080, #1084d0); }
+  .onlinelist ul { list-style: none; margin: 0; padding: 2px 4px; background: #fff;
+    border: 2px solid; border-color: #808080 #fff #fff #808080; box-shadow: inset 1px 1px 0 #000; }
+  .onlinelist li { padding: 1px 0; overflow-wrap: anywhere; font: 13px Tahoma, Verdana, sans-serif; }
+  .onlinelist li.admin { font-weight: bold; }
+  .onlinelist li.none { color: #6b6b6b; }
+
+  /* phones: two rows (colour + name, then message + Send) */
+  @media (max-width: 540px) {
+    form {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: "color name name" "text text send";
+    }
+  }
+  /* touch screens: bigger tap targets */
+  @media (pointer: coarse) {
+    input, button { min-height: 38px; }
+    #onlineBtn, #earlier, #panelClose { min-height: 30px; }
+    .palette { grid-template-columns: repeat(7, 32px); gap: 4px; }
+    .swatch { width: 32px; height: 32px; min-height: 0; }
+    #messages { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+  <div class="titlebar">burgersandwich messenger</div>
+  <div id="msgwrap">
+    <div id="messages" role="log" aria-live="polite"></div>
+    <button type="button" id="jump" hidden>Jump to new message</button>
+    <div id="panel" role="dialog" aria-label="Command output" hidden>
+      <div class="ptitle"><span id="panelTitle"></span><button type="button" id="panelClose" aria-label="Close">&times;</button></div>
+      <div id="panelBody"></div>
+    </div>
+  </div>
+  <form id="form" autocomplete="off">
+    <div class="colorwrap" id="colorWrap">
+      <button type="button" id="colorBtn" class="colorbtn" title="Name color" aria-label="Choose name color" aria-haspopup="true" aria-expanded="false"><span id="colorChip"></span></button>
+      <div id="palette" class="palette" hidden></div>
+    </div>
+    <input id="name" placeholder="Screen name" aria-label="Screen name" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <input id="text" maxlength="500" placeholder="Type a message" aria-label="Message" autocomplete="off" enterkeyhint="send">
+    <button type="submit" id="send">Send</button>
+  </form>
+  <div id="foot">
+    <div id="status" role="status" aria-live="polite"></div>
+    <div class="onlinewrap" id="onlineWrap">
+      <button type="button" id="onlineBtn" aria-haspopup="true" aria-expanded="false" title="Who is online">Online: –</button>
+      <div id="onlineList" class="onlinelist" role="region" aria-label="People online" hidden></div>
+    </div>
+  </div>
+
+<script>
+  // ---- SETTING FOR HOSTING THIS PAGE ELSEWHERE ----
+  // Leave empty when the Worker serves this page. Otherwise put the Worker's address here,
+  // for example "https://chatroom.yourname.workers.dev".
+  const CHAT_SERVER = "";
+
+  const list = document.getElementById("messages");
+  const nameInput = document.getElementById("name");
+  const textInput = document.getElementById("text");
+  const statusEl = document.getElementById("status");
+  const colorWrap = document.getElementById("colorWrap");
+  const colorBtn = document.getElementById("colorBtn");
+  const colorChip = document.getElementById("colorChip");
+  const paletteEl = document.getElementById("palette");
+  const onlineWrap = document.getElementById("onlineWrap");
+  const onlineBtn = document.getElementById("onlineBtn");
+  const onlineList = document.getElementById("onlineList");
+  const jumpBtn = document.getElementById("jump");
+  const panelEl = document.getElementById("panel");
+  const panelTitle = document.getElementById("panelTitle");
+  const panelBody = document.getElementById("panelBody");
+  const formEl = document.getElementById("form");
+
+  // ---- local output window: only the person who ran the command sees it ----
+  // /logs arrives in pieces; when all are in, save them as a CSV file.
+  const logParts = {};
+  function receiveLogs(m) {
+    if (!m || typeof m.id !== "string" || !Number.isInteger(m.part) || !Number.isInteger(m.parts) || m.parts < 1 || m.parts > 500) return;
+    const e = logParts[m.id] || (logParts[m.id] = { parts: [], n: 0 });
+    if (e.parts[m.part] === undefined) { e.parts[m.part] = String(m.data); e.n++; }
+    if (e.n < m.parts) return;
+    delete logParts[m.id];
+    const file = String(m.file || "chatlog.csv").replace(/[^A-Za-z0-9._-]/g, "_");
+    const blob = new Blob([String.fromCharCode(0xfeff) + e.parts.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = file;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+
+  function showPanel(title, lines) {
+    panelTitle.textContent = String(title || "");
+    panelBody.textContent = "";
+    for (const line of Array.isArray(lines) ? lines : []) {
+      const d = document.createElement("div");
+      if (line && typeof line === "object") { d.className = "head"; d.textContent = String(line.head ?? ""); }
+      else d.textContent = String(line);
+      panelBody.append(d);
+    }
+    panelBody.scrollTop = 0;
+    panelEl.hidden = false;
+  }
+  const hidePanel = () => { panelEl.hidden = true; };
+  document.getElementById("panelClose").addEventListener("click", hidePanel);
+  // Typing in the entry row keeps it open (so a list stays visible while you type the next command).
+  document.addEventListener("pointerdown", (e) => { if (!panelEl.contains(e.target) && !formEl.contains(e.target)) hidePanel(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") hidePanel(); });
+
+  const MAX_NAME = 16;
+  const MAX_ROWS = 300; // oldest lines are dropped from the page beyond this
+  const FALLBACK_COLOR = "#000000";
+  const safeColor = (c) => (typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c) ? c : FALLBACK_COLOR);
+
+  // ---- scrolling ----
+  const nearBottom = () => list.scrollHeight - list.scrollTop - list.clientHeight < 40;
+  let stick = true; // true while the reader is at the bottom, so new lines keep it there
+  let unseen = 0;   // new messages that arrived while the reader was scrolled up
+
+  function updateJump() {
+    jumpBtn.hidden = unseen === 0;
+    jumpBtn.textContent = unseen > 1 ? `Jump to new messages (${unseen})` : "Jump to new message";
+  }
+  function jumpToBottom() {
+    list.scrollTop = list.scrollHeight;
+    stick = true;
+    unseen = 0;
+    updateJump();
+  }
+  jumpBtn.addEventListener("click", jumpToBottom);
+  list.addEventListener("scroll", () => {
+    stick = nearBottom();
+    if (stick && unseen) { unseen = 0; updateJump(); }
+  }, { passive: true });
+
+  // ---- keyboard (phones) ----
+  // iOS Safari doesn't shrink the page when the keyboard opens; it pans the visual viewport
+  // instead. Pin the page to the visible area so the entry row stays above the keyboard.
+  // Skipped inside an iframe, where visualViewport describes the parent page, not this one.
+  if (window.visualViewport && window.top === window.self) {
+    const vv = window.visualViewport;
+    const root = document.documentElement;
+    const fit = () => {
+      if (vv.scale > 1.01) return; // pinch-zoomed: leave the layout alone
+      root.style.setProperty("--app-h", vv.height + "px");
+      root.style.setProperty("--app-top", vv.offsetTop + "px");
+      document.body.classList.toggle("kb", window.innerHeight - vv.height > 120);
+      if (stick) list.scrollTop = list.scrollHeight;
+    };
+    vv.addEventListener("resize", fit);
+    vv.addEventListener("scroll", fit);
+    fit();
+  }
+
+  // ---- account: set while logged in; the name box then shows the username and is locked ----
+  let account = null;
+
+  // ---- screen name ----
+  try { nameInput.value = localStorage.getItem("chatName") || ""; } catch {}
+  const fitName = (v) => Array.from(v.replace(/@/g, "")).slice(0, MAX_NAME).join("");
+  nameInput.value = fitName(nameInput.value);
+  // Saved as you type (and once for a newly generated name), not only when a message is sent.
+  const saveName = () => {
+    if (account) return; // a logged-in username isn't the saved guest name
+    const v = fitName(nameInput.value).trim();
+    if (!v) return;
+    try { localStorage.setItem("chatName", v); } catch {}
+  };
+  if (!nameInput.value) nameInput.value = "burger" + Math.floor(100 + Math.random() * 900);
+  saveName();
+  // "@" marks admin messages, so it can't be typed into a name. Length is counted in whole
+  // characters (an emoji is one), which a plain maxlength attribute can't do.
+  // Not touched mid-composition, so Japanese/Chinese/Korean input keeps working.
+  const trimName = () => { const v = fitName(nameInput.value); if (v !== nameInput.value) nameInput.value = v; };
+  nameInput.addEventListener("input", (e) => { if (!e.isComposing) trimName(); });
+  nameInput.addEventListener("compositionend", trimName);
+  nameInput.addEventListener("input", (e) => { if (!e.isComposing) saveName(); });
+  nameInput.addEventListener("compositionend", saveName);
+  nameInput.addEventListener("change", saveName);
+
+  // Logged in: show the username and lock the box. Logged out: give back the saved guest name.
+  function setAccount(name) {
+    const was = account;
+    account = name || null;
+    if (account) {
+      nameInput.value = account;
+      nameInput.readOnly = true;
+      nameInput.title = `Logged in as ${account}. Log out on the website to change your name.`;
+    } else {
+      nameInput.readOnly = false;
+      nameInput.title = "";
+      if (was) {
+        let guest = "";
+        try { guest = localStorage.getItem("chatName") || ""; } catch {}
+        nameInput.value = fitName(guest) || "burger" + Math.floor(100 + Math.random() * 900);
+        saveName();
+        sendName();
+      }
+    }
+  }
+
+  // ---- name colour ----
+  let palette = [];          // supplied by the server on connect
+  let adminColor = "#ff0000";
+  let isAdmin = false;
+  let savedColor = null;     // the visitor's own colour, kept across visits (null = none yet)
+  try {
+    const c = localStorage.getItem("chatColor");
+    if (/^#[0-9a-f]{6}$/i.test(c || "")) savedColor = c.toLowerCase();
+  } catch {}
+  let color = savedColor || FALLBACK_COLOR; // colour used for the next message
+
+  function updateChip() { colorChip.style.background = color; }
+
+  function setPaletteOpen(open) {
+    paletteEl.hidden = !open;
+    colorBtn.setAttribute("aria-expanded", String(open));
+  }
+
+  function renderPalette() {
+    paletteEl.textContent = "";
+    for (const c of palette) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "swatch" + (c.hex === color ? " selected" : "");
+      b.style.background = safeColor(c.hex);
+      b.title = c.name;
+      b.setAttribute("aria-label", c.name);
+      b.addEventListener("click", () => pickColor(c.hex));
+      paletteEl.append(b);
+    }
+  }
+
+  function pickColor(hex) {
+    if (isAdmin) return;
+    color = savedColor = hex;
+    try { localStorage.setItem("chatColor", hex); } catch {}
+    updateChip();
+    renderPalette();
+    setPaletteOpen(false);
+  }
+
+  function applyPalette(p, admin) {
+    palette = Array.isArray(p) ? p : [];
+    adminColor = safeColor(admin || adminColor);
+    if (palette.length && !palette.some((c) => c.hex === savedColor)) {
+      // First visit (or a colour that is no longer offered): pick one at random and keep it.
+      // Plain black is skipped so the colour looks like it was assigned.
+      const pool = palette.filter((c) => c.hex !== "#000000");
+      const pick = (pool.length ? pool : palette)[Math.floor(Math.random() * (pool.length || palette.length))];
+      savedColor = pick.hex;
+      try { localStorage.setItem("chatColor", savedColor); } catch {}
+      if (!isAdmin) color = savedColor;
+    }
+    renderPalette();
+    updateChip();
+  }
+
+  // Admins are always bright red. Logging out restores the colour they had before.
+  function setAdmin(on) {
+    if (on === isAdmin) return;
+    isAdmin = on;
+    document.body.classList.toggle("admin", on);
+    color = on ? adminColor : savedColor || FALLBACK_COLOR;
+    colorBtn.title = on ? "Admin names are always red" : "Name color";
+    setPaletteOpen(false);
+    updateChip();
+    renderPalette();
+  }
+
+  colorBtn.addEventListener("click", () => {
+    if (isAdmin) { flash("Admin names are always red."); return; }
+    if (!palette.length) return;
+    setPaletteOpen(paletteEl.hidden);
+    if (!paletteEl.hidden) setOnlineOpen(false);
+  });
+  // pointerdown (not click): iOS Safari doesn't deliver click events for taps on plain page areas.
+  document.addEventListener("pointerdown", (e) => { if (!colorWrap.contains(e.target)) setPaletteOpen(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setPaletteOpen(false); });
+  updateChip();
+
+  // ---- online list ----
+  let onlineUsers = [], onlineCount = null; // null = unknown (not connected)
+
+  function renderOnline() {
+    onlineBtn.textContent = "Online: " + (onlineCount === null ? "–" : onlineCount);
+    onlineList.textContent = "";
+    const h = document.createElement("h2");
+    h.textContent = onlineCount === null ? "Online now" : `Online now (${onlineCount})`;
+    const ul = document.createElement("ul");
+    if (!onlineUsers.length) {
+      const li = document.createElement("li");
+      li.className = "none";
+      li.textContent = onlineCount === null ? "Not connected" : "Nobody yet";
+      ul.append(li);
+    }
+    for (const u of onlineUsers) {
+      const li = document.createElement("li");
+      if (u.admin) li.className = "admin";
+      li.textContent = (u.admin ? "@" : "") + u.name;
+      ul.append(li);
+    }
+    const more = onlineCount === null ? 0 : onlineCount - onlineUsers.length;
+    if (more > 0) {
+      const li = document.createElement("li");
+      li.className = "none";
+      li.textContent = `…and ${more} more`;
+      ul.append(li);
+    }
+    onlineList.append(h, ul);
+  }
+
+  function setOnline(users, count) {
+    onlineUsers = Array.isArray(users) ? users : [];
+    onlineCount = Number.isInteger(count) ? count : onlineUsers.length;
+    renderOnline();
+  }
+
+  function setOnlineOpen(open) {
+    onlineList.hidden = !open;
+    onlineBtn.setAttribute("aria-expanded", String(open));
+    if (open) setPaletteOpen(false);
+  }
+  onlineBtn.addEventListener("click", () => setOnlineOpen(onlineList.hidden));
+  document.addEventListener("pointerdown", (e) => { if (!onlineWrap.contains(e.target)) setOnlineOpen(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOnlineOpen(false); });
+  renderOnline();
+
+  // ---- status line: connection, lock state, and short-lived notices ----
+  let connected = false, locked = false, slowMs = 0, serverOutdated = false, flashText = "", flashTimer;
+  function fmtMs(ms) {
+    if (ms >= 120000) return Math.round(ms / 60000) + " min";
+    if (ms >= 1000) return (ms / 1000).toFixed(ms % 1000 ? 1 : 0) + " s";
+    return ms + " ms";
+  }
+  function renderStatus() {
+    statusEl.textContent =
+      flashText ||
+      (!connected ? "Connection lost. Reconnecting..." :
+       locked ? "Chat is temporarily locked." :
+       slowMs ? `Slow mode: one message every ${fmtMs(slowMs)}.` :
+       serverOutdated ? "Name colors are unavailable: the chat server needs the latest update." : "");
+  }
+  function flash(text, ms = 3000) {
+    flashText = text;
+    renderStatus();
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => { flashText = ""; renderStatus(); }, ms);
+  }
+
+  // ---- messages ----
+  const timeFmt = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
+  const dateTimeFmt = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+
+  // Today's messages show just the time; older ones also show the date.
+  function timeEl(ts) {
+    const d = new Date(ts);
+    if (typeof ts !== "number" || Number.isNaN(d.getTime())) return null;
+    const el = document.createElement("time");
+    el.className = "time";
+    el.dateTime = d.toISOString();
+    el.title = d.toLocaleString();
+    el.textContent = d.toDateString() === new Date().toDateString() ? timeFmt.format(d) : dateTimeFmt.format(d);
+    return el;
+  }
+
+  // "Load earlier messages" link, always the first child of the list.
+  let hasMore = false, loadingEarlier = false, loadTimer;
+  const earlierRow = document.createElement("div");
+  earlierRow.id = "earlierRow";
+  earlierRow.hidden = true;
+  const earlierBtn = document.createElement("button");
+  earlierBtn.type = "button";
+  earlierBtn.id = "earlier";
+  earlierRow.append(earlierBtn);
+  list.append(earlierRow);
+  const rowCount = () => list.childElementCount - 1;
+
+  function updateEarlier() {
+    earlierRow.hidden = !hasMore;
+    earlierBtn.disabled = loadingEarlier;
+    earlierBtn.textContent = loadingEarlier ? "Loading…" : "Load earlier messages";
+  }
+  earlierBtn.addEventListener("click", () => {
+    if (loadingEarlier || !ws || ws.readyState !== 1) return;
+    const first = list.children[1];
+    const id = first ? Number(first.dataset.id) : 0;
+    if (!id) return;
+    loadingEarlier = true;
+    updateEarlier();
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(() => { loadingEarlier = false; updateEarlier(); }, 5000);
+    ws.send(JSON.stringify({ type: "before", id }));
+  });
+  function prependEarlier(messages, more) {
+    clearTimeout(loadTimer);
+    const frag = document.createDocumentFragment();
+    for (const m of messages) if (!document.getElementById("m" + m.id)) frag.append(buildRow(m));
+    const height = list.scrollHeight, top = list.scrollTop;
+    list.setAttribute("aria-busy", "true"); // don't make screen readers read the whole backlog
+    earlierRow.after(frag);
+    list.scrollTop = top + (list.scrollHeight - height); // keep the reader where they were
+    list.removeAttribute("aria-busy");
+    hasMore = !!more;
+    loadingEarlier = false;
+    updateEarlier();
+  }
+
+  // Does this message mention me? Whole-name match, any capitals; my own messages and
+  // very short names (under 3 characters) never count.
+  const WORD_CHAR = /[\p{L}\p{N}_]/u;
+  const isOwn = (m) => String(m.name).toLowerCase() === fitName(nameInput.value).trim().toLowerCase();
+  function mentionsMe(m) {
+    const me = fitName(nameInput.value).trim().toLowerCase();
+    if (Array.from(me).length < 3 || isOwn(m)) return false;
+    const text = String(m.text).toLowerCase();
+    for (let i = text.indexOf(me); i !== -1; i = text.indexOf(me, i + 1)) {
+      const before = Array.from(text.slice(Math.max(0, i - 2), i)).pop() || "";
+      const after = Array.from(text.slice(i + me.length, i + me.length + 2))[0] || "";
+      if (!WORD_CHAR.test(before) && !WORD_CHAR.test(after)) return true;
+    }
+    return false;
+  }
+
+  function buildRow(m) {
+    const row = document.createElement("div");
+    row.id = "m" + m.id;
+    row.dataset.id = m.id;
+    row.dataset.lname = String(m.name).toLowerCase();
+    row.dataset.admin = m.admin ? "1" : "0";
+    row.className = mentionsMe(m) ? "row mention" : "row";
+    const id = document.createElement("span");
+    id.className = "id";
+    id.textContent = "#" + m.id;
+    const who = document.createElement("span");
+    who.className = "name";
+    who.style.color = safeColor(m.color);
+    who.textContent = (m.admin ? "@" : "") + m.name + ": ";
+    const body = document.createElement("span");
+    body.textContent = m.text;
+    const t = timeEl(m.ts);
+    row.append(...[id, t, who, body].filter(Boolean));
+    return row;
+  }
+
+  function add(m) {
+    const follow = nearBottom();
+    list.append(buildRow(m));
+    if (follow) {
+      // Only trim the top while the reader is at the bottom, so reading older lines isn't disturbed.
+      while (rowCount() > MAX_ROWS) { list.children[1].remove(); hasMore = true; }
+      updateEarlier();
+      list.scrollTop = list.scrollHeight;
+    } else if (!isOwn(m)) {
+      unseen++;
+      updateJump();
+    }
+  }
+
+  // A hidden message was restored: put it back in its place (or, if it's older than anything
+  // on screen, let "Load earlier messages" find it).
+  function insertRestored(m) {
+    if (document.getElementById("m" + m.id)) return;
+    const rows = list.querySelectorAll(".row");
+    const follow = nearBottom();
+    const row = buildRow(m);
+    if (!rows.length) {
+      list.append(row);
+    } else if (Number(rows[0].dataset.id) > m.id) {
+      hasMore = true;
+      updateEarlier();
+      return;
+    } else {
+      let after = rows[0];
+      for (let i = rows.length - 1; i >= 0; i--) {
+        if (Number(rows[i].dataset.id) < m.id) { after = rows[i]; break; }
+      }
+      after.after(row);
+    }
+    if (follow) list.scrollTop = list.scrollHeight;
+  }
+
+  // An admin renamed someone: change the name on everything already on screen.
+  function applyRename(oldLower, name) {
+    const lower = String(name).toLowerCase();
+    for (const row of list.querySelectorAll(".row")) {
+      if (row.dataset.lname !== oldLower) continue;
+      row.dataset.lname = lower;
+      const who = row.querySelector(".name");
+      if (who) who.textContent = (row.dataset.admin === "1" ? "@" : "") + name + ": ";
+    }
+  }
+
+  function showHistory(messages, more) {
+    const frag = document.createDocumentFragment();
+    for (const m of messages) frag.append(buildRow(m));
+    list.textContent = "";
+    list.append(earlierRow, frag);
+    hasMore = !!more;
+    loadingEarlier = false;
+    updateEarlier();
+    unseen = 0;
+    updateJump();
+    list.scrollTop = list.scrollHeight;
+    stick = true;
+  }
+
+  // ---- saved copy of the newest messages ----
+  // The page keeps the last CACHE_MAX messages in localStorage and shows them at once on load.
+  // On connecting it tells the server the newest id it has; the server sends only newer messages,
+  // unless an admin has hidden, restored or renamed anything since (the version number then differs).
+  const CACHE_MAX = 100, CACHE_KEY = "chatCache";
+  let cache = [], cacheVer = 0, cacheMore = false;
+  function saveCache() {
+    if (cache.length > CACHE_MAX) { cache = cache.slice(-CACHE_MAX); cacheMore = true; }
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ v: cacheVer, more: cacheMore, msgs: cache })); } catch {}
+  }
+  const slim = (m) => ({ id: m.id, name: m.name, text: m.text, ts: m.ts, color: m.color, admin: m.admin ? 1 : 0 });
+  function loadCache() {
+    try {
+      const o = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+      if (!o || !Array.isArray(o.msgs) || !Number.isSafeInteger(o.v) || o.v < 0) return;
+      const ok = o.msgs.every((m, i) => m && Number.isSafeInteger(m.id) && m.id > 0 && typeof m.name === "string" &&
+        typeof m.text === "string" && Number.isFinite(m.ts) && (i === 0 || o.msgs[i - 1].id < m.id));
+      if (!ok || !o.msgs.length) return;
+      cache = o.msgs.map(slim); cacheVer = o.v; cacheMore = !!o.more;
+      showHistory(cache, cacheMore);
+    } catch { cache = []; }
+  }
+  function cacheAdd(m) { cache.push(slim(m)); saveCache(); }
+
+  // ---- connection ----
+  let ws = null, retry = 0, reconnectTimer = null, lastAlive = Date.now(), lastSent = "";
+
+  function markDown() {
+    onlineUsers = []; onlineCount = null; renderOnline();
+    connected = false;
+    flashText = "";
+    clearTimeout(flashTimer);
+    setAdmin(false);
+    renderStatus();
+  }
+  function scheduleReconnect(ms) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, ms);
+  }
+
+  function handle(m) {
+    if (m.type === "history") {
+      serverOutdated = !Array.isArray(m.palette);
+      applyPalette(m.palette, m.adminColor);
+      cacheVer = Number(m.ver) || 0;
+      if (m.incremental) {
+        for (const msg of m.messages || []) {
+          if (document.getElementById("m" + msg.id)) continue;
+          add(msg); cache.push(slim(msg));
+        }
+        saveCache();
+      } else {
+        showHistory(m.messages || [], m.hasMore);
+        cache = (m.messages || []).map(slim); cacheMore = !!m.hasMore;
+        saveCache();
+      }
+      setOnline(m.users, m.count);
+      locked = !!m.locked;
+      slowMs = Number(m.slow) || 0;
+      renderStatus();
+    } else if (m.type === "earlier") {
+      prependEarlier(m.messages || [], m.hasMore);
+    } else if (m.type === "nametaken") {
+      // That name can't be used: take the free name the server suggests.
+      if (m.suggestion) { nameInput.value = fitName(m.suggestion); saveName(); }
+      const why = m.reason === "blocked" ? "can't be used"
+        : m.reason === "reserved" ? "belongs to a registered account (log in on the website to use it)"
+        : "is already in use";
+      flash(`"${m.name}" ${why}, so you're now "${nameInput.value}".`, 7000);
+      if (nameRetries++ < 3) sendName(true);
+    } else if (m.type === "presence") {
+      setOnline(m.users, m.count);
+    } else if (m.type === "message") {
+      if (document.getElementById("m" + m.message.id)) return;
+      add(m.message);
+      cacheAdd(m.message);
+    } else if (m.type === "delete") {
+      for (const id of m.ids || [m.id]) {
+        const el = document.getElementById("m" + id);
+        if (el) el.remove();
+      }
+      const gone = new Set((m.ids || [m.id]).map(Number));
+      cache = cache.filter((c) => !gone.has(c.id));
+      cacheVer = Number(m.ver) || cacheVer; saveCache();
+    } else if (m.type === "ok") {
+      if (textInput.value.trim() === lastSent) textInput.value = "";
+      jumpToBottom(); // your own message: always show it
+    } else if (m.type === "rejected") {
+      if (m.reason === "locked") {
+        locked = true;
+        renderStatus();
+        flash("Chat is locked. Message not sent.");
+      } else if (m.reason === "command") {
+        flash("Messages can't start with /.");
+      } else if (m.reason === "name") {
+        flash("Enter a screen name.");
+      } else if (m.reason === "filter") {
+        flash("Your message contains a word that isn't allowed. Message not sent.");
+      } else if (m.wait > 0) {
+        flash(`Slow down: wait ${fmtMs(Math.ceil(m.wait / 100) * 100)} before sending again.`);
+      } else {
+        flash("You're sending too fast. Message not sent.");
+      }
+    } else if (m.type === "lock") {
+      locked = !!m.locked;
+      renderStatus();
+    } else if (m.type === "cmd") {
+      flash(m.text, 6000);
+    } else if (m.type === "auth") {
+      setAccount(m.account);
+      setAdmin(!!m.admin);
+    } else if (m.type === "logs") {
+      receiveLogs(m);
+    } else if (m.type === "panel") {
+      showPanel(m.title, m.lines);
+    } else if (m.type === "restored") {
+      for (const msg of m.messages || []) {
+        insertRestored(msg);
+        if (cache.some((c) => c.id === msg.id)) continue;
+        if (!cache.length || msg.id > cache[0].id) { cache.push(slim(msg)); cache.sort((a, b) => a.id - b.id); }
+        else cacheMore = true;
+      }
+      cacheVer = Number(m.ver) || cacheVer; saveCache();
+    } else if (m.type === "renamed") {
+      applyRename(m.old, m.name);
+      for (const c of cache) if (c.name.toLowerCase() === m.old) c.name = m.name;
+      cacheVer = Number(m.ver) || cacheVer; saveCache();
+    } else if (m.type === "forcename") {
+      nameInput.value = fitName(m.name);
+      saveName();
+      flash(`An admin changed your name to "${nameInput.value}".`, 7000);
+    } else if (m.type === "slow") {
+      slowMs = Number(m.ms) || 0;
+      renderStatus();
+    }
+  }
+
+  // Where the chat server is. Empty = the same site that served this page. To host this page somewhere
+  // else, set CHAT_SERVER (near the top of this script) to your Worker's address.
+  function wsUrl() {
+    const base = String(CHAT_SERVER || "").trim().replace(/\/+$/, "");
+    if (base) return base.replace(/^http/i, "ws") + "/api/chat";
+    return `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/api/chat`;
+  }
+
+  // ---- follow the website login ----
+  // The chat takes its name from the site login. When someone logs in or out in another tab (or the
+  // page around this one), reconnect so the server sees the new cookie.
+  function reconnectNow() {
+    retry = 0;
+    if (ws && ws.readyState <= 1) { try { ws.close(); } catch {} }
+    else connect();
+  }
+  try {
+    const bc = new BroadcastChannel("site-auth");
+    bc.onmessage = reconnectNow;
+  } catch {}
+  window.addEventListener("storage", (e) => { if (e.key === "siteAuthPing") reconnectNow(); });
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState !== "visible" || typeof fetch !== "function" || String(CHAT_SERVER || "").trim()) return;
+    try {
+      const r = await fetch("/api/me", { credentials: "same-origin", cache: "no-store" });
+      if (!r.ok) return;
+      const who = ((await r.json()).user || {}).username || null;
+      if ((who || "").toLowerCase() !== (account || "").toLowerCase()) reconnectNow();
+    } catch {}
+  });
+
+  function connect() {
+    clearTimeout(reconnectTimer);
+    if (ws && ws.readyState <= 1) return; // already connecting or open
+    const since = cache.length ? `?after=${cache[cache.length - 1].id}&ver=${cacheVer}` : "";
+    const sock = new WebSocket(wsUrl() + since);
+    ws = sock;
+    sock.onopen = () => { retry = 0; lastAlive = Date.now(); connected = true; renderStatus(); sendName(); };
+    sock.onmessage = (e) => {
+      lastAlive = Date.now();
+      if (e.data === "pong") return;
+      let m;
+      try { m = JSON.parse(e.data); } catch { return; }
+      handle(m);
+    };
+    sock.onclose = () => {
+      if (ws !== sock) return;
+      markDown();
+      scheduleReconnect(Math.min(1000 * 2 ** retry++, 15000));
+    };
+  }
+
+  // Throw away a socket we believe is dead and open a fresh one straight away.
+  function dropAndReconnect() {
+    const old = ws;
+    ws = null;
+    if (old) {
+      old.onopen = old.onmessage = old.onclose = null;
+      try { old.close(); } catch {}
+    }
+    markDown();
+    retry = 0;
+    scheduleReconnect(0);
+  }
+
+  // Phones freeze or silently kill sockets when the tab is backgrounded or the screen locks,
+  // and the page may never get a "close" event. Ping, and reconnect if nothing comes back.
+  function checkAlive() {
+    if (!ws || ws.readyState >= 2) { retry = 0; connect(); return; }
+    if (ws.readyState === 0) return;
+    const sock = ws, before = lastAlive;
+    try { sock.send("ping"); } catch {}
+    setTimeout(() => { if (ws === sock && lastAlive === before) dropAndReconnect(); }, 5000);
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkAlive(); });
+  window.addEventListener("pageshow", (e) => { if (e.persisted) checkAlive(); });
+  window.addEventListener("online", checkAlive);
+  setInterval(() => { if (document.visibilityState === "visible") checkAlive(); }, 25000);
+
+  loadCache();
+  connect();
+
+  // The server lists connected people by screen name, so it needs to be told ours.
+  // A random id kept in this browser lets the server tell your own tabs (allowed to share a name)
+  // from someone else who picked the same name (not allowed).
+  let clientId = null;
+  try { clientId = localStorage.getItem("chatId"); } catch {}
+  if (!/^[0-9a-f]{16,64}$/.test(clientId || "")) {
+    const bytes = new Uint8Array(16);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(bytes);
+    else bytes.forEach((_, i) => { bytes[i] = Math.floor(Math.random() * 256); });
+    clientId = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    try { localStorage.setItem("chatId", clientId); } catch {}
+  }
+
+  let nameRetries = 0;
+  function sendName(auto) {
+    if (!auto) nameRetries = 0;
+    if (!ws || ws.readyState !== 1) return;
+    const name = fitName(nameInput.value).trim();
+    if (name) { try { ws.send(JSON.stringify({ type: "name", name, cid: clientId })); } catch {} }
+  }
+  nameInput.addEventListener("change", () => sendName());
+  nameInput.addEventListener("blur", () => sendName());
+
+  // ---- sending ----
+  document.getElementById("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = fitName(nameInput.value).trim();
+    const text = textInput.value.trim();
+    if (!text || !ws || ws.readyState !== 1) return;
+
+    // Anything starting with "/" is a command and is never posted as a chat message.
+    // The box is cleared immediately so a token doesn't stay on screen.
+    if (text.startsWith("/")) {
+      ws.send(JSON.stringify({ type: "command", text }));
+      textInput.value = "";
+      return;
+    }
+
+    if (!name) { flash("Enter a screen name."); return; }
+    if (!account) { try { localStorage.setItem("chatName", name); } catch {} }
+    lastSent = text;
+    ws.send(JSON.stringify({ name, text, color, cid: clientId }));
+    textInput.focus();
+  });
+</script>
+</body>
+</html>

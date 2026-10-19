@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in / Sign up</title>
+<!-- Bare-bones on purpose: restyle freely. Keep the ids; the script below uses them. -->
+</head>
+<body>
+<p><a href="/">&larr; Home</a></p>
+<p id="msg" role="status"></p>
+
+<h1>Log in</h1>
+<form id="loginForm">
+  <label>Username <input id="lu" autocomplete="username" maxlength="16" required></label><br>
+  <label>Password <input id="lp" type="password" autocomplete="current-password" maxlength="128" required></label><br>
+  <button>Log in</button>
+</form>
+
+<h1>Sign up</h1>
+<form id="regForm">
+  <label>Username <input id="ru" autocomplete="username" maxlength="16" required></label><br>
+  <label>Password <input id="rp" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></label><br>
+  <small>3 to 16 letters, numbers, - or _. Password 8 or more characters.</small><br>
+  <!-- To use Turnstile, add its widget here and pass the token as the third argument of register(). -->
+  <button>Sign up</button>
+</form>
+
+<script src="/site-account.js"></script>
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  var next = SiteAccount.safeNext(new URLSearchParams(location.search).get("next"), "/");
+  function say(t) { $("msg").textContent = t || ""; }
+  function done() { location.assign(next); }
+
+  // Already logged in: nothing to do here.
+  SiteAccount.me().then(function (r) { if (r.ok && r.user) done(); });
+
+  $("loginForm").onsubmit = function (e) {
+    e.preventDefault();
+    SiteAccount.login($("lu").value, $("lp").value).then(function (r) {
+      $("lp").value = "";
+      if (r.ok) return done();
+      say(SiteAccount.message(r));
+    });
+  };
+  $("regForm").onsubmit = function (e) {
+    e.preventDefault();
+    SiteAccount.register($("ru").value, $("rp").value).then(function (r) {
+      $("rp").value = "";
+      if (r.ok) return done();
+      say(SiteAccount.message(r));
+    });
+  };
+</script>
+</body>
+</html>

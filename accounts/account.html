@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account</title>
+<!-- Bare-bones account page: achievements, change password, delete account, log out. Restyle freely. -->
+</head>
+<body>
+<h1>Account</h1>
+<p id="msg" role="status"></p>
+
+<div id="out" hidden>
+  <p><a href="/login.html">Log in / Sign up</a></p>
+</div>
+
+<div id="in" hidden>
+  <p>Logged in as <b id="who"></b> <button id="logout">Log out</button></p>
+  <h2>Achievements</h2>
+  <ul id="ach"></ul>
+  <h2>Change password</h2>
+  <form id="pwForm">
+    <label>Current <input id="pc" type="password" autocomplete="current-password" maxlength="128"></label><br>
+    <label>New <input id="pn" type="password" autocomplete="new-password" maxlength="128"></label><br>
+    <button>Change password</button>
+  </form>
+  <h2>Delete account</h2>
+  <form id="delForm">
+    <label>Password <input id="dp" type="password" autocomplete="current-password" maxlength="128"></label><br>
+    <button>Delete my account and everything saved with it</button>
+  </form>
+  <h2>Test controls (placeholders from defs.js)</h2>
+  <button id="q3">Set placeholder quest to step 3</button>
+  <button id="ev">Report placeholder page event</button>
+</div>
+
+<script src="/site-account.js"></script>
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  var defs = null;
+  function say(t) { $("msg").textContent = t || ""; }
+  function show(user) {
+    $("out").hidden = !!user;
+    $("in").hidden = !user;
+    if (user) { $("who").textContent = user.username; loadAch(); }
+  }
+  function loadAch() {
+    Promise.all([defs || SiteAccount.defs(), SiteAccount.me()]).then(function (res) {
+      defs = res[0];
+      var mine = {};
+      ((res[1] && res[1].achievements) || []).forEach(function (a) { mine[a.id] = a.earnedAt; });
+      var ul = $("ach"); ul.textContent = "";
+      ((defs && defs.achievements) || []).forEach(function (d) {
+        var li = document.createElement("li");
+        li.textContent = (mine[d.id] ? "[earned] " : "[not yet] ") + d.title + " - " + d.description;
+        ul.appendChild(li);
+      });
+    });
+  }
+  function earnedNote(r) { if (r && r.earned && r.earned.length) { say("Earned: " + r.earned.join(", ")); loadAch(); } }
+  SiteAccount.onChange(show);
+  $("logout").onclick = function () { SiteAccount.logout().then(function () { location.assign("/"); }); };
+  $("pwForm").onsubmit = function (e) {
+    e.preventDefault();
+    SiteAccount.changePassword($("pc").value, $("pn").value).then(function (r) {
+      say(r.ok ? "Password changed. Other devices were logged out." : SiteAccount.message(r)); $("pc").value = $("pn").value = "";
+    });
+  };
+  $("delForm").onsubmit = function (e) {
+    e.preventDefault();
+    if (!confirm("Delete your account? This cannot be undone.")) return;
+    SiteAccount.deleteAccount($("dp").value).then(function (r) { say(r.ok ? "Account deleted." : SiteAccount.message(r)); $("dp").value = ""; });
+  };
+  $("q3").onclick = function () { SiteAccount.saveQuest("placeholder_quest", { step: 3 }).then(function (r) { say(r.ok ? "Saved." : r.error); earnedNote(r); }); };
+  $("ev").onclick = function () { SiteAccount.event("placeholder_visited_page").then(function (r) { say(r.ok ? "Reported." : r.error); earnedNote(r); }); };
+</script>
+</body>
+</html>
