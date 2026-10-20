@@ -1164,6 +1164,98 @@ nav a:hover {
     }
 }
 
+/* ==========================================================
+   MERCH SECTION — COMING SOON
+   ========================================================== */
+
+.merch-panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    max-width: 850px;
+    min-height: 280px;
+    padding: 42px 28px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-large);
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(115, 245, 255, 0.09),
+            transparent 65%
+        ),
+        linear-gradient(
+            135deg,
+            rgba(28, 42, 67, 0.8),
+            rgba(11, 15, 27, 0.95)
+        );
+
+    box-shadow: var(--glow);
+}
+
+.merch-symbol {
+    margin-bottom: 12px;
+
+    color: rgba(115, 245, 255, 0.8);
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: -0.12em;
+
+    text-shadow: 0 0 30px rgba(115, 245, 255, 0.25);
+}
+
+.merch-status,
+.merch-stamp {
+    color: var(--cyan);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.merch-panel h3 {
+    margin: 12px 0;
+
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+
+    background: linear-gradient(
+        100deg,
+        #ffffff,
+        #83aaff,
+        #73f5ff
+    );
+
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.merch-description {
+    max-width: 420px;
+    margin: 0 0 24px;
+
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+.merch-stamp {
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+
+    color: var(--muted);
+}
+
 
 /* ==========================================================
    END OF MUNANCHO STYLESHEET

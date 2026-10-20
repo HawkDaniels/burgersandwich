@@ -53,8 +53,7 @@ const albums = [
         id: "album1",
         title: "Munanchosis",
         year: 2026,
-        cover: "Munancho\\albums\\Munanchosis Lens flare 10k.jpg",
-
+        cover: "/Munancho/albums/Munanchosis Lens flare 10k.jpg",
         songs: [
             {
                 title: "Intro-sis",
@@ -128,8 +127,7 @@ const albums = [
         id: "album2",
         title: "Munanchosis Songs That Were Too Good To Be On The Album",
         year: 2026,
-        cover: "Munancho\\albums\\Munanchosis Extrude - LowQ.jpg",
-
+        cover: "/Munancho/albums/Munanchosis Extrude - LowQ.jpg",
         songs: [
             {
                 title: "Ma Saw My Report Card",
@@ -168,8 +166,7 @@ const albums = [
         id: "album3",
         title: "Munancho Dies (Coming Soon)",
         year: 2027,
-        cover: "Munancho\\albums\\Munancho Dies Crystallize.jpg",
-
+        cover: "/Munancho/albums/Munancho Dies Crystallize.jpg",
         songs: [
             {
                 title: "I Am Going to Kill Myself Today",
