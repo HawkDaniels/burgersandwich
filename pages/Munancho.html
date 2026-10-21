@@ -1,4 +1,3 @@
-
 <!--
 ============================================================
 MUNANCHO DIGITAL ARCHIVE
@@ -15,6 +14,23 @@ Munancho/
     css/Style.css   Colors, layout, typography, and effects.
     js/script.js    Album data, tracklists, and playback logic.
 
+SECTION GUIDE
+------------------------------------------------------------
+01. Page setup
+02. Site header
+    02A. Brand
+    02B. Navigation
+    02C. Status
+03. Hero / introduction
+04. Lore / classified history
+05. Album archive
+06. Track manifest
+07. Merch
+08. Persistent music player
+    08A. Now playing
+    08B. Audio controls
+    08C. Player label
+
 HOW THE WEBSITE WORKS
 ------------------------------------------------------------
 1. HTML defines the page sections and their containers.
@@ -25,8 +41,9 @@ HOW THE WEBSITE WORKS
 EDITING GUIDE
 ------------------------------------------------------------
 Change text and page sections in this file.
-Change appearance in Munancho/css/style.css.
-Change music data and playback behavior in Munancho/js/script.js.
+Change appearance in Munancho/css/Style.css.
+Change music data, about text, and playback behavior in
+Munancho/js/script.js.
 
 FILE PATH NOTE
 ------------------------------------------------------------
@@ -76,28 +93,32 @@ File and folder names must match their actual spelling.
 
          PURPOSE:
          Displays the brand, page navigation, and archive
-         status indicator.
+         status indicator. Stays pinned to the top while
+         scrolling.
 
          IMPORTANT HOOKS:
          .logo         Brand styling.
          .status       Archive status styling.
          #lore         Navigation destination for the lore.
          #albums       Navigation destination for the archive.
+         #merch        Navigation destination for the merch.
          ================================================== -->
 
     <header class="site-header">
 
+        <!-- 02A — Brand -->
         <a class="logo" href="#home">
             MUNANCHO<span>®</span>
         </a>
 
-    <nav aria-label="Main navigation">
-        <a href="#lore">THE LORE</a>
-        <a href="#albums">THE ARCHIVE</a>
-        <a href="#merch">THE MERCH</a>
-    </nav>
+        <!-- 02B — Navigation -->
+        <nav aria-label="Main navigation">
+            <a href="#lore">THE LORE</a>
+            <a href="#albums">THE ARCHIVE</a>
+            <a href="#merch">THE MERCH</a>
+        </nav>
 
-
+        <!-- 02C — Status -->
         <span class="status">
             <span class="status-dot" aria-hidden="true"></span>
             ARCHIVE ONLINE
@@ -258,8 +279,8 @@ File and folder names must match their actual spelling.
 
              IMPORTANT:
              Leave this container empty in the HTML. Album titles,
-             artwork, and other album information belong in the
-             JavaScript album database.
+             artwork, colors, and other album information belong
+             in the JavaScript album database.
              ================================================== -->
 
         <section class="section-block" id="albums">
@@ -294,8 +315,8 @@ File and folder names must match their actual spelling.
              #track-subheading Album details.
              #track-list       Generated song rows.
 
-             FUTURE TRACK COLUMNS:
-             Track # | Song | Year | Album | Likes
+             TRACK COLUMNS:
+             Track # | Song | Year | Album | About | Likes
              ================================================== -->
 
         <section class="section-block track-section"
@@ -321,43 +342,52 @@ File and folder names must match their actual spelling.
 
         </section>
 
-        
-<!-- SECTION — MERCH -->
 
-<section class="section-block merch-section" id="merch">
+        <!-- ==================================================
+             SECTION 07 — MERCH
 
-    <div class="section-heading">
-        <p class="eyebrow">FILE 004 / COMING SOON</p>
-        <h2>
-            The Merch<span class="accent">.</span>
-        </h2>
-        <p class="section-description">
-            Wear the Munancho. Become The Production.
-        </p>
-    </div>
+             PURPOSE:
+             Placeholder panel for upcoming merchandise.
 
-    <div class="merch-panel">
-        <div class="merch-symbol" aria-hidden="true">M//</div>
+             WHAT YOU CAN CHANGE:
+             .merch-description  Supporting text.
+             .merch-stamp        Transmission label.
+             ================================================== -->
 
-        <p class="merch-status">MERCHANDISE DIVISION</p>
+        <section class="section-block merch-section" id="merch">
 
-        <h3>COMING SOON.</h3>
+            <div class="section-heading">
+                <p class="eyebrow">FILE 004 / COMING SOON</p>
+                <h2>
+                    The Merch<span class="accent">.</span>
+                </h2>
+                <p class="section-description">
+                    Wear the Munancho. Become The Production.
+                </p>
+            </div>
 
-        <p class="merch-description">
-            Official Munancho merchandise is currently being developed by Bing Dingy.
-            Stay tuned for the next transmission via nanomachines.
-        </p>
+            <div class="merch-panel">
+                <div class="merch-symbol" aria-hidden="true">M//</div>
 
-        <span class="merch-stamp">TRANSMISSION PENDING // Bing Dingy</span>
-    </div>
+                <p class="merch-status">MERCHANDISE DIVISION</p>
 
-</section>
+                <h3>COMING SOON.</h3>
+
+                <p class="merch-description">
+                    Official Munancho merchandise is currently being developed by Bing Dingy.
+                    Stay tuned for the next transmission via nanomachines.
+                </p>
+
+                <span class="merch-stamp">TRANSMISSION PENDING // Bing Dingy</span>
+            </div>
+
+        </section>
 
     </main>
 
 
     <!-- ==================================================
-         SECTION 07 — PERSISTENT MUSIC PLAYER
+         SECTION 08 — PERSISTENT MUSIC PLAYER
 
          PURPOSE:
          Keeps the audio player available at the bottom
@@ -370,12 +400,14 @@ File and folder names must match their actual spelling.
          #audio-player   Browser audio playback element.
 
          JAVASCRIPT RESPONSIBILITY:
-         Assign the selected song's file path and update
-         the displayed song and album information.
+         Assign the selected song's file path, update the
+         displayed song and album information, and tint the
+         player with the playing album's accent color.
          ================================================== -->
 
     <footer class="player">
 
+        <!-- 08A — Now playing -->
         <div class="now-playing">
 
             <div class="mini-art" id="player-art" aria-hidden="true">
@@ -391,12 +423,14 @@ File and folder names must match their actual spelling.
 
         </div>
 
-        <!-- JavaScript assigns the source when a track is selected. -->
+        <!-- 08B — Audio controls.
+             JavaScript assigns the source when a track is selected. -->
         <audio id="audio-player"
                controls
                preload="metadata">
         </audio>
 
+        <!-- 08C — Player label -->
         <span class="player-label">
             MUNANCHO MACHINE / NANO-TECHNOLOGY
         </span>
