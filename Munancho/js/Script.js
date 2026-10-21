@@ -54,6 +54,7 @@ const albums = [
         title: "Munanchosis",
         year: 2026,
         cover: "../Munancho/albums/Munanchosis Lens flare 10k.jpg",
+        accent: "255, 140, 66",   // album1: placeholder
         songs: [
             {
                 title: "Intro-sis",
@@ -128,6 +129,7 @@ const albums = [
         title: "Munanchosis Songs That Were Too Good To Be On The Album",
         year: 2026,
         cover: "../Munancho/albums/Munanchosis Extrude - LowQ.jpg",
+        accent: "190, 110, 255",  // album2: placeholder
         songs: [
             {
                 title: "Ma Saw My Report Card",
@@ -167,6 +169,7 @@ const albums = [
         title: "Munancho Dies (Coming Soon)",
         year: 2027,
         cover: "../Munancho/albums/Munancho Dies Crystallize.jpg",
+        accent: "255, 80, 120",   // album3: placeholder
         songs: [
             {
                 title: "I Am Going to Kill Myself Today",
@@ -272,10 +275,38 @@ const playerAlbum = document.getElementById("player-album");
 const playerArt = document.getElementById("player-art");
 
 const trackSection = document.getElementById("track-section");
+const player = document.querySelector(".player");
 
 let selectedAlbumIndex = -1;
 let currentTrackIndex = -1;
 
+// Remembers where each album was left off.
+// Example: { 0: { trackIndex: 3, time: 41.2 } }
+const albumProgress = {};
+
+// Seek position to apply once a loaded song is ready.
+let pendingStartTime = 0;
+
+// Save the current album's track and timestamp before leaving it.
+function saveAlbumProgress() {
+    if (selectedAlbumIndex < 0 || currentTrackIndex < 0) {
+        return;
+    }
+
+    // A finished album starts over next time.
+    if (audioPlayer.ended) {
+        delete albumProgress[selectedAlbumIndex];
+        return;
+    }
+
+    albumProgress[selectedAlbumIndex] = {
+        trackIndex: currentTrackIndex,
+        // If a seek hasn't applied yet, keep the pending time.
+        time: pendingStartTime > 0
+            ? pendingStartTime
+            : audioPlayer.currentTime
+    };
+}
 
 // Load locally saved likes.
 // If saved data is missing or unreadable, use an empty object.
@@ -353,6 +384,9 @@ function renderAlbums() {
         card.type = "button";
         card.className = "album-card";
 
+        // Each album tile uses its own accent color.
+        card.style.setProperty("--accent", album.accent);
+
         card.classList.toggle(
             "selected",
             albumIndex === selectedAlbumIndex
@@ -415,12 +449,37 @@ function renderAlbums() {
 
 // Select an album, update the interface, and optionally play it.
 
+// Select an album and resume it where it was left off.
+// A new album starts at track one.
+
 function selectAlbum(albumIndex) {
     const album = albums[albumIndex];
 
     if (!album) {
         return;
     }
+
+    // Clicking the album that is already loaded never restarts it.
+    if (
+        albumIndex === selectedAlbumIndex &&
+        currentTrackIndex >= 0 &&
+        !audioPlayer.ended
+    ) {
+        if (audioPlayer.paused) {
+            audioPlayer.play().catch(() => {});
+        }
+
+        trackSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+        return;
+    }
+
+    // Save the album being left before switching.
+    saveAlbumProgress();
+
+    const saved = albumProgress[albumIndex];
 
     selectedAlbumIndex = albumIndex;
     currentTrackIndex = -1;
@@ -433,9 +492,13 @@ function selectAlbum(albumIndex) {
     renderAlbums();
     renderTracks();
 
-    // Start at track one when the album tile is selected.
+    // Resume saved progress, or start at track one.
     if (album.songs.length > 0) {
-        playTrack(albumIndex, 0);
+        playTrack(
+            albumIndex,
+            saved ? saved.trackIndex : 0,
+            saved ? saved.time : 0
+        );
     }
 
     trackSection.scrollIntoView({
@@ -443,6 +506,7 @@ function selectAlbum(albumIndex) {
         block: "start"
     });
 }
+
 
 
 // ============================================================
@@ -499,31 +563,56 @@ function renderTracks() {
             row.classList.add("playing");
         }
 
+        // Clicking anywhere on the row plays the song.
+        row.addEventListener("click", () => {
+            playTrack(selectedAlbumIndex, trackIndex);
+        });
 
-        // COLUMN 01 — Track number.
+
+        // COLUMN 01 — Track number (swaps to a play icon on hover).
         const number = document.createElement("span");
 
         number.className = "track-number";
-        number.textContent = String(trackIndex + 1).padStart(2, "0");
+
+        const numberText = document.createElement("span");
+
+        numberText.className = "track-number-text";
+        numberText.textContent = String(trackIndex + 1).padStart(2, "0");
+
+        const playIcon = document.createElement("span");
+
+        playIcon.className = "track-play-icon";
+        playIcon.textContent = "▶\uFE0E";
+        playIcon.setAttribute("aria-hidden", "true");
+
+        number.append(numberText, playIcon);
 
 
-        // COLUMN 02 — Clickable song title.
+        // COLUMN 02 — Song title (keyboard-focusable button).
         const title = document.createElement("button");
 
         title.type = "button";
         title.className = "track-name";
         title.textContent = song.title;
 
-        title.addEventListener("click", () => {
-            playTrack(selectedAlbumIndex, trackIndex);
-        });
 
-
-        // COLUMN 03 — Release year.
+        // COLUMN 03 — Release year (swaps to "Right Now" on hover).
         const year = document.createElement("span");
 
         year.className = "track-year";
-        year.textContent = song.year;
+
+        const yearText = document.createElement("span");
+
+        yearText.className = "track-year-text";
+        yearText.textContent = song.year;
+
+        const yearHover = document.createElement("span");
+
+        yearHover.className = "track-year-hover";
+        yearHover.textContent = "Right Now";
+        yearHover.setAttribute("aria-hidden", "true");
+
+        year.append(yearText, yearHover);
 
 
         // COLUMN 04 — Album name.
@@ -548,9 +637,11 @@ function renderTracks() {
             `Like ${song.title}. ${count} likes`
         );
 
-
         // Increase the count and save it locally.
-        likeButton.addEventListener("click", () => {
+        // stopPropagation keeps the row click from playing the song.
+        likeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+
             likes[likeKey] = (likes[likeKey] || 0) + 1;
 
             saveLikes();
@@ -582,7 +673,7 @@ function renderTracks() {
 // Selecting a song also updates the album selection if needed.
 // ============================================================
 
-function playTrack(albumIndex, trackIndex) {
+function playTrack(albumIndex, trackIndex, startTime = 0) {
     const album = albums[albumIndex];
 
     if (!album || !album.songs[trackIndex]) {
@@ -602,7 +693,8 @@ function playTrack(albumIndex, trackIndex) {
         `${album.year} · ${album.songs.length} tracks · Munancho Archive`;
 
 
-    // Load the song.
+    // Load the song. startTime is applied once metadata is ready.
+    pendingStartTime = startTime;
     audioPlayer.src = song.file;
     audioPlayer.load();
 
@@ -617,7 +709,9 @@ function playTrack(albumIndex, trackIndex) {
     playerArt.style.backgroundImage = `url("${album.cover}")`;
     playerArt.style.backgroundSize = "cover";
     playerArt.style.backgroundPosition = "center";
-
+    
+    // Tint the player with the playing album's accent color.
+    player.style.setProperty("--accent", album.accent);
 
     // Refresh the album selection and track highlight.
     renderAlbums();
@@ -667,7 +761,21 @@ audioPlayer.addEventListener("ended", () => {
 
     if (currentTrackIndex < album.songs.length - 1) {
         playTrack(selectedAlbumIndex, currentTrackIndex + 1);
+    } else {
+        // Album finished: clicking its tile again starts over.
+        delete albumProgress[selectedAlbumIndex];
     }
+});
+
+
+// Jump to the saved position once the song is ready to seek.
+
+audioPlayer.addEventListener("loadedmetadata", () => {
+    if (pendingStartTime > 0) {
+        audioPlayer.currentTime = pendingStartTime;
+    }
+
+    pendingStartTime = 0;
 });
 
 

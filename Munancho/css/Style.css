@@ -149,88 +149,69 @@ audio:focus-visible {
    ========================================================== */
 
 .site-header {
-    position: relative;
-    z-index: 5;
+    position: sticky;
+    top: 0;
+    z-index: 20;
 
-    min-height: 76px;
-    padding: 20px 7%;
+    min-height: 96px;
+    padding: 26px 7%;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 56px;
 
-    border-bottom: 1px solid var(--border);
+    /* Hard edge: a crisp line separates the bar from the page. */
+    border-bottom: 1.6px solid var(--border-strong);
 
-    background: rgba(8, 11, 20, 0.76);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    /* Glass: darker tint + heavy blur so content underneath
+       softens instead of competing with the text. */
+    background: rgba(8, 11, 20, 0.88);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Thin cyan highlight along the bottom edge. */
+.site-header::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(115, 245, 255, 0.55) 50%,
+        transparent
+    );
+
+    pointer-events: none;
 }
 
 .logo {
-    flex-shrink: 0;
-
-    font-size: 1.25rem;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-
-    transition: color var(--transition-fast);
-}
-
-.logo:hover {
-    color: var(--blue);
-}
-
-.logo span {
-    color: var(--cyan);
-    font-size: 0.6rem;
-    vertical-align: top;
+    font-size: 1.4rem;   /* was 1.25rem */
+    /* ...rest unchanged... */
 }
 
 nav {
-    display: flex;
-    align-items: center;
-    gap: 28px;
+    gap: 56px;           /* was 28px */
 }
 
-nav a,
-.status,
 .eyebrow,
 .player-label {
-    font-size: 0.68rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
 }
 
 nav a {
-    color: var(--muted);
-    transition: color var(--transition-fast);
-}
-
-nav a:hover {
-    color: var(--cyan);
-}
-
-.status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    color: var(--cyan);
-    white-space: nowrap;
-}
-
-.status-dot {
-    width: 7px;
-    height: 7px;
-    flex-shrink: 0;
-
-    border-radius: 50%;
-    background: var(--cyan);
-
-    box-shadow:
-        0 0 8px rgba(115, 245, 255, 0.75),
-        0 0 18px rgba(115, 245, 255, 0.35);
+    color: var(--text);
 }
 
 
@@ -487,54 +468,50 @@ nav a:hover {
 
 /* Creates the glass-like surface around each album. */
 .album-card {
-    position: relative;
-    min-width: 0;
-    padding: 12px;
+    --accent: 115, 245, 255;  /* fallback: your cyan */
 
-    overflow: hidden;
-    text-align: left;
+    /* ...keep everything else, but replace the border and background: */
+    border: 1px solid rgba(var(--accent), 0.4);
 
-    color: var(--text);
-    background: linear-gradient(
-        145deg,
-        rgba(25, 39, 64, 0.82),
-        rgba(12, 18, 32, 0.92)
-    );
-
-    border: 1px solid var(--border);
-    border-radius: var(--radius-medium);
-
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
-
-    cursor: pointer;
-
-    transition:
-        transform var(--transition-smooth),
-        border-color var(--transition-smooth),
-        background var(--transition-smooth),
-        box-shadow var(--transition-smooth);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(var(--accent), 0.16),
+            transparent 70%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(25, 39, 64, 0.82),
+            rgba(12, 18, 32, 0.92)
+        );
 }
 
-/* Adds lift and blue illumination when a card is hovered. */
 .album-card:hover {
     transform: translateY(-5px);
-    border-color: var(--border-strong);
-    box-shadow: var(--glow);
+    border-color: rgba(var(--accent), 0.8);
+    box-shadow: 0 0 24px rgba(var(--accent), 0.18);
 }
 
-/* Identifies the album currently open in the archive. */
 .album-card.selected {
-    border-color: var(--cyan);
-    background: linear-gradient(
-        145deg,
-        rgba(35, 60, 91, 0.88),
-        rgba(12, 20, 36, 0.96)
-    );
+    border-color: rgb(var(--accent));
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(var(--accent), 0.28),
+            transparent 75%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(35, 60, 91, 0.88),
+            rgba(12, 20, 36, 0.96)
+        );
 
     box-shadow:
-        inset 0 0 0 1px rgba(115, 245, 255, 0.08),
-        var(--glow-cyan);
+        inset 0 0 0 1px rgba(var(--accent), 0.15),
+        0 0 26px rgba(var(--accent), 0.3);
 }
+
 
 /* Keeps all album artwork square and consistently cropped. */
 .album-art {
@@ -612,7 +589,7 @@ nav a:hover {
     grid-template-columns:
         35px
         minmax(120px, 1.6fr)
-        minmax(70px, 0.5fr)
+        minmax(80px, 0.5fr)   /* was 70px */
         minmax(110px, 1fr)
         65px;
 
@@ -721,6 +698,106 @@ nav a:hover {
     font-size: 0.9rem;
 }
 
+/* ==================================================
+   TRACK ROW HOVER
+   PURPOSE: Whole row is clickable. On hover, the
+   track number becomes a play button and the year
+   becomes "Right Now".
+   ================================================== */
+
+.track-row {
+    cursor: pointer;
+}
+
+/* Stack both states in one cell so the column width never jumps. */
+.track-number,
+.track-year {
+    display: grid;
+    align-items: center;
+}
+
+.track-number > *,
+.track-year > * {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+}
+
+.track-play-icon,
+.track-year-hover {
+    opacity: 0;
+}
+
+/* hover: hover keeps touch screens from getting stuck in hover state. */
+@media (hover: hover) {
+    .track-row:hover .track-number-text,
+    .track-row:hover .track-year-text {
+        opacity: 0;
+    }
+
+    .track-row:hover .track-play-icon,
+    .track-row:hover .track-year-hover {
+        opacity: 1;
+    }
+}
+
+/* Whole row is clickable. */
+.track-row {
+    cursor: pointer;
+}
+
+/* Stacks the number and play icon in one cell so the column never jumps. */
+.track-number,
+.track-year {
+    display: grid;
+    align-items: center;
+}
+
+.track-number > *,
+.track-year > * {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+
+    transition: opacity var(--transition-fast);
+}
+
+/* Hidden until the row is hovered or focused. */
+.track-play-icon,
+.track-year-hover {
+    opacity: 0;
+}
+
+.track-play-icon {
+    color: var(--cyan);
+    font-size: 0.8rem;
+}
+
+.track-year-hover {
+    color: var(--cyan);
+}
+
+/* Swaps number to play icon and year to "Right Now". */
+.track-row:focus-within .track-number-text,
+.track-row:focus-within .track-year-text {
+    opacity: 0;
+}
+
+.track-row:focus-within .track-play-icon,
+.track-row:focus-within .track-year-hover {
+    opacity: 1;
+}
+
+/* Prevents touch devices from getting stuck in hover state. */
+@media (hover: hover) {
+    .track-row:hover .track-number-text,
+    .track-row:hover .track-year-text {
+        opacity: 0;
+    }
+
+    .track-row:hover .track-play-icon,
+    .track-row:hover .track-year-hover {
+        opacity: 1;
+    }
+}
 
 /* ==========================================================
    SECTION 09 — PERSISTENT MUSIC PLAYER
@@ -737,6 +814,7 @@ nav a:hover {
 
 /* Keeps the music player visible at the bottom of the screen. */
 .player {
+    --accent: 115, 245, 255;  /* fallback: munancho cyan */
     position: fixed;
     z-index: 10;
 
@@ -757,13 +835,17 @@ nav a:hover {
     align-items: center;
     gap: 25px;
 
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(var(--accent), 0.6);
 
     background: var(--glass);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-
-    box-shadow: 0 -8px 35px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow:
+        0 -8px 35px rgba(0, 0, 0, 0.18),
+        0 -2px 30px rgba(var(--accent), 0.16);
+    transition:
+        border-color var(--transition-smooth),
+        box-shadow var(--transition-smooth);
 }
 
 /* Groups the mini cover with the current song information. */
@@ -784,7 +866,7 @@ nav a:hover {
     height: 48px;
     flex-shrink: 0;
 
-    border: 1px solid var(--border);
+    border: 1px solid rgba(var(--accent), 0.7);
     border-radius: var(--radius-small);
 
     background: linear-gradient(
@@ -958,7 +1040,7 @@ nav a:hover {
     }
 
     nav a {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
     }
 
     .status {
