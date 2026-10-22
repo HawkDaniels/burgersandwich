@@ -9,6 +9,7 @@
    before loading this file. (Logins use cookies, so the same domain is strongly recommended.) */
 (function () {
   "use strict";
+  if (window.SiteAccount) return; // already loaded (several widgets may ask for it)
   var BASE = (window.SITE_API || "").replace(/\/+$/, "") + "/api";
 
   var MESSAGES = {
@@ -24,6 +25,14 @@
     bad_captcha: "The human check failed. Try again.",
     network: "Couldn't reach the server.",
     server_error: "Something went wrong on the server.",
+    not_enough: "You don't have enough for that.",
+    not_ready: "You can't do that yet.",
+    already_done: "You've already done that.",
+    too_soon: "Not yet. Try again later.",
+    wrong_answer: "That isn't the right answer.",
+    full: "You can't carry any more of that.",
+    busy: "The server is busy. Try again.",
+    unknown_action: "That isn't available.",
   };
 
   function call(method, path, body) {
@@ -83,6 +92,14 @@
     progress: function () { return call("GET", "/progress"); },
     saveQuest: function (questId, state) { return call("PUT", "/progress/" + encodeURIComponent(questId), { state: state }); },
     event: function (name) { return call("POST", "/event", { event: name }); },
+    // The player's money and items: { ok, money, items: { itemId: count } }. Needs a login.
+    inventory: function () { return call("GET", "/inventory"); },
+    // Ask the server to carry out one of the ACTIONS in defs.js. The server decides whether it is allowed.
+    action: function (id, answer) {
+      var b = { id: id };
+      if (answer !== undefined) b.answer = answer;
+      return call("POST", "/action", b);
+    },
     defs: function () { return call("GET", "/defs"); },
     stats: function () { return call("GET", "/achievements/stats"); },
     // Only same-site paths are allowed as a "go back to" address (blocks //evil.com, https://..., javascript:).

@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Log in / Sign up</title>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in / Sign up</title>
 <!-- Bare-bones on purpose: restyle freely. Keep the ids; the script below uses them. -->
 </head>
 <body>
-<p><a href="/">&larr; Home</a></p>
+<a href="/">
+ <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
+</a>
 <p id="msg" role="status"></p>
 
 <h1>Log in</h1>
@@ -26,7 +30,7 @@
   <button>Sign up</button>
 </form>
 
-<script src="/accounts/site-account.js"></script>
+<script src="/account/site-account.js"></script>
 <script>
   var $ = function (id) { return document.getElementById(id); };
   var next = SiteAccount.safeNext(new URLSearchParams(location.search).get("next"), "/");

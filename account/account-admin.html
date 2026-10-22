@@ -29,6 +29,15 @@
     <button>Reset</button>
   </form>
   <p><small>Resetting logs the account out everywhere and clears any lockout. Tell the person the new password yourself.</small></p>
+  <h2>Give or take money and items</h2>
+  <form id="grantForm">
+    <label>Username <input id="gu" maxlength="16" required></label>
+    <label>Money (a negative number takes it away) <input id="gm" type="number" step="1" value="0"></label>
+    <label>Item id <input id="gi" maxlength="60" placeholder="optional, from ITEMS in defs.js"></label>
+    <label>How many (negative takes away) <input id="gn" type="number" step="1" value="1"></label>
+    <button>Apply</button>
+  </form>
+  <p><small>For testing and for putting right a mistake. Nothing goes below zero or above the limits. Each change is recorded in the ledger table.</small></p>
 </div>
 
 <script>
@@ -64,6 +73,16 @@
   }
   $("tokenForm").onsubmit = function (e) { e.preventDefault(); token = $("token").value; load(); };
   $("reload").onclick = load;
+  $("grantForm").onsubmit = function (e) {
+    e.preventDefault();
+    var body = { username: $("gu").value, money: Number($("gm").value) || 0, items: {} };
+    if ($("gi").value.trim()) body.items[$("gi").value.trim()] = Number($("gn").value);
+    call("POST", "/admin/grant", body).then(function (r) {
+      var names = r.ok ? Object.keys(r.items).map(function (k) { return k + " x" + r.items[k]; }).join(", ") : "";
+      say(r.ok ? "Done. They now have " + r.money + " money" + (names ? " and " + names : "") + "."
+        : r.error === "not_found" ? "No such account." : r.error === "unknown_item" ? "That item id is not in ITEMS." : r.error === "out_of_range" ? "That would go below zero or over the limit." : "Failed (" + r.error + ").");
+    });
+  };
   $("resetForm").onsubmit = function (e) {
     e.preventDefault();
     call("POST", "/admin/reset-password", { username: $("ru").value, password: $("rp").value }).then(function (r) {

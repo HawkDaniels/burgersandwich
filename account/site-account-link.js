@@ -9,8 +9,8 @@
   "use strict";
   var LOGGED_OUT_TEXT = "Log in / Sign up";
   var LOGGED_IN_PREFIX = "Signed in as ";
-  var LOGIN_PAGE = "/accounts/login.html";
-  var ACCOUNT_PAGE = "/accounts/account.html";
+  var LOGIN_PAGE = "/account/login.html";
+  var ACCOUNT_PAGE = "/account/account.html";
 
   var holder = document.getElementById("account-link");
   if (!holder || !window.SiteAccount) return;
