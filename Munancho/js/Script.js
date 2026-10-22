@@ -5,11 +5,12 @@
 //
 // PROJECT STRUCTURE
 // ------------------------------------------------------------
-// /pages/Munancho.html         Main webpage
-// /Munancho/albums/            Album cover images
-// /Munancho/audio/             Song audio files
-// /Munancho/css/Style.css      Website appearance
-// /Munancho/js/script.js       Album data and player functionality
+// /pages/Munancho.html          Main webpage
+// /Munancho/albums/       Album cover images
+// /Munancho/audio/        Song audio files
+// /Munancho/audio/cues/   Navigation sound cues
+// /Munancho/css/Style.css Website appearance
+// /Munancho/js/script.js  Album data and player functionality
 //
 // SECTION GUIDE
 // ------------------------------------------------------------
@@ -26,9 +27,15 @@
 //     04B. About bubble
 // 05. Music playback
 // 06. Audio events and initialization
+// 07. Navigation cues and page views
+//     07A. Cue files
+//     07B. Cue playback
+//     07C. Page views
+// 08. Lore expander
 //
 // GENERAL RULE
 // Edit song names, years, file paths, and about text in Section 01.
+// Edit sound cue files in Section 07A.
 // Edit the appearance in Style.css, not in this file.
 // ============================================================
 
@@ -278,6 +285,270 @@ const albums = [
                 about: "This track is currently classified."
             }
         ]
+    },
+
+    {
+        id: "album4",
+        title: "Munancho Milks The Milkman (Coming Soon)",
+        year: 2027,
+        cover: "../Munancho/albums/Munancho(1).jpg",
+        accent: "255, 80, 120",   // album3: placeholder
+        songs: [
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/no-bones-remaining.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/dolphin-frequency.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            }
+        ]
+    },
+
+    {
+        id: "album4",
+        title: "Munancho Commits Lunch (Coming Soon)",
+        year: 2027,
+        cover: "../Munancho/albums/Munancho(2).jpg",
+        accent: "255, 80, 120",   // album3: placeholder
+        songs: [
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/no-bones-remaining.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/dolphin-frequency.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            }
+        ]
+    },
+
+    {
+        id: "album5",
+        title: "Munancho Goes To Rehab In a Whale (Coming Soon)",
+        year: 2027,
+        cover: "../Munancho/albums/Munancho(3).jpg",
+        accent: "255, 80, 120",   // album3: placeholder
+        songs: [
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/no-bones-remaining.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/dolphin-frequency.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            },
+            {
+                title: "18NakedCowboys",
+                year: 2026,
+                file: "../Munancho/audio/government-cheese.mp3",
+                about: "This track is currently classified."
+            }
+        ]
     }
 ];
 
@@ -296,6 +567,7 @@ const albums = [
 // trackSubheading Album information.
 // audioPlayer     Browser audio player.
 // player          Fixed bottom player bar.
+// siteHeader      Sticky top header.
 //
 // 02B. PLAYBACK STATE
 // selectedAlbumIndex = Currently selected album.
@@ -327,6 +599,7 @@ const playerArt = document.getElementById("player-art");
 
 const trackSection = document.getElementById("track-section");
 const player = document.querySelector(".player");
+const siteHeader = document.querySelector(".site-header");
 
 
 // ------------------------------------------------------------
@@ -601,7 +874,7 @@ function selectAlbum(albumIndex) {
 // playing           Currently selected song.
 // track-number      Track number cell.
 // track-number-text Track number (default state).
-// track-play-icon   Play icon (hover state).
+// track-play-icon   Play icon (hover state, drawn by CSS).
 // track-name        Song title.
 // track-year        Year cell.
 // track-year-text   Song year (default state).
@@ -676,10 +949,10 @@ function renderTracks() {
         numberText.className = "track-number-text";
         numberText.textContent = String(trackIndex + 1).padStart(2, "0");
 
+        // The triangle itself is drawn by CSS.
         const playIcon = document.createElement("span");
 
         playIcon.className = "track-play-icon";
-        playIcon.textContent = "▶\uFE0E";
         playIcon.setAttribute("aria-hidden", "true");
 
         number.append(numberText, playIcon);
@@ -927,7 +1200,7 @@ window.addEventListener("resize", closeAboutBubble);
 // playerTitle       Current song name.
 // playerAlbum       Current album name.
 // playerArt         Mini album artwork.
-// player --accent   Player highlight color.
+// player --accent   Player and header highlight color.
 // currentTrackIndex Active track highlight.
 //
 // Selecting a song also updates the album selection if needed.
@@ -973,6 +1246,9 @@ function playTrack(albumIndex, trackIndex, startTime = 0) {
 
     // Tint the player with the playing album's accent color.
     player.style.setProperty("--accent", album.accent);
+
+    // Tint the top header with the same album color.
+    siteHeader.style.setProperty("--accent", album.accent);
 
 
     // Refresh the album selection and track highlight.
@@ -1057,3 +1333,164 @@ audioPlayer.addEventListener("error", () => {
 
 renderAlbums();
 renderTracks();
+
+
+// ============================================================
+// SECTION 07 — NAVIGATION CUES AND PAGE VIEWS
+//
+// PURPOSE:
+// Plays a short sound cue when a header tab is clicked, and
+// switches between the page views (home and The Bing Dingy).
+//
+// 07A. CUE FILES
+// Each header link has a data-cue name in the HTML. The name
+// below points to its audio file. To add a voice clip, save
+// the file with the exact name and put it in
+// /Munancho/audio/cues/. No other code changes are needed.
+// A missing file is skipped silently (the browser console
+// may show a 404, which is expected until the file exists).
+//
+// 07B. CUE PLAYBACK
+// Cues use their own audio object, so they never interrupt
+// the album playing in the bottom player.
+//
+// 07C. PAGE VIEWS
+// view-home        Hero, lore, archive, track manifest, merch.
+// view-bing-dingy  The Bing Dingy page.
+// Only one view is visible at a time. The player and header
+// stay on screen in every view.
+// ============================================================
+
+
+// ------------------------------------------------------------
+// 07A — CUE FILES
+// ------------------------------------------------------------
+
+const navCues = {
+    "lore": "../Munancho/audio/cues/lore.mp3",
+    "archive": "../Munancho/audio/cues/archive.mp3",
+    "merch": "../Munancho/audio/cues/merch.mp3",
+    "bing-dingy": "../Munancho/audio/cues/bing-dingy.mp3",
+    "logo": "../Munancho/audio/Munancho.mp3"
+};
+// Each cue keeps one audio object, so clicking again restarts it
+// instead of layering copies on top of each other.
+
+const activeCues = {};
+
+function playNavCue(cueName) {
+    const file = navCues[cueName];
+
+    // Links without a cue stay silent.
+    if (!file) {
+        return;
+    }
+
+    if (!activeCues[cueName]) {
+        activeCues[cueName] = new Audio(file);
+    }
+
+    const cue = activeCues[cueName];
+
+    cue.currentTime = 0;
+
+    // A missing or blocked file should never cause an error.
+    cue.play().catch(() => {});
+}
+
+
+// ------------------------------------------------------------
+// 07C — PAGE VIEWS
+// ------------------------------------------------------------
+
+const siteViews = {
+    "home": document.getElementById("view-home"),
+    "bing-dingy": document.getElementById("view-bing-dingy")
+};
+
+const viewLinks = document.querySelectorAll("[data-view]");
+
+// Show one view, hide the others, and mark the active tab.
+function showView(viewName) {
+    if (!siteViews[viewName]) {
+        return;
+    }
+
+    Object.entries(siteViews).forEach(([name, element]) => {
+        element.hidden = name !== viewName;
+    });
+
+    viewLinks.forEach((link) => {
+        link.classList.toggle(
+            "active",
+            viewName === "bing-dingy" && link.dataset.view === "bing-dingy"
+        );
+    });
+}
+
+// Clicking a header link plays its cue and opens its view.
+// The view is shown before the browser scrolls to the link's
+// section, so the section is already on screen when it jumps.
+viewLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+        playNavCue(link.dataset.cue);
+        showView(link.dataset.view);
+    });
+});
+
+// Keep the view correct for the back button and direct links.
+function syncViewToHash() {
+    showView(
+        window.location.hash === "#bing-dingy" ? "bing-dingy" : "home"
+    );
+
+    const target = document.getElementById(
+        window.location.hash.slice(1)
+    );
+
+    if (target) {
+        target.scrollIntoView();
+    }
+}
+
+window.addEventListener("hashchange", syncViewToHash);
+
+// Open The Bing Dingy directly if the page loads on its link.
+if (window.location.hash === "#bing-dingy") {
+    syncViewToHash();
+}
+
+
+// ============================================================
+// SECTION 08 — LORE EXPANDER
+//
+// PURPOSE:
+// Opens and closes the rest of the lore text.
+//
+// HOW IT WORKS:
+// Clicking the button toggles the "expanded" class on the
+// lore panel. CSS (Style.css Section 06B) does the sliding.
+// The button text changes to match.
+// ============================================================
+
+const lorePanel = document.getElementById("lore-panel");
+const loreToggle = document.getElementById("lore-toggle");
+const loreToggleLabel = document.getElementById("lore-toggle-label");
+
+loreToggle.addEventListener("click", () => {
+    const expanded = lorePanel.classList.toggle("expanded");
+
+    loreToggle.setAttribute("aria-expanded", String(expanded));
+
+    loreToggleLabel.textContent = expanded
+        ? "Collapse The Mythos"
+        : "Expand The Mythos";
+
+    // Bring the lore heading back into view after collapsing.
+    if (!expanded) {
+        document.getElementById("lore").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+});

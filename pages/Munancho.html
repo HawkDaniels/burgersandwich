@@ -11,6 +11,8 @@ Munancho.html
 Munancho/
     albums/         Album artwork and visual assets.
     audio/          Music files.
+        cues/       Navigation sound cues (lore.mp3,
+                    archive.mp3, merch.mp3, bing-dingy.mp3).
     css/Style.css   Colors, layout, typography, and effects.
     js/script.js    Album data, tracklists, and playback logic.
 
@@ -23,13 +25,25 @@ SECTION GUIDE
     02C. Status
 03. Hero / introduction
 04. Lore / classified history
+    04A. Heading
+    04B. Opening text (always visible)
+    04C. Expandable text
+    04D. Expand button
 05. Album archive
 06. Track manifest
 07. Merch
-08. Persistent music player
-    08A. Now playing
-    08B. Audio controls
-    08C. Player label
+08. The Bing Dingy page
+09. Persistent music player
+    09A. Now playing
+    09B. Audio controls
+    09C. Player label
+
+PAGE VIEWS
+------------------------------------------------------------
+The page has two views. Only one is visible at a time.
+#view-home         Hero, lore, archive, track manifest, merch.
+#view-bing-dingy   The Bing Dingy page.
+JavaScript (script.js Section 07) switches between them.
 
 HOW THE WEBSITE WORKS
 ------------------------------------------------------------
@@ -42,8 +56,8 @@ EDITING GUIDE
 ------------------------------------------------------------
 Change text and page sections in this file.
 Change appearance in Munancho/css/Style.css.
-Change music data, about text, and playback behavior in
-Munancho/js/script.js.
+Change music data, about text, sound cues, and playback
+behavior in Munancho/js/script.js.
 
 FILE PATH NOTE
 ------------------------------------------------------------
@@ -78,6 +92,7 @@ File and folder names must match their actual spelling.
 
     <meta name="description"
           content="Enter the digital archive of Munancho.">
+    <link rel="icon" href="/favicon(1).png">
 
     <!-- Visual styling: colors, layout, and effects. -->
     <link rel="stylesheet" href="../Munancho/css/Style.css">
@@ -94,28 +109,50 @@ File and folder names must match their actual spelling.
          PURPOSE:
          Displays the brand, page navigation, and archive
          status indicator. Stays pinned to the top while
-         scrolling.
+         scrolling, and is tinted by the playing album.
 
          IMPORTANT HOOKS:
          .logo         Brand styling.
+        .logo-icon    Round home icon. Plays the "logo" cue.
          .status       Archive status styling.
+         data-view     Which page view a link opens
+                       ("home" or "bing-dingy").
+         data-cue      Which sound cue a link plays. The
+                       file is listed in script.js Section 07.
          #lore         Navigation destination for the lore.
          #albums       Navigation destination for the archive.
          #merch        Navigation destination for the merch.
+         #bing-dingy   Navigation destination for the Bing
+                       Dingy page.
          ================================================== -->
 
     <header class="site-header">
 
         <!-- 02A — Brand -->
-        <a class="logo" href="#home">
-            MUNANCHO<span>®</span>
-        </a>
+        <div class="brand">
+
+            <!-- 02A-1 — Icon (home link, plays Munancho.mp3) -->
+            <a class="logo-icon"
+               href="../index.html"
+               data-view="home"
+               data-cue="logo"      
+               aria-label="Munancho home">
+                <img src="/favicon(1).png" alt="Munancho logo">
+            </a>
+
+            <!-- 02A-2 — Wordmark (home link) -->
+            <a class="logo" href="#home" data-view="home">
+                MUNANCHO<span>®</span>
+            </a>
+
+        </div>
 
         <!-- 02B — Navigation -->
         <nav aria-label="Main navigation">
-            <a href="#lore">THE LORE</a>
-            <a href="#albums">THE ARCHIVE</a>
-            <a href="#merch">THE MERCH</a>
+            <a href="#lore" data-view="home" data-cue="lore">THE LORE</a>
+            <a href="#albums" data-view="home" data-cue="archive">THE ARCHIVE</a>
+            <a href="#merch" data-view="home" data-cue="merch">THE MERCH</a>
+            <a href="#bing-dingy" data-view="bing-dingy" data-cue="bing-dingy">THE BING DINGY</a>
         </nav>
 
         <!-- 02C — Status -->
@@ -128,6 +165,9 @@ File and folder names must match their actual spelling.
 
 
     <main id="home">
+
+        <!-- PAGE VIEW: HOME (Sections 03 to 07) -->
+        <div class="page-view" id="view-home">
 
         <!-- ==================================================
              SECTION 03 — HERO / INTRODUCTION
@@ -173,12 +213,18 @@ File and folder names must match their actual spelling.
 
              PURPOSE:
              Presents the fictional history and mythology
-             behind Munancho.
+             behind Munancho. Only the opening is visible at
+             first. The rest opens with the Expand button.
 
              WHAT YOU CAN CHANGE:
              .file-stamp   Document label.
              .lore-panel   Main document container.
              .file-footer  Document status label.
+
+             JAVASCRIPT CONNECTIONS (script.js Section 08):
+             #lore-panel        Panel that gets the "expanded" class.
+             #lore-toggle       Expand / collapse button.
+             #lore-toggle-label Button text.
 
              CONTENT NOTE:
              Keep the story in separate paragraphs so it is
@@ -187,15 +233,17 @@ File and folder names must match their actual spelling.
 
         <section class="lore section-block" id="lore">
 
+            <!-- 04A — Heading -->
             <div class="section-heading">
                 <p class="eyebrow">FILE 001 / CLASSIFIED HISTORY</p>
                 <h2>The Munancho Mythos</h2>
             </div>
 
-            <div class="lore-panel">
+            <div class="lore-panel" id="lore-panel">
 
                 <span class="file-stamp">OFFICIAL ARCHIVE</span>
 
+                <!-- 04B — Opening text (always visible) -->
                 <p>
                     Founded in the questionable depths of history,
                     Munancho Incorporated emerged as a musical force
@@ -211,58 +259,75 @@ File and folder names must match their actual spelling.
                     via the first gay couple in recorded history.
                 </p>
 
-                <p>
-                    Barak “The Cheese” Music was born at the ripe age
-                    of 6. His first words were famously “I'm cheesing
-                    it,” which earned him his famous nickname “The
-                    Cheese” as well as becoming the number one pickup
-                    line on earth.
-                </p>
+                <!-- 04C — Expandable text -->
+                <div class="lore-more" id="lore-more">
+                    <div class="lore-more-inner">
 
-                <p>
-                    Christopher “The Crunch” Music was famously born
-                    as just a pair of legs with zero bones left broken.
-                    He eventually overcame this fact by becoming the
-                    first person to ever throw it back sexual style
-                    with no heart or brain. This earned him his famous
-                    nickname of “The Crunch,” and he's been America's
-                    number one heartthrob since.
-                </p>
+                        <p>
+                            Barak “The Cheese” Music was born at the ripe age
+                            of 6. His first words were famously “I'm cheesing
+                            it,” which earned him his famous nickname “The
+                            Cheese” as well as becoming the number one pickup
+                            line on earth.
+                        </p>
 
-                <p>
-                    Before beginning their music journey, the duo made
-                    their first ever controversial media stunt. They
-                    made the conscious decision to enter ketosis live
-                    on national television. Scholars today still debate
-                    the morality of this decision, but the general
-                    public has seemed to move on in favor of celebrating
-                    their success as the number one music group on earth.
-                </p>
+                        <p>
+                            Christopher “The Crunch” Music was famously born
+                            as just a pair of legs with zero bones left broken.
+                            He eventually overcame this fact by becoming the
+                            first person to ever throw it back sexual style
+                            with no heart or brain. This earned him his famous
+                            nickname of “The Crunch,” and he's been America's
+                            number one heartthrob since.
+                        </p>
 
-                <p>
-                    Munancho accomplishes their unique sound by combining
-                    harsh noise with experimental dolphin mating sounds.
-                    This fusion has created their signature soundstage
-                    that has yet to be recreated by anyone else.
-                </p>
+                        <p>
+                            Before beginning their music journey, the duo made
+                            their first ever controversial media stunt. They
+                            made the conscious decision to enter ketosis live
+                            on national television. Scholars today still debate
+                            the morality of this decision, but the general
+                            public has seemed to move on in favor of celebrating
+                            their success as the number one music group on earth.
+                        </p>
 
-                <p>
-                    Munancho was unfortunately executed on March 3rd,
-                    2004 for smuggling fentanyl and Guitar Hero
-                    controllers over the US-Azerbaijan border.
-                    The albums left… are their legacy. Rest In Piece
-                    Munancho, we're all praying for you.
-                </p>
+                        <p>
+                            Munancho accomplishes their unique sound by combining
+                            harsh noise with experimental dolphin mating sounds.
+                            This fusion has created their signature soundstage
+                            that has yet to be recreated by anyone else.
+                        </p>
 
-                <p>
-                    Their legacy lives on through the recordings
-                    preserved below. The truth is classified.
-                    The music is eternal.
-                </p>
+                        <p>
+                            Munancho was unfortunately executed on March 3rd,
+                            2004 for smuggling fentanyl and Guitar Hero
+                            controllers over the US-Azerbaijan border.
+                            The albums left… are their legacy. Rest In Piece
+                            Munancho, we're all praying for you.
+                        </p>
 
-                <span class="file-footer">
-                    DOCUMENT STATUS: QUESTIONABLE
-                </span>
+                        <p>
+                            Their legacy lives on through the recordings
+                            preserved below. The truth is classified.
+                            The music is eternal.
+                        </p>
+
+                        <span class="file-footer">
+                            DOCUMENT STATUS: QUESTIONABLE
+                        </span>
+
+                    </div>
+                </div>
+
+                <!-- 04D — Expand button -->
+                <button class="lore-toggle"
+                        id="lore-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="lore-more">
+                    <span id="lore-toggle-label">Expand The Mythos</span>
+                    <span class="lore-toggle-arrow" aria-hidden="true">↓</span>
+                </button>
 
             </div>
         </section>
@@ -383,15 +448,144 @@ File and folder names must match their actual spelling.
 
         </section>
 
+        </div>
+        <!-- END PAGE VIEW: HOME -->
+
+
+        <!-- PAGE VIEW: THE BING DINGY (Section 08) -->
+        <div class="page-view" id="view-bing-dingy" hidden>
+
+        <!-- ==================================================
+             SECTION 08 — THE BING DINGY
+
+             PURPOSE:
+             A separate page space with none of the other
+             sections on it. Opens from the "THE BING DINGY"
+             tab in the header. Not a new HTML file.
+
+             HOW TO ADD YOUR OWN CONTENT:
+             Replace or add anything inside .script-panel.
+             .script-scene     Scene heading.
+             .script-line      One line of dialogue.
+             .script-speaker   Character name.
+             ================================================== -->
+
+        <section class="section-block bing-dingy" id="bing-dingy">
+
+            <div class="section-heading">
+                <p class="eyebrow">FILE 005 / RECOVERED TRANSCRIPT</p>
+                <h2>
+                    The Bing Dingy<span class="accent">.</span>
+                </h2>
+                <p class="section-description">
+                    Bing Dingy: La Película. Versión abreviada.
+                </p>
+            </div>
+
+            <div class="lore-panel script-panel">
+
+                <span class="file-stamp">TRANSCRIPCIÓN RECUPERADA</span>
+
+                <p class="script-scene">ESCENA 1 — EL PANTANO, 6:00 A.M.</p>
+
+                <p class="script-line">
+                    <span class="script-speaker">SHREK:</span>
+                    Hay una abeja en mi pantano. Y trae sombrero.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">BURRO:</span>
+                    No es una abeja, Shrek. Soy yo. Me disfracé.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">SHREK:</span>
+                    Tienes alas de cartón y un aguijón hecho con una cuchara.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">BURRO:</span>
+                    Aun así vuelo. Por dentro. Espiritualmente.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">FIONA:</span>
+                    ¿Quién se comió mi miel? Estaba en el frasco que decía “no tocar”.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">BURRO:</span>
+                    Ese frasco lo decía en un idioma que yo no leo.
+                </p>
+
+                <p class="script-scene">ESCENA 2 — EL TRIBUNAL DE FAR FAR AWAY</p>
+
+                <p class="script-line">
+                    <span class="script-speaker">LORD FARQUAAD:</span>
+                    Declaro abierto el juicio contra el pantano por exceso de zumbido.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">GATO CON BOTAS:</span>
+                    Su Señoría, mi cliente es un burro disfrazado de abeja. Eso no es un delito. Es un estilo de vida.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">LORD FARQUAAD:</span>
+                    Objeción. Todo en esta sala es demasiado alto.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">DRAGONA:</span>
+                    (desde la ventana) Yo solo vine por la miel.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">SHREK:</span>
+                    Los ogros son como las cebollas. Las abejas son como las cebollas, pero con alas.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">FIONA:</span>
+                    Eso no tiene ningún sentido, Shrek.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">SHREK:</span>
+                    Lo sé. Zumbé de más.
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">BURRO:</span>
+                    ¡Bing Dingy!
+                </p>
+
+                <p class="script-line">
+                    <span class="script-speaker">TODOS:</span>
+                    ¡Bing Dingy!
+                </p>
+
+                <span class="file-footer">
+                    FIN DE LA TRANSMISIÓN. EL RESTO DEL ARCHIVO SIGUE CLASIFICADO.
+                </span>
+
+            </div>
+
+        </section>
+
+        </div>
+        <!-- END PAGE VIEW: THE BING DINGY -->
+
     </main>
 
 
     <!-- ==================================================
-         SECTION 08 — PERSISTENT MUSIC PLAYER
+         SECTION 09 — PERSISTENT MUSIC PLAYER
 
          PURPOSE:
          Keeps the audio player available at the bottom
          of the page while visitors browse the archive.
+         It stays visible on every page view.
 
          IMPORTANT HOOKS:
          #player-art     Small album artwork / placeholder.
@@ -402,12 +596,12 @@ File and folder names must match their actual spelling.
          JAVASCRIPT RESPONSIBILITY:
          Assign the selected song's file path, update the
          displayed song and album information, and tint the
-         player with the playing album's accent color.
+         player and header with the playing album's color.
          ================================================== -->
 
     <footer class="player">
 
-        <!-- 08A — Now playing -->
+        <!-- 09A — Now playing -->
         <div class="now-playing">
 
             <div class="mini-art" id="player-art" aria-hidden="true">
@@ -423,14 +617,14 @@ File and folder names must match their actual spelling.
 
         </div>
 
-        <!-- 08B — Audio controls.
+        <!-- 09B — Audio controls.
              JavaScript assigns the source when a track is selected. -->
         <audio id="audio-player"
                controls
                preload="metadata">
         </audio>
 
-        <!-- 08C — Player label -->
+        <!-- 09C — Player label -->
         <span class="player-label">
             MUNANCHO MACHINE / NANO-TECHNOLOGY
         </span>
