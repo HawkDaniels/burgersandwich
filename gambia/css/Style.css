@@ -1,0 +1,262 @@
+/* 1. THEME VARIABLES */
+/* (For education) CSS variables are named values you define once and reuse. Change a color here and it updates everywhere. */
+
+/* 1A. Base */
+:root {
+  --ink: #2b2a26;                                              /* main text color */
+  --font-body: "Lora", Georgia, serif;                         /* readable body font */
+  --font-hand: "Caveat", "Comic Sans MS", cursive;             /* hand-drawn heading font */
+}
+
+/* 1B. Per-river palettes */
+/* (For education) The JS sets body[data-river], and the matching line below takes over.
+   --river = water color, --accent = shadows and highlights, --deep = dark text and borders (kept dark for contrast), --paper = page background. */
+body[data-river="beginning"] { --river:#8ecae6; --accent:#7fb069; --deep:#2f5d3a; --paper:#fbf5e1; }
+body[data-river="meme"]      { --river:#c8b6ff; --accent:#ff9ecb; --deep:#4b2a7b; --paper:#f6effb; }
+body[data-river="fact"]      { --river:#e9b44c; --accent:#c8553d; --deep:#8a3b26; --paper:#f3e5c3; }
+body[data-river="art"]       { --river:#1b9aaa; --accent:#6a994e; --deep:#0f5560; --paper:#eaf5f3; }
+body[data-river="culture"]   { --river:#ff6f59; --accent:#f4a259; --deep:#8c1519; --paper:#fff1e0; }
+
+/* 2. BASE STYLES */
+/* (For education) Rules that apply to the whole page. */
+
+/* 2A. Sizing and hidden fix */
+* { box-sizing: border-box; }                 /* padding no longer makes boxes wider than you set */
+[hidden] { display: none !important; }        /* makes sure hidden views stay hidden even if other CSS sets display */
+
+/* 2B. Body, paper background, and text */
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);   /* faint dotted paper texture */
+  background-size: 14px 14px;
+  line-height: 1.6;
+  transition: background-color 0.4s;           /* smooth fade when switching rivers */
+}
+
+/* 2C. Headings, links, and keyboard focus */
+h1, h2 { font-family: var(--font-hand); color: var(--deep); line-height: 1.1; }
+h1 { font-size: 3rem; margin: 0 0 0.5rem; }
+h2 { font-size: 1.8rem; margin: 0 0 0.5rem; }
+a { color: var(--deep); }
+:focus-visible { outline: 3px solid var(--deep); outline-offset: 3px; }   /* visible outline for keyboard users */
+
+/* 3. HEADER AND NAVIGATION */
+/* (For education) The top of the page: utility links, title, and the river with floating items. */
+
+/* 3A. Header shell */
+/* (For education) Sticky only on wider screens, because the river band makes the header tall and phones need the space. */
+.site-header {
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 4px solid var(--river);
+  background: var(--paper);
+  z-index: 10;
+}
+@media (min-width: 48rem) { .site-header { position: sticky; top: 0; } }
+
+.site-title { font-family: var(--font-hand); font-size: 1.6rem; margin: 0; color: var(--deep); }
+
+/* 3B. Utility bar (home icon and Senegal link) */
+.utility-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-size: 0.9rem; margin-bottom: 0.5rem; }
+.home-link img { display: block; height: 30px; width: auto; }   /* matches your original 30px home icon */
+
+/* 3C. The river along the top */
+/* (For education) The SVG sits behind the buttons (position absolute) and stretches to the full width. */
+.river-nav { position: relative; margin-top: 0.5rem; }
+.river-band { position: absolute; top: 0; left: 0; width: 100%; height: 4.5rem; }
+.river-band .water { fill: var(--river); opacity: 0.6; transition: fill 0.4s; }   /* takes the current river's color */
+
+/* 3C1. Flowing current line */
+/* (For education) A dashed line whose offset animates, which looks like water moving. */
+.river-band .current {
+  fill: none;
+  stroke: var(--deep);
+  stroke-width: 2;
+  stroke-dasharray: 6 10;
+  opacity: 0.5;
+  vector-effect: non-scaling-stroke;   /* keeps the line thin even though the SVG stretches */
+  animation: flow-lines 6s linear infinite;
+}
+@keyframes flow-lines { to { stroke-dashoffset: -64; } }
+
+/* 3D. Floating items */
+/* (For education) A 5-column grid, one column per river. */
+.float-row { list-style: none; margin: 0; padding: 0; position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; }
+
+/* 3D1. Stagger so items bob out of sync */
+/* (For education) --y is each item's starting height, --delay offsets the animation start. Edit these to change the rhythm. */
+.float-row li:nth-child(1) { --y: -4px; --delay: 0s; }
+.float-row li:nth-child(2) { --y: 4px;  --delay: -0.8s; }
+.float-row li:nth-child(3) { --y: -2px; --delay: -1.6s; }
+.float-row li:nth-child(4) { --y: 5px;  --delay: -2.4s; }
+.float-row li:nth-child(5) { --y: -5px; --delay: -3.0s; }
+
+/* 3D2. Buttons */
+/* (For education) The buttons are stripped of their default look so only the icon and label show. */
+.float-row button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--deep);
+  cursor: pointer;
+}
+
+/* 3D3. Icons */
+/* (For education) "scale" is used for hover and active size so it doesn't fight the bobbing, which uses "transform". */
+.float-icon {
+  position: relative;
+  height: 4.5rem;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);   /* grows and shrinks with screen width */
+  scale: 1;
+  transition: scale 0.2s;
+  animation: bob 3.2s ease-in-out infinite alternate;
+  animation-delay: var(--delay);
+}
+@keyframes bob {
+  from { transform: translate(-4px, var(--y)) rotate(-5deg); }
+  to   { transform: translate(4px, calc(var(--y) + 8px)) rotate(5deg); }
+}
+.float-row button:hover .float-icon { scale: 1.15; }
+
+/* 3D4. Labels */
+.float-label {
+  font-size: clamp(0.65rem, 2.4vw, 0.95rem);
+  line-height: 1.2;
+  text-align: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+/* 3D5. Active river */
+/* (For education) The current river gets a bigger icon, a ring, and a filled label, so color isn't the only signal. */
+.float-row button[aria-current="true"] .float-icon { scale: 1.3; }
+.float-row button[aria-current="true"] .float-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3.6rem;
+  height: 3.6rem;
+  translate: -50% -50%;
+  border: 3px solid var(--deep);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.float-row button[aria-current="true"] .float-label { background: var(--deep); color: #fff; font-weight: 600; }
+
+/* 4. MAIN CONTENT */
+/* (For education) The centered reading column. */
+
+/* 4A. Page width */
+main { max-width: 56rem; margin: 0 auto; padding: 2rem 1.25rem; }
+
+/* 4B. Welcome heading */
+/* (For education) clamp(min, ideal, max) keeps the heading readable on phones and caps it at your original 60px (3.75rem). */
+h1.welcome { font-size: clamp(2.5rem, 8vw, 3.75rem); }
+
+/* 4C. Intro text */
+.lead { font-size: 1.15rem; max-width: 40rem; }
+
+/* 5. RIVER DIVIDER */
+/* (For education) The wavy line "draws itself" by animating stroke-dashoffset from fully hidden to fully shown. */
+.river-divider { width: 100%; height: 40px; margin: 1rem 0; }
+.river-divider path {
+  fill: none;
+  stroke: var(--river);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: flow 2.2s ease-out forwards;
+}
+@keyframes flow { to { stroke-dashoffset: 0; } }
+
+/* 6. CARDS AND STOPS */
+/* (For education) The scrapbook-style content cards along the river. */
+
+/* 6A. Stops layout */
+/* (For education) Mobile first: one narrow column with a river line down the left side. */
+.stops { display: flex; flex-direction: column; gap: 2rem; border-left: 6px solid var(--river); padding-left: 1.25rem; border-radius: 0 0 0 40px; }
+
+/* 6B. Scrapbook card */
+/* (For education) --tilt comes from the style attribute on each card in the HTML. */
+.card {
+  background: #fff;
+  padding: 1.25rem;
+  border: 2px solid var(--deep);
+  border-radius: 6px;
+  box-shadow: 5px 5px 0 var(--accent);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+/* 6C. Media placeholder */
+.slot {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  border: 2px dashed var(--deep);
+  background: repeating-linear-gradient(45deg, transparent 0 10px, rgba(0,0,0,0.04) 10px 20px);
+  font-family: var(--font-hand);
+  font-size: 1.4rem;
+  color: var(--deep);
+}
+
+/* 6D. Hero photo and caption */
+/* (For education) max-height 400px matches your original height="400", and width:auto keeps the proportions. */
+.hero-photo { display: block; max-width: 100%; max-height: 400px; width: auto; height: auto; margin: 0 auto; border: 4px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+figcaption { font-family: var(--font-hand); font-size: 1.4rem; color: var(--deep); text-align: center; margin-top: 0.5rem; }
+
+/* 6E. Audio player */
+.card audio { width: 100%; }
+
+/* 6F. Wider screens */
+/* (For education) On desktop the stops zigzag left and right instead of stacking in one column. */
+@media (min-width: 48rem) {
+  .stops { border-left: none; padding-left: 0; }
+  .stop:nth-child(even) { margin-left: 25%; }
+  .stop:nth-child(odd)  { margin-right: 25%; }
+}
+
+/* 7. STICKER */
+/* (For education) display:block plus width:fit-content, with margin-left:auto, pins it to the right edge. */
+.sticker {
+  display: block;
+  width: fit-content;
+  margin: 2.5rem 0 0 auto;
+  padding: 0.4rem 1rem;
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  color: var(--deep);
+  background: var(--river);
+  border: 2px dashed var(--deep);
+  border-radius: 999px;
+  transform: rotate(-4deg);
+}
+
+/* 8. FOOTER */
+
+/* 8A. Converging rivers */
+.site-footer { text-align: center; padding: 1rem 1.25rem 2rem; font-family: var(--font-hand); font-size: 1.4rem; color: var(--deep); }
+.site-footer svg { width: min(100%, 600px); height: auto; }
+.site-footer path { fill: none; stroke-width: 5; stroke-linecap: round; }
+
+/* 8B. Fine print (the Water disclaimer) */
+.fine-print { font-family: var(--font-body); font-size: 0.85rem; max-width: 36rem; margin: 0.5rem auto 0; color: var(--ink); }
+
+/* 9. REDUCED MOTION */
+/* (For education) Some people get dizzy from animation and set "reduce motion" in their device. This turns every animation off for them. Keep this last. */
+@media (prefers-reduced-motion: reduce) {
+  .river-divider path { animation: none; stroke-dashoffset: 0; }
+  .river-band .current { animation: none; }
+  .float-icon { animation: none; }
+  body { transition: none; }
+}

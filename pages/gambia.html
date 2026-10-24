@@ -1,32 +1,176 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Gambia :)</title>
   <link rel="icon" type="image/png" href="/favicon.png">
+
+  <!-- (For education) Fonts: Caveat is the hand-drawn look for headings, Lora is the readable body font. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- (For education) Order matters: the site-wide style.css loads first, then the Gambia stylesheet overrides it. -->
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/gambia/css/Style.css">
 </head>
-<body>
 
-<a href="/">
- <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
-</a>
-<br>
-<a href="/pages/negasenegal.html">Actually I Prefer Senegal</a>
-<br>
-<span class="space"></span>
+<!-- (For education) data-river decides which color palette the page uses. The JS changes it when you switch rivers. -->
+<body data-river="beginning">
 
-<h1 style="font-size:60px;">Welcome to The Gambia!!</h1>
-<p>This country will soon feature all of your favorite river content!</p>
-<br>
- <img src="/gambia/gambia.JPG" alt="alt text" height="400"> 
-<p>Please enjoy my country</p>
-<br>
-<br>
-<br>
-<br>
-<p>Frequently updated</p>
+  <!-- 1. HEADER AND NAVIGATION -->
+  <!-- (For education) Everything at the top of the page: your original links, the title, and the river nav. -->
+  <header class="site-header">
+
+    <!-- 1A. Utility bar (original links) -->
+    <!-- (For education) Your original home icon and Senegal link, kept as-is. Edit the href values to change where they go. -->
+    <div class="utility-bar">
+      <a href="/" class="home-link">
+        <img src="/assets/home.jpg" alt="Home">
+      </a>
+      <a href="/pages/negasenegal.html">Actually I Prefer Senegal</a>
+    </div>
+
+    <!-- 1B. Title and river nav -->
+    <p class="site-title">The Gambia River Project</p>
+
+    <!-- (For education) A nav is a landmark for screen readers. aria-label names it so it isn't just "navigation". -->
+    <nav class="river-nav" aria-label="The five rivers">
+
+      <!-- 1B1. The river along the top -->
+      <!-- (For education) Decorative SVG water band drawn behind the buttons. aria-hidden hides it from screen readers. -->
+      <svg class="river-band" viewBox="0 0 600 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path class="water" d="M0 25 C 100 5, 200 45, 300 25 S 500 5, 600 25 L 600 75 C 500 95, 400 55, 300 75 S 100 95, 0 75 Z"/>
+        <path class="current" d="M0 50 C 100 30, 200 70, 300 50 S 500 30, 600 50"/>
+      </svg>
+
+      <!-- 1B2. Floating items -->
+      <!-- (For education) Each button has data-view, which must match a view id below (data-view="fact" opens id="view-fact").
+           The emoji is the floating object. To swap one, change the emoji inside float-icon. The label stays as real text for accessibility. -->
+      <ul class="float-row">
+        <li><button type="button" data-view="beginning" aria-current="true">
+          <span class="float-icon" aria-hidden="true">🛶</span>
+          <span class="float-label">The Beginning</span>
+        </button></li>
+        <li><button type="button" data-view="meme">
+          <span class="float-icon" aria-hidden="true">🦛</span>
+          <span class="float-label">The Meme River</span>
+        </button></li>
+        <li><button type="button" data-view="fact">
+          <span class="float-icon" aria-hidden="true">🥜</span>
+          <span class="float-label">The Fact River</span>
+        </button></li>
+        <li><button type="button" data-view="art">
+          <span class="float-icon" aria-hidden="true">🌅</span>
+          <span class="float-label">Art &amp; Scenery</span>
+        </button></li>
+        <li><button type="button" data-view="culture">
+          <span class="float-icon" aria-hidden="true">🥁</span>
+          <span class="float-label">The Culture River</span>
+        </button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- 2. VIEW: THE BEGINNING -->
+    <!-- (For education) Each river is one <section>. Only one is visible at a time; the others carry the hidden attribute. -->
+    <section class="river-view" id="view-beginning" aria-labelledby="h-beginning">
+      <!-- (For education) tabindex="-1" lets the script move keyboard focus here after switching rivers. -->
+      <h1 id="h-beginning" class="welcome" tabindex="-1">Welcome to The Gambia!! Now featuring The Gambia!</h1>
+
+      <!-- 2A. Intro -->
+      <!-- (For education) The short intro line under the heading. -->
+      <p class="lead">This country will soon feature all of your favorite river content! Please float on by when you're not busy!</p>
+
+      <!-- (For education) A decorative wavy river line between the intro and the content. -->
+      <svg class="river-divider" viewBox="0 0 600 40" aria-hidden="true" focusable="false">
+        <path d="M0 20 C 80 0, 120 40, 200 20 S 320 0, 400 20 S 520 40, 600 20"/>
+      </svg>
+
+      <!-- 2B. Stops along the river -->
+      <!-- (For education) Each card is a "stop". --tilt sets how much the card rotates. To add a stop, copy a whole <article>. -->
+      <div class="stops">
+
+        <!-- 2B1. Favorite photograph -->
+        <article class="stop card" style="--tilt:-1.2deg">
+          <h2>The photo that started it all</h2>
+          <figure>
+            <!-- (For education) alt is what screen readers say out loud. Replace "alt text" with a real description of the photo. -->
+            <img class="hero-photo" src="/gambia/gambia.JPG" alt="alt text">
+            <figcaption>Please enjoy my country</figcaption>
+          </figure>
+        </article>
+
+        <!-- 2B2. Slideshow -->
+        <!-- (For education) The dashed box is a placeholder. Replace it with the slideshow embed later. -->
+        <article class="stop card" style="--tilt:0.8deg">
+          <h2>The slideshow</h2>
+          <div class="slot">Slideshow embed goes here :)</div>
+          <p><a href="#">Open slideshow</a></p>
+        </article>
+
+        <!-- 2B3. Original song -->
+        <!-- (For education) The player is empty until you add a source. Put this inside the audio tag when ready:
+             <source src="/gambia/song.mp3" type="audio/mpeg"> (adjust path and type to your file). -->
+        <article class="stop card" style="--tilt:-0.6deg">
+          <h2>The song that inspired a nation</h2>
+          <p>Where the slideshow ends up when i'm less busy.</p>
+          <audio controls preload="none"></audio>
+        </article>
+
+      </div>
+
+      <!-- 2C. Update sticker -->
+      <!-- (For education) Your original "Frequently updated" line, styled as a sticker. -->
+      <p class="sticker">Frequently updated</p>
+    </section>
+
+    <!-- 3. VIEW: THE MEME RIVER -->
+    <!-- (For education) hidden keeps this view invisible until its nav button is clicked. -->
+    <section class="river-view" id="view-meme" aria-labelledby="h-meme" hidden>
+      <h1 id="h-meme" tabindex="-1">The Meme River</h1>
+      <p class="lead">Controlled chaos goes here.</p>
+    </section>
+
+    <!-- 4. VIEW: THE FACT RIVER -->
+    <section class="river-view" id="view-fact" aria-labelledby="h-fact" hidden>
+      <h1 id="h-fact" tabindex="-1">The Fact River</h1>
+      <p class="lead">Facts, geography, history, wildlife. Sources attached.</p>
+    </section>
+
+    <!-- 5. VIEW: ART AND SCENERY -->
+    <section class="river-view" id="view-art" aria-labelledby="h-art" hidden>
+      <h1 id="h-art" tabindex="-1">The Art &amp; Scenery River</h1>
+      <p class="lead">Landscapes, architecture, textiles, photography. Credits included.</p>
+    </section>
+
+    <!-- 6. VIEW: THE CULTURE RIVER -->
+    <section class="river-view" id="view-culture" aria-labelledby="h-culture" hidden>
+      <h1 id="h-culture" tabindex="-1">The Culture River</h1>
+      <p class="lead">Food, music, languages, traditions, and Gambian voices.</p>
+    </section>
+
+  </main>
+
+  <!-- 7. FOOTER: THE FIVE RIVERS CONVERGE -->
+  <!-- (For education) Five paths in the five palette colors meeting at one point. Hex colors are used here because
+       the footer should show all five rivers at once, not just the current palette. -->
+  <footer class="site-footer">
+    <svg viewBox="0 0 600 90" aria-hidden="true" focusable="false">
+      <path d="M60 0 C 60 40, 280 30, 300 88"  stroke="#7fb069"/>
+      <path d="M180 0 C 180 40, 290 40, 300 88" stroke="#7b4fb5"/>
+      <path d="M300 0 L 300 88"                 stroke="#e9b44c"/>
+      <path d="M420 0 C 420 40, 310 40, 300 88" stroke="#1b9aaa"/>
+      <path d="M540 0 C 540 40, 320 30, 300 88" stroke="#ff6f59"/>
+    </svg>
+    <p>Five rivers, one Gambia.</p>
+    <p class="fine-print">Water is only used ironically on this website. Excluding Water use disclaimers, this website does not use Water.</p>
+  </footer>
+
+  <!-- (For education) The script goes last so the page elements already exist when it runs. -->
+  <script src="/gambia/js/script.js"></script>
 </body>
-
-<p>Water is only used ironically on this website. Excluding Water use disclaimers, this website does not use Water.</p>
-</html> 
+</html>
