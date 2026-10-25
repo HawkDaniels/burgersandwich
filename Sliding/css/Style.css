@@ -1,0 +1,50 @@
+/* 1. BASE */
+[hidden]{display:none!important}
+:root{--y:#ffd400;--k:#111;--r:#d6001c}
+*{box-sizing:border-box}
+body{margin:0;color:#eee;font:16px/1.5 "Courier New",monospace;overflow-x:hidden;
+  background-color:#16161a;
+  background-image:repeating-linear-gradient(45deg,transparent 0 14px,rgba(255,255,255,.04) 14px 15px),
+  repeating-linear-gradient(-45deg,transparent 0 14px,rgba(255,255,255,.04) 14px 15px)}
+h1,h2,h3,button,.tag{font-family:"Black Ops One","Impact",sans-serif;letter-spacing:1px}
+a{color:var(--y)}
+
+/* 2. GATE */
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.sign{background:var(--y);color:var(--k);border:10px solid var(--k);outline:6px solid var(--y);max-width:440px;padding:26px;text-align:center;transform:rotate(-2deg);box-shadow:10px 10px 0 var(--r)}
+.skull{font-size:5rem;line-height:1}
+.sign h1{margin:6px 0;font-size:2.6rem}
+.small{font-size:.8rem}
+button{background:var(--k);color:var(--y);border:3px solid var(--k);padding:10px 18px;font-size:1.1rem;cursor:pointer}
+button:hover{background:var(--r);color:#fff}
+
+/* 3. YARD */
+#yard{position:relative;max-width:760px;margin:auto;padding:16px}
+#sparks{position:fixed;inset:0;pointer-events:none;z-index:5}
+header.hazard{text-align:center;padding:16px;border:6px solid var(--k);
+  background:repeating-linear-gradient(45deg,var(--y) 0 22px,var(--k) 22px 44px)}
+#logo{display:inline-block;background:var(--k);color:var(--y);padding:6px 14px;margin:0;font-size:3rem;transform:rotate(1.5deg)}
+.tag{display:inline-block;background:var(--k);color:var(--y);padding:2px 8px;margin:8px 0}
+.rival{display:block;background:var(--k);padding:4px 8px;font-size:.9rem}
+
+/* 4. PANELS */
+.panel{margin:32px 0;padding:18px;background:#1e1e24;border:5px solid var(--y);box-shadow:6px 6px 0 var(--k)}
+.panel:nth-of-type(even){transform:rotate(.8deg)}
+.panel:nth-of-type(odd){transform:rotate(-.8deg)}
+h2{font-size:2rem;margin:0 0 8px;color:var(--y)}
+article{border-top:3px dashed #555;margin-top:14px;padding-top:6px}
+
+/* 5. MEDIA SLOTS */
+.slots{display:flex;flex-wrap:wrap;gap:12px}
+.slots img{max-width:100%;max-height:300px;border:5px solid var(--y)}
+.slots figure{margin:0}
+.slots .missing{width:200px;height:120px;border:3px dashed var(--r);display:flex;align-items:center;justify-content:center;text-align:center;font-size:.8rem;padding:6px}
+
+/* 6. SAFETY */
+.danger{border-color:var(--r)}
+.dog{color:var(--y);font-family:"Black Ops One",sans-serif;font-size:1.2rem}
+#counter{margin-top:14px;padding:10px;background:var(--k);border:3px solid var(--y)}
+#days{font-size:1.6rem;color:var(--y);margin:0 8px}
+
+/* 7. REDUCED MOTION */
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}

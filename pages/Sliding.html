@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLIDING // beware of dog</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Sliding/css/Style.css">
+</head>
+<body>
+
+<!-- 1. GATE (beware of dog sign) -->
+<div id="gate">
+  <div class="sign">
+    <div class="skull">☠</div>
+    <h1>BEWARE OF DOG</h1>
+    <p>(and concrete. mostly concrete.)</p>
+    <p class="small">Sparks may fly. Sparks are totally rad. Gear up anyway.</p>
+    <button id="enterBtn" type="button" onclick="document.getElementById('gate').hidden=true;document.getElementById('yard').hidden=false;scrollTo(0,0)">I'M NOT SCARED</button>
+  </div>
+</div>
+
+<main id="yard" hidden>
+  <canvas id="sparks"></canvas>
+
+  <!-- 2. HEADER -->
+  <header class="hazard">
+    <h1 id="logo">☠ SLIDING ☠</h1>
+    <p class="tag">(click anywhere for sparks. gnarly.)</p>
+    <a class="rival" href="/pages/Gloving.html">Glovers: jazz hands for people afraid of concrete. We fucking execute glovers here →</a>
+  </header>
+
+  <!-- 3. LORE -->
+  <section class="panel">
+    <h2>LORE</h2>
+    <p>Back in the day, some radical dudes put on gear and slid across the ground like it owed them money. Totally tubular. My wife hasn't messaged me in months, she keeps spending time with John Sandwich!</p>
+    <div class="slots" data-slots="1,2,3"></div>
+  </section>
+
+  <!-- 4. TECHNIQUE WALL -->
+  <section class="panel">
+    <h2>TECHNIQUE WALL</h2>
+    <article><h3>A. Stance</h3><p>Low, balanced, relaxed. Tense equals gnarly wipeout.</p><div class="slots" data-slots="4"></div></article>
+    <article><h3>B. The Slide</h3><p>Commit, keep your weight centered, let the gear do the work.</p><div class="slots" data-slots="5"></div></article>
+    <article><h3>C. Stopping</h3><p>Slow down gradually. Plan your exit before you start.</p><div class="slots" data-slots="6"></div></article>
+    <article><h3>D. Bailing Out</h3><p>Falling is part of it. Learn it early, on purpose, at low speed.</p><div class="slots" data-slots="7"></div></article>
+  </section>
+
+  <!-- 5. GEAR -->
+  <section class="panel">
+    <h2>GEAR</h2>
+    <p>Helmet, wrist guards, knee and elbow pads, slide-rated gloves or pucks. Totally bodacious, totally mandatory.</p>
+    <div class="slots" data-slots="8,9"></div>
+  </section>
+
+  <!-- 6. SAFETY (over the top, still true) -->
+  <section class="panel danger">
+    <h2>☠ SAFETY ☠</h2>
+    <p class="dog">🐕 THE DOG SAYS: "Helmet. NOW. Then we can talk, dude."</p>
+    <ul>
+      <li>Wear a helmet, wrist guards, and knee and elbow protection every time. No exceptions, no "just one quick slide."</li>
+      <li>Use a smooth, clean, dry surface. Wet, gritty, or cracked concrete is grody.</li>
+      <li>Check the area first: no traffic, no pedestrians, no stairs, no drop-offs.</li>
+      <li>Start slow and low. Practice falling at low speed before you go bigger.</li>
+      <li>Learn from someone experienced, and check your gear for wear before each session.</li>
+      <li>Know local rules about where you can slide.</li>
+    </ul>
+    <div id="counter">
+      <strong>DAYS SINCE LAST SCRAPE:</strong> <span id="days">0</span>
+      <button id="scrapeBtn" type="button">I SCRAPED (This is so sad)</button>
+    </div>
+  </section>
+</main>
+
+<script src="/Sliding/js/script.js"></script>
+</body>
+</html>

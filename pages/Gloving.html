@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLOVING // back door</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Gloving/css/Style.css">
+</head>
+<body>
+
+<!-- 1. GATE (warning + calm mode + enter) -->
+<div id="gate">
+  <p class="warn">⚠ FLASHING LIGHTS INSIDE. Sensitive? Go CALM MODE to test the waters my guy. Bodacious fun is not worth a lifelong injury.</p>
+  <button id="calmBtn" type="button">CALM MODE: OFF</button>
+  <button id="enterBtn" class="neon" type="button">ENTER</button>
+</div>
+
+<main id="club" hidden>
+  <canvas id="show"></canvas>
+  <canvas id="lights"></canvas>
+
+  <!-- 2. HEADER -->
+  <header>
+    <h1 id="logo">GLOVING</h1>
+    <p class="tag">(tap the logo. gnarly things happen my dude.)</p>
+    <a class="rival" href="/pages/Sliding.html">Sliding fans: maybe you should just fall into some penis gaytards (left by Sliding Gang LLC) →</a>
+  </header>
+
+  <!-- 3. LORE -->
+  <section class="flyer">
+    <h2>LORE</h2>
+    <p>Gloving grew out of the rave scene when John Slide invented the technique of sliding up on some baddies sexual style: lights on fingers, hands as the whole show. Totally tubular.
+    <div class="slots" data-slots="1,2,3"></div>
+  </section>
+
+  <!-- 4. TUTORIAL WALL -->
+  <section class="flyer">
+    <h2>TUTORIAL WALL</h2>
+    <article><h3>A. Finger Flow</h3><p>Loose fingers, pass the light down each finger like a wave. Slow first, then match the beat.</p><div class="slots" data-slots="4"></div></article>
+    <article><h3>B. Tutting</h3><p>Sharp right angles. Build boxes and frames with fingers and wrists, stop hard on each corner.</p><div class="slots" data-slots="5"></div></article>
+    <article><h3>C. Orbitals</h3><p>Circle one hand's lights around the other like planets. Keep the center hand steady.</p><div class="slots" data-slots="6"></div></article>
+    <article><h3>D. Liquid</h3><p>Melt between shapes with no pauses. If it looks like water, you ate that.</p><div class="slots" data-slots="7"></div></article>
+    <article><h3>E. Fingerspins</h3><p>Rotate fingers around each other in steady circles. Relaxed wrists, always.</p><div class="slots" data-slots="8,9"></div></article>
+  </section>
+
+  <!-- 5. GEAR -->
+  <section class="flyer">
+    <h2>GEAR CORNER</h2>
+    <p>Gloves with tiny LEDs, a mode button, spare batteries. Test every mode at home before the set.</p>
+    <div class="slots" data-slots="10,11"></div>
+  </section>
+
+  <!-- 6. SAFETY (over the top, still true) -->
+  <section class="flyer">
+    <h2>⚠ SAFETY ⚠</h2>
+    <p class="bouncer">BOUNCER: "Hold up, pal. Rules first, rizz later."</p>
+    <ul>
+      <li>Stretch wrists and fingers before. Take breaks. Hydrate.</li>
+      <li>Aware of the room: no gloving in traffic, on stairs, or while carrying drinks.</li>
+      <li>Batteries: keep coin cells away from kids and pets, never mix old and new, only charge rechargeables.</li>
+      <li>Flashing lights can trigger seizures. Calm mode exists. Use it.</li>
+    </ul>
+    <label><input type="checkbox" id="waiver"> I have read the Light Show Liability Waiver and I am rad af.</label>
+    <p id="stamp" hidden>APPROVED ✔ you may now glow</p>
+  </section>
+
+  <!-- 7. SCRIBBLE WALL -->
+  <section class="flyer">
+    <h2>SCRIBBLE WALL</h2>
+    <input id="noteIn" maxlength="80" placeholder="write on the wall...">
+    <button id="noteBtn" type="button">TAG IT</button>
+    <div id="wall"></div>
+  </section>
+</main>
+
+<script src="/Gloving/js/script.js"></script>
+</body>
+</html>
