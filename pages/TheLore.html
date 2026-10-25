@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 1. HEAD -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Lore | 7,000 Steps to The Crunch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/TheLore/css/Style.css">
+</head>
+<body>
+
+<!-- 2. BACKDROP -->
+<!-- 2A. Sky (rose dusk at the base, night at the summit) -->
+<div class="sky sky-dusk"></div>
+<div class="sky sky-night"></div>
+<!-- 2B. Aurora (fades in near the top) -->
+<div class="aurora" id="aurora"><i></i><i></i></div>
+<!-- 2C. Atmosphere -->
+<div class="fog fog-a"></div>
+<div class="fog fog-b"></div>
+<div class="motes" id="motes" aria-hidden="true"></div>
+
+<!-- 3. HUD -->
+<div class="hud">Step <span id="stepNum">0</span> / 7,000</div>
+
+<!-- 3A. Home button (moon burger) -->
+<a class="home" href="/" title="Home" aria-label="Back to home">
+  <svg viewBox="0 0 64 64" aria-hidden="true">
+    <defs>
+      <radialGradient id="moonGlow" cx="50%" cy="45%" r="55%">
+        <stop offset="0%" stop-color="#fffdf2" stop-opacity="0.95"/>
+        <stop offset="70%" stop-color="#cfc3ff" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#b9a4f0" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="32" cy="32" r="31" fill="url(#moonGlow)"/>
+    <path d="M12 30 C12 16 22 10 32 10 C42 10 52 16 52 30 Z" fill="#fff1c9"/>
+    <ellipse cx="24" cy="21" rx="2" ry="1.2" fill="#fffdf2"/>
+    <ellipse cx="33" cy="17" rx="2" ry="1.2" fill="#fffdf2"/>
+    <ellipse cx="41" cy="23" rx="2" ry="1.2" fill="#fffdf2"/>
+    <path d="M10 33 q5.5 -4 11 0 t11 0 t11 0 t11 0 v3 H10 Z" fill="#c9ffe0"/>
+    <rect x="11" y="37" width="42" height="7" rx="3.5" fill="#8a6fc0"/>
+    <path d="M12 47 H52 C52 54 44 56 32 56 C20 56 12 54 12 47 Z" fill="#ffe3a6"/>
+  </svg>
+</a>
+
+<!-- 4. THE CLIMB (DOM runs bottom to top; CSS flips it visually) -->
+<main class="climb">
+
+  <!-- 4A. The mountain and the sky face (not part of the flow) -->
+  <div class="mountain-wrap" aria-hidden="true"><div class="mountain"></div></div>
+  <img class="abe" id="abe" src="/TheLore/assets/Giga.webp" alt="A faint glowing face in the sky">
+
+  <!-- 4B. Start of the climb -->
+  <header class="intro">
+    <h1>7,000 Steps to The Crunch</h1>
+    <p>Scroll up. Read every tablet. Do not ask about the van.</p>
+  </header>
+
+  <!-- 4C. Tablets and stairs -->
+  <article class="tablet left">
+    <h2>Age I: The Garden</h2>
+    <p>Adam and Eve had a son the records omit. John Anime was born already mid-opening-sequence, cursed and blessed with the gift of time. He is the only witness to everything above.</p>
+  </article>
+  <div class="stairs" aria-hidden="true"></div>
+
+  <article class="tablet right">
+    <h2>Age II: The Visitors</h2>
+    <p>The Anunnaki came from Nibiru and seeded humanity. Then they heard a sound they could not explain: harsh noise braided with dolphin mating calls. It had no source. It arrived from the future, carried by John Anime.</p>
+  </article>
+  <div class="stairs flip" aria-hidden="true"></div>
+
+  <article class="tablet left">
+    <h2>Age III: The Lost Ages</h2>
+    <p>Lemuria fell, then Atlantis, then the Mud Flood buried Tartaria. The chakras were recolored and Christ consciousness was given a number. The Anunnaki retreated into Agartha with the tape. Evil Wizard was born of a bad summoning and an open White Monster. John Sandwich fed everyone through all of it.</p>
+  </article>
+  <div class="stairs" aria-hidden="true"></div>
+
+  <article class="tablet right">
+    <h2>Age IV: The Gambia</h2>
+    <p>The river is the Styx. The dead, the lost, and the very online cross it to reach the dolphin-tuned mouth. John Wizard keeps the banks. Alden Pizza runs the ferry-van and takes slices as toll. Senegal wraps around nearly all of it and belongs to no one. No one crosses it clean.</p>
+  </article>
+
+  <!-- 4D. The van (halfway up, unexplained) -->
+  <div class="van" role="img" aria-label="A pizza van parked on the mountain path">
+    <span class="van-icon" aria-hidden="true">🚐</span>
+    <p>Alden's Pizza. Cash or slices. Do not ask.</p>
+  </div>
+
+  <article class="tablet left">
+    <h2>Age V: The Founding</h2>
+    <p>On February 25th, 1724, twins Pope Barak Music and God Emperor Christopher Music founded Munancho Incorporated in Mecca, Japan. They were born the same day in a Sprite factory. Barak's first words were "I'm cheesing it," and he became The Cheese. Christopher was born as legs with no unbroken bones, and he became The Crunch. Their sound has never been recreated.</p>
+  </article>
+  <div class="stairs flip" aria-hidden="true"></div>
+
+  <article class="tablet right">
+    <h2>Age VI: The Fall</h2>
+    <p>On March 3rd, 2004, Munancho was executed for smuggling fentanyl and Guitar Hero controllers over the US-Azerbaijan border. Hiroshi Abe attended. He nodded once. The last master tape vanished that night. The albums are the legacy. Rest in Piece.</p>
+  </article>
+  <div class="stairs" aria-hidden="true"></div>
+
+  <article class="tablet left">
+    <h2>Age VII: The Rift</h2>
+    <p>The Cheese, Chris The Nomad, and Christopher The Crunch were once buddies. The Cheese and the Nomad fell out. The Crunch stepped back and became a monk. Climb on.</p>
+  </article>
+
+  <!-- 4E. Hiroshi Abe popup (rare, hidden until triggered) -->
+  <div class="hiroshi" id="hiroshi" hidden>Hiroshi Abe nods once.</div>
+
+  <!-- 4F. Summit (last in DOM, so it sits at the top) -->
+  <section class="summit" id="summit">
+    <h2>The Summit</h2>
+    <p class="monk">The Crunch sits in the snow, eyes closed, no bones, no shoes.</p>
+    <blockquote class="haiku">
+      No bones, yet I stand.<br>
+      The river asks for no toll.<br>
+      Cheese melts. Crunch remains.
+    </blockquote>
+    <div class="neutral">
+      <p class="n-line"><strong>Are you neutral?</strong> The Crunch: "I am a still pond."</p>
+      <p class="n-line"><strong>Are you neutral?</strong> Alden Pizza: "I'm Switzerland with a van."</p>
+      <!-- 4F-1. Neutrality meter -->
+      <div class="meter">
+        <p class="meter-title">Neutrality Meter</p>
+        <div class="meter-row">
+          <span>Cheese</span>
+          <div class="meter-track"><i id="needle"></i></div>
+          <span>Nomad</span>
+        </div>
+        <p class="meter-status">Status: perfectly neutral. Verified by The Crunch and Alden Pizza.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 5. SCRIPT -->
+<script src="/TheLore/js/Script.js"></script>
+</body>
+</html>

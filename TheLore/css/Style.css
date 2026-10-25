@@ -1,0 +1,223 @@
+/* 1. TOKENS */
+:root {
+  --snow: #f4f0ff;
+  --gold: #ffe3a6;
+  --lavender: #b9a4f0;
+  --dusk: #2a1f4d;
+  --stone: rgba(34, 27, 66, 0.86);
+  --bloom-gold: 0 0 14px rgba(255, 227, 166, 0.75), 0 0 36px rgba(255, 190, 140, 0.4);
+  --noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: inherit; }
+
+/* 2. BASE */
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--dusk); color: var(--snow);
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-size: 1.2rem; line-height: 1.6; overflow-x: hidden;
+}
+h1, h2 {
+  font-family: "Cinzel", Georgia, serif; font-weight: 700;
+  color: var(--gold); text-shadow: var(--bloom-gold); letter-spacing: 0.04em;
+}
+
+/* 3. BACKDROP */
+/* 3A. Sky: JS fades the night layer in as you climb */
+.sky { position: fixed; inset: 0; z-index: 0; }
+.sky-dusk { background: linear-gradient(180deg, #1d1540 0%, #4a2f7a 50%, #c97fa8 100%); }
+.sky-night {
+  opacity: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 78% 12%, #fff, transparent),
+    radial-gradient(2px 2px at 40% 30%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 88% 42%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 24% 55%, #fff, transparent),
+    linear-gradient(180deg, #070528 0%, #150f48 45%, #2f1d63 100%);
+}
+/* 3B. Aurora (two ribbons, screen-blended) */
+.aurora { position: fixed; inset: 0 0 auto 0; height: 70vh; z-index: 1; opacity: 0; pointer-events: none; overflow: hidden; mix-blend-mode: screen; }
+.aurora i {
+  position: absolute; inset: -5% -15% 20% -15%; filter: blur(34px);
+  background: linear-gradient(100deg, transparent 5%, rgba(110, 255, 195, 0.55) 30%, rgba(120, 190, 255, 0.45) 50%, rgba(220, 130, 255, 0.5) 70%, transparent 95%);
+  animation: aurora 16s ease-in-out infinite alternate;
+}
+.aurora i:nth-child(2) {
+  inset: 5% -15% 10% -15%; opacity: 0.7;
+  background: linear-gradient(80deg, transparent 10%, rgba(255, 150, 220, 0.45) 35%, rgba(110, 255, 195, 0.5) 60%, transparent 90%);
+  animation-duration: 23s; animation-direction: alternate-reverse;
+}
+@keyframes aurora { from { transform: translateX(-7%) skewX(-10deg); } to { transform: translateX(7%) skewX(10deg); } }
+/* 3C. Fog */
+.fog {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none; filter: blur(18px);
+  background:
+    radial-gradient(ellipse 60% 30% at 20% 70%, rgba(255, 255, 255, 0.26), transparent 70%),
+    radial-gradient(ellipse 50% 25% at 80% 40%, rgba(255, 255, 255, 0.2), transparent 70%);
+}
+.fog-a { animation: drift 50s ease-in-out infinite alternate; }
+.fog-b { animation: drift 75s ease-in-out infinite alternate-reverse; opacity: 0.7; }
+@keyframes drift { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+/* 3D. Light motes (in front of the mountain) */
+.motes { position: fixed; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; }
+.mote {
+  position: absolute; bottom: -10px; border-radius: 50%; background: #fff6d8;
+  box-shadow: 0 0 10px 3px rgba(255, 236, 180, 0.8); animation: rise linear infinite;
+}
+@keyframes rise { from { transform: translateY(0); opacity: 0; } 15% { opacity: 0.9; } to { transform: translateY(-110vh); opacity: 0; } }
+
+/* 4. HUD */
+.hud {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; z-index: 20;
+  padding: 6px 14px; font-family: "Cinzel", Georgia, serif; font-size: 0.85rem; color: var(--gold);
+  background: rgba(34, 27, 66, 0.8); border: 1px solid rgba(255, 227, 166, 0.5); border-radius: 999px;
+  text-shadow: var(--bloom-gold); box-shadow: 0 0 18px rgba(255, 227, 166, 0.3);
+}
+
+/* 4A. HOME BUTTON (moon burger) */
+.home {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 12px; z-index: 20;
+  width: 56px; height: 56px; display: block;
+  filter: drop-shadow(0 0 10px rgba(255, 236, 190, 0.9)) drop-shadow(0 0 26px rgba(185, 164, 240, 0.6));
+  animation: bob 6s ease-in-out infinite alternate;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.home svg { width: 100%; height: 100%; display: block; }
+.home:hover, .home:focus-visible {
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 14px rgba(255, 245, 210, 1)) drop-shadow(0 0 36px rgba(185, 164, 240, 0.85));
+}
+.home:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 50%; }
+@keyframes bob { from { translate: 0 -3px; } to { translate: 0 4px; } }
+@media (prefers-reduced-motion: reduce) { .home { animation: none; transition: none; } }
+@media (max-width: 720px) { .home { width: 46px; height: 46px; } }
+
+/* 5. THE CLIMB (column-reverse: first item in the HTML sits at the bottom) */
+.climb {
+  position: relative; z-index: 5; display: flex; flex-direction: column-reverse;
+  max-width: 1000px; margin: 0 auto; padding: 0 16px;
+}
+.intro { text-align: center; padding: 14vh 0 18vh; position: relative; }
+.intro h1 { font-size: clamp(2rem, 7vw, 3.6rem); margin: 0 0 0.6em; }
+.intro p { font-style: italic; font-size: 1.3rem; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8); }
+
+/* 6. THE MOUNTAIN */
+/* 6A. Wrapper carries the glow, the inner shape is clipped */
+.mountain-wrap {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%);
+  z-index: -1; filter: drop-shadow(0 0 36px rgba(185, 164, 240, 0.45));
+}
+.mountain {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0, rgba(235, 228, 255, 0.55) 6%, transparent 13%),
+    var(--noise),
+    linear-gradient(180deg, #8f86b8 0%, #4a4372 20%, #2a2548 60%, #17142e 100%);
+  clip-path: polygon(50% 1%, 55% 3%, 59% 7%, 63% 12%, 69% 20%, 75% 30%, 81% 42%, 87% 55%, 93% 70%, 98% 85%, 100% 100%, 0 100%, 2% 85%, 7% 70%, 13% 55%, 19% 42%, 25% 30%, 31% 20%, 37% 12%, 41% 7%, 45% 3%);
+}
+
+/* 7. STONE TABLETS */
+.tablet {
+  position: relative; width: 44%; margin-bottom: 14vh; padding: 56px 26px 28px;
+  background: var(--noise), linear-gradient(165deg, #5a5678 0%, #3d3858 55%, #29253f 100%);
+  border: 3px solid #17142a;
+  border-radius: 130px 130px 8px 8px / 80px 80px 8px 8px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.07), inset 0 16px 22px rgba(255, 255, 255, 0.07), inset 0 -26px 34px rgba(0, 0, 0, 0.55), 0 10px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0.3; filter: blur(2px); transform: translateY(-26px);
+  transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease, box-shadow 1.4s ease;
+}
+.tablet.left { margin-right: auto; }
+.tablet.right { margin-left: auto; }
+/* 7A. A crack across the corner */
+.tablet::after {
+  content: ""; position: absolute; right: 14px; bottom: 14px; width: 70px; height: 70px; pointer-events: none;
+  background: linear-gradient(118deg, transparent 47%, rgba(0, 0, 0, 0.55) 48.5%, transparent 50.5%);
+}
+/* 7B. Carved text */
+.tablet h2 { font-size: 1.1rem; margin: 0 0 0.6em; text-align: center; }
+.tablet p { margin: 0; color: #efe6c8; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 0 8px rgba(255, 227, 166, 0.3); }
+/* 7C. Lit state (runes glow) */
+.tablet.lit {
+  opacity: 1; filter: none; transform: none;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.07), inset 0 16px 22px rgba(255, 255, 255, 0.07), inset 0 -26px 34px rgba(0, 0, 0, 0.55), 0 0 46px rgba(255, 214, 150, 0.45);
+}
+.tablet.lit p { text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 227, 166, 0.55); }
+
+/* 8. STONE STAIRS */
+.stairs {
+  width: min(46%, 380px); height: 120px; margin: 0 auto 14vh;
+  background: var(--noise), linear-gradient(180deg, #6b6788, #3a3556);
+  clip-path: polygon(0 100%, 0 83%, 16% 83%, 16% 66%, 33% 66%, 33% 50%, 50% 50%, 50% 33%, 66% 33%, 66% 16%, 83% 16%, 83% 0, 100% 0, 100% 100%);
+  filter: drop-shadow(0 0 8px rgba(255, 227, 166, 0.35));
+}
+.stairs.flip { transform: scaleX(-1); }
+
+/* 9. THE VAN */
+.van { text-align: center; margin-bottom: 14vh; }
+.van-icon { display: block; font-size: 4rem; filter: drop-shadow(0 0 16px rgba(255, 214, 150, 0.8)); }
+.van p { display: inline-block; margin: 0.4em 0 0; padding: 6px 14px; background: var(--stone); border-radius: 6px; font-style: italic; }
+
+/* 10. HIROSHI ABE */
+/* 10A. Rare popup */
+.hiroshi {
+  position: fixed; left: 50%; bottom: 18vh; z-index: 30; transform: translateX(-50%);
+  padding: 10px 22px; font-family: "Cinzel", Georgia, serif; font-size: 1rem; color: #fff;
+  background: rgba(20, 15, 45, 0.88); border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.7); text-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+  opacity: 0; transition: opacity 1.2s ease;
+}
+.hiroshi.show { opacity: 1; }
+/* 10B. Sky face: invisible until near the top, sharp only when you stop moving */
+.abe {
+  position: absolute; top: 3vh; left: 50%; transform: translateX(-50%);
+  width: min(78vw, 560px); z-index: -1; pointer-events: none;
+  mix-blend-mode: screen; opacity: 0; filter: blur(22px) brightness(2.2);
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  transition: opacity 3s ease, filter 3s ease;
+}
+.abe.near { opacity: 0.18; }
+.abe.focus { opacity: 0.6; filter: blur(0) brightness(1.15); }
+
+/* 11. SUMMIT */
+.summit { text-align: center; padding-top: 58vh; padding-bottom: 6vh; }
+.summit h2 { font-size: clamp(1.8rem, 6vw, 2.8rem); }
+.monk { font-style: italic; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6); }
+.haiku {
+  margin: 1.4em auto; max-width: 28rem; padding: 22px; font-size: 1.45rem; font-style: italic; color: #fff;
+  background: var(--stone); border-radius: 10px; text-shadow: 0 0 16px rgba(255, 236, 190, 0.9);
+  box-shadow: 0 0 60px rgba(255, 236, 190, 0.45);
+}
+.neutral { max-width: 34rem; margin: 0 auto; padding: 16px 20px; background: var(--stone); border-radius: 10px; }
+.n-line { margin: 0.5em 0; }
+/* 11A. Neutrality meter */
+.meter { margin-top: 1.4em; }
+.meter-title { font-family: "Cinzel", Georgia, serif; color: var(--gold); margin: 0 0 0.5em; }
+.meter-row { display: flex; align-items: center; gap: 10px; }
+.meter-track { position: relative; flex: 1; height: 10px; border-radius: 999px; background: linear-gradient(90deg, var(--gold), var(--lavender)); }
+.meter-track::after { content: ""; position: absolute; left: 50%; top: -4px; width: 2px; height: 18px; background: #fff; opacity: 0.8; }
+.meter-track i {
+  position: absolute; top: -6px; left: 50%; width: 14px; height: 22px; margin-left: -7px;
+  border-radius: 4px; background: #fff; box-shadow: 0 0 14px 4px rgba(255, 255, 255, 0.8);
+  transition: left 7s ease-in-out;
+}
+.meter-status { margin: 0.7em 0 0; font-style: italic; }
+
+/* 12. FOCUS AND MOTION */
+@media (prefers-reduced-motion: reduce) {
+  .fog-a, .fog-b, .aurora i, .mote { animation: none; }
+  .tablet { opacity: 1; filter: none; transform: none; transition: none; }
+  .meter-track i, .abe { transition: none; }
+}
+
+/* 13. MOBILE */
+@media (max-width: 720px) {
+  body { font-size: 1.1rem; }
+  .tablet { width: 94%; margin: 0 auto 12vh !important; padding-top: 44px; border-radius: 70px 70px 8px 8px / 50px 50px 8px 8px; }
+  .stairs { width: 66%; margin-bottom: 12vh; }
+  .mountain { clip-path: polygon(50% 1%, 62% 4%, 78% 8%, 100% 13%, 100% 100%, 0 100%, 0 13%, 22% 8%, 38% 4%); }
+}
