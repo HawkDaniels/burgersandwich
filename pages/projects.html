@@ -6,23 +6,63 @@
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<style>
+  .photo {
+    border: 3px solid #ffffff;
+    cursor: pointer;
+  }
+  #overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+  }
+  #overlay img {
+    max-width: 95%;
+    max-height: 95%;
+  }
+</style>
 
+<div id="overlay"><img id="big" src="" alt=""></div>
+
+<script>
+var overlay = document.getElementById("overlay");
+var big = document.getElementById("big");
+
+document.addEventListener("click", function (e) {
+  if (e.target.classList && e.target.classList.contains("photo")) {
+    big.src = e.target.getAttribute("data-full") || e.target.src;
+    overlay.style.display = "flex";
+  } else if (e.target === overlay || e.target === big) {
+    overlay.style.display = "none";
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    overlay.style.display = "none";
+  }
+});
+</script>
+<body>
 <a href="/">
  <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
 </a>
 <h1 style="font-size:45px;">The following are my business cards. Please meet me to receive one.</h1>
 <br>
- <img src="/projects/card-japan.png" alt="card" style="width: 60%; height: auto;"> 
-<br>
- <img src="/projects/card-france.png" alt="card" style="width: 60%; height: auto;"> 
-<br>
- <img src="/projects/card-hiroshi.png" alt="card" style="width: 60%; height: auto;"> 
-<br>
- <img src="/projects/card-solo.png" alt="card" style="width: 30%; height: auto;"> 
-<br>
- <img src="/projects/card-sf.png" alt="card" style="width: 60%; height: auto;"> 
-<br>
- <img src="/projects/card-salvador.png" alt="card" style="width: 60%; height: auto;"> 
+<img class="photo" src="/projects/card-japan.jpg" height="200" alt="">
+<img class="photo" src="/projects/card-france.jpg" height="200" alt="">
+<img class="photo" src="/projects//card-hiroshi.jpg" height="200" alt="">
+<img class="photo" src="/projects//card-solo.jpg" height="200" alt="">
+<img class="photo" src="/projects//card-sf.jpg" height="200" alt="">
+<img class="photo" src="/projects//card-salvador.jpg" height="200" alt="">
+<img class="photo" src="/projects//card-solo-2.jpg" height="200" alt="">
 </body>
 </html> 
