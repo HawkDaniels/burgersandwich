@@ -201,10 +201,13 @@
   </div>
 
 <script>
-  // ---- SETTING FOR HOSTING THIS PAGE ELSEWHERE ----
-  // Leave empty when the Worker serves this page. Otherwise put the Worker's address here,
-  // for example "https://chatroom.yourname.workers.dev".
-  const CHAT_SERVER = "";
+  // ---- WHERE THE CHAT SERVER IS ----
+  // Empty = this same site (burgersandwich.jp/api/chat, the bs-backend Worker). It must stay empty on the
+  // live site: the login cookie only belongs to burgersandwich.jp, and browser storage (screen name,
+  // color, message cache) is shared only between pages on the same address, such as BurgerOS.
+  // When testing locally (Live Server), it connects to the local backend (npm run dev in bs-backend, port 8787),
+  // which sees the local login cookie.
+  const CHAT_SERVER = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "http://" + location.hostname + ":8787" : "";
 
   const list = document.getElementById("messages");
   const nameInput = document.getElementById("name");

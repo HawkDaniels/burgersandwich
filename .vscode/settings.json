@@ -1,0 +1,9 @@
+{
+  // Live Server: send /api/* to the local backend (npm run dev in the bs-backend folder),
+  // so log in / sign up work on http://127.0.0.1:5500 with the same login cookie as the pages.
+  "liveServer.settings.proxy": {
+    "enable": true,
+    "baseUri": "/api",
+    "proxyUri": "http://127.0.0.1:8787/api"
+  }
+}

@@ -315,12 +315,16 @@ window.BURGER_CONTENT = {
 
   /* ----------------------------------------------------------
      BS MESSENGER
-       server - address of the chat server (the Worker that serves chat.html).
-                "" means the same site BurgerOS is on.
+       server - address of the chat server (the bs-backend Worker).
+                "" means the same site BurgerOS is on (burgersandwich.jp/api/chat).
+                It must be "" on the live site: the login cookie only belongs to
+                burgersandwich.jp, so a chat on any other address can't see who is
+                logged in. When testing locally (Live Server), it connects to the
+                local backend (npm run dev in bs-backend, port 8787).
      ---------------------------------------------------------- */
   messenger: {
     title: "BS Messenger",
-    server: "https://chat.burgersandwich.jp"
+    server: /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "http://" + location.hostname + ":8787" : ""
   },
 
   /* ----------------------------------------------------------
