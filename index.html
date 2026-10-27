@@ -220,7 +220,8 @@ document.getElementById('enterBtn').addEventListener('click', function () {
   //NOTE: This will attempt to serve every ad at least once (based on probability without repeats) until all bypass (false) ads have been served. Then all ads are eligible and served randomly.
 var ads = [
   { src: "/ads/ad-ramranch.jpg", link: "https://18nakedcowboys.com", alt: "Failed to load ad", newTab: true,  weight: 1, bypass: false },
-  { src: "/ads/ad-munancho.jpg", link: "/pages/merch.html",          alt: "Failed to load ad", newTab: false, weight: 1, bypass: false }
+  { src: "/ads/ad-munancho.jpg", link: "/pages/merch.html",          alt: "Failed to load ad", newTab: false, weight: 1, bypass: false },
+  { src: "/ads/ad-noose.jpg",    link: "/pages/knot.html",           alt: "Failed to load ad", newTab: false, weight: 1, bypass: false }
 ];
 
 var KEY = "adsSeen";
