@@ -2,7 +2,7 @@
    "Signed in as [username]" while the visitor is logged in.
 
    Usage on any page: put <span id="account-link"></span> where the link should appear, then load
-   /site-account.js and after it /site-account-link.js with ordinary script tags (in that order).
+   /account/site-account.js and after it /account/site-account-link.js with ordinary script tags (in that order).
 
    The wording and addresses are the settings just below. */
 (function () {

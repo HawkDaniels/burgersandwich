@@ -1,12 +1,16 @@
 /* site-account.js: include this on any page of the site to talk to the accounts system.
-   Add a script tag with src="/site-account.js", then use window.SiteAccount.
+   Add a script tag with src="/account/site-account.js", then use window.SiteAccount.
 
    Every call returns a promise that resolves to an object: { ok: true, ... } or { ok: false, error: "code" }.
    It never throws and never rejects. SiteAccount.message(result) turns an error code into a sentence;
    edit the MESSAGES table below to change the wording.
 
-   If the pages are NOT on the same domain as the Worker's /api route, set window.SITE_API = "https://..."
-   before loading this file. (Logins use cookies, so the same domain is strongly recommended.) */
+   The accounts system is the bs-backend Worker, reached at /api on this same site (burgersandwich.jp/api/*).
+   If a page is NOT on that domain, set window.SITE_API = "https://..." before loading this file.
+   (Logins use cookies, so the same domain is strongly recommended.)
+
+   Who is logged in is asked once per page and remembered: SiteAccount.current() and onChange() share that
+   one answer, and it is asked again only when the login changes (on this tab or another). */
 (function () {
   "use strict";
   if (window.SiteAccount) return; // already loaded (several widgets may ask for it)
@@ -18,7 +22,7 @@
     username_taken: "That username is taken.",
     name_unavailable: "That username can't be used.",
     bad_login: "Username or password is wrong.",
-    locked: "Too many wrong passwords. Try again in 15 minutes.",
+    locked: "Too many wrong passwords.", // followed by "Try again in N minutes." (see message below)
     slow_down: "Too many attempts. Wait a while and try again.",
     not_logged_in: "You need to log in first.",
     closed: "Registration is closed.",
@@ -44,13 +48,26 @@
     return fetch(BASE + path, opts).then(
       function (r) {
         return r.json().then(
-          function (j) { j.status = r.status; return j; },
+          function (j) {
+            j.status = r.status;
+            if (j.error === "not_logged_in" && path !== "/me") cached = null; // the login ran out: ask again next time
+            return j;
+          },
           function () { return { ok: false, error: "server_error", status: r.status }; }
         );
       },
       function () { return { ok: false, error: "network" }; }
     );
   }
+
+  // ---- who is logged in: asked once, shared by everything on the page ----
+  var cached = null; // promise of the last /me answer
+  function ask() {
+    cached = call("GET", "/me");
+    cached.then(function (r) { if (!r || r.error === "network" || r.error === "server_error") cached = null; }); // retry next time
+    return cached;
+  }
+  function current() { return cached || ask(); }
 
   // ---- tell other tabs (and the chat) when the login changes ----
   var listeners = [];
@@ -62,10 +79,13 @@
     try { localStorage.setItem("siteAuthPing", String(Date.now())); } catch (e) {}
     notify();
   }
+  function tell(cb, r) {
+    try { cb(r && r.ok ? r.user : null, r); } catch (e) {}
+  }
+  // The login changed: ask the server once, then tell every listener.
   function notify() {
-    api.me().then(function (r) {
-      var user = r && r.ok ? r.user : null;
-      listeners.slice().forEach(function (cb) { try { cb(user, r); } catch (e) {} });
+    ask().then(function (r) {
+      listeners.slice().forEach(function (cb) { tell(cb, r); });
     });
   }
   if (channel) channel.onmessage = notify;
@@ -77,9 +97,17 @@
     messages: MESSAGES,
     message: function (r) {
       if (!r || r.ok) return "";
-      return MESSAGES[r.error] || "Something went wrong.";
+      var text = MESSAGES[r.error] || "Something went wrong.";
+      if (r.error === "locked") {
+        var min = Math.ceil((Number(r.retryInMs) || 15 * 60000) / 60000);
+        text += " Try again in " + (min <= 1 ? "a minute." : min + " minutes.");
+      }
+      return text;
     },
-    me: function () { return call("GET", "/me"); },
+    // Always asks the server. Most pages want current() instead.
+    me: function () { return ask(); },
+    // Who is logged in, without asking the server again if this page already asked. Same answer as me().
+    current: current,
     register: function (username, password, turnstileToken) {
       var b = { username: username, password: password };
       if (turnstileToken) b.turnstile = turnstileToken;
@@ -108,7 +136,7 @@
       return /^\/(?![\/\\])[^\r\n\\]*$/.test(v) ? v : (fallback || "/");
     },
     // Calls cb(user or null) once now and again whenever the login changes on this or another tab.
-    onChange: function (cb) { listeners.push(cb); notify(); },
+    onChange: function (cb) { listeners.push(cb); current().then(function (r) { tell(cb, r); }); },
   };
   window.SiteAccount = api;
 })();

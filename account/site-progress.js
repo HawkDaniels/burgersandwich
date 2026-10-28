@@ -1,8 +1,8 @@
 /* site-progress.js: saves game progress in the browser for signed-out players, and hands it to the
    account when (and only when) they CREATE an account. Load it after site-account.js:
 
-     <script src="/site-account.js"></script>
-     <script src="/site-progress.js"></script>
+     <script src="/account/site-account.js"></script>
+     <script src="/account/site-progress.js"></script>
 
    Rules:
    - Signed out: progress is saved in this browser only (localStorage, keys starting "quest:").
@@ -29,7 +29,11 @@
   function writeLocal(q, s) { try { localStorage.setItem(PREFIX + q, JSON.stringify(s)); } catch (e) {} }
   function eraseLocal() { keys().forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} }); }
 
-  function signedIn() { return A.me().then(function (r) { return !!(r && r.ok && r.user); }); }
+  // Uses the login status the page already has (SiteAccount.current), so a save or load doesn't ask the
+  // server who is logged in every time.
+  function signedIn() {
+    return (A.current ? A.current() : A.me()).then(function (r) { return !!(r && r.ok && r.user); });
+  }
 
   // Hand the saved progress to the brand-new account. A quest stays saved here only if its upload failed.
   function sendLocalProgress() {

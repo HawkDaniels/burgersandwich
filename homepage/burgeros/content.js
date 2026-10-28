@@ -82,7 +82,7 @@ window.BURGER_CONTENT = {
     mobileRedirect: "",
 
     // Quest system helper scripts, loaded in this order. Missing ones are skipped.
-    progressScripts: ["/site-account.js", "/site-progress.js", "/site-inventory.js"],
+    progressScripts: ["/account/site-account.js", "/account/site-progress.js", "/account/site-inventory.js"],
 
     // How to count finished steps for  when: { quest: "...", steps: N }.
     // Copy the  progress  setting from the quest in defs.js.

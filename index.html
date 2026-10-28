@@ -44,28 +44,36 @@ fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=JPY")
 </style>
 
 <script>
-var API = "https://click-counter.oksohi.workers.dev/";
+var API = "/api/counter";
 var clicks = 0;
 
 function show(n) {
   document.getElementById("count").textContent = n + " burgersandwiches";
 }
 
+// The counter lives on bs-backend at /api/counter on this same site.
+function load(r) {
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
 fetch(API)
-  .then(function (r) { return r.json(); })
-  .then(function (d) { show(d.count); });
+  .then(load)
+  .then(function (d) { show(d.count); })
+  .catch(function () { document.getElementById("count").textContent = "? burgersandwiches"; });
 
 document.getElementById("clickBtn").onclick = function () {
   clicks++;
 
   if (clicks === 1) {
     fetch(API, { method: "POST" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { show(d.count); });
+      .then(load)
+      .then(function (d) { show(d.count); })
+      .catch(function () {});
   } else if (clicks === 2) {
     alert("Please do not artifically inflate our visitor count :,(");
   } else {
-    window.top.location.href = "banned.html";
+    window.top.location.href = "/pages/banned.html";
   }
 };
 </script>

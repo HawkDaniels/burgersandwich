@@ -233,11 +233,9 @@ function sync() {
       if (!me || !me.ok) return false;           // server unreachable: keep what we have
       var next = { user: me.user ? me.user.username : null, achievements: [], quests: {}, items: null, money: null };
       next.achievements = (me.achievements || []).map(function (a) { return a.id; });
-      var ids = questIds();
-      var loaded = await Promise.all(ids.map(function (id) {
-        return Promise.resolve(P.load(id)).catch(function () { return null; });
-      }));
-      ids.forEach(function (id, i) { if (loaded[i]) next.quests[id] = loaded[i]; });
+      // Every quest's progress in one request (loadAll), then keep the ones BurgerOS uses.
+      var all = P.loadAll ? await Promise.resolve(P.loadAll()).catch(function () { return {}; }) : {};
+      questIds().forEach(function (id) { if (all && all[id] != null) next.quests[id] = all[id]; });
       if (I && I.get && me.user) {
         var inv = await Promise.resolve(I.get()).catch(function () { return null; });
         if (inv && inv.ok !== false) { next.items = inv.items || {}; next.money = inv.money || 0; }

@@ -31,24 +31,8 @@
 
 <script>
 (function () {
-  // Address of the click-counter Worker's /downloads route.
-  // Replace CLICK-COUNTER-ADDRESS with the same domain your other counter's fetch uses.
-  const API = 'https://click-counter.oksohi.workers.dev/downloads';
-
-  function getFileSize(href) {
-    return fetch(href, { method: 'HEAD', cache: 'no-store' })
-      .then(function (r) {
-        const len = Number(r.headers.get('Content-Length'));
-        if (len) return len;
-        return fetch(href, { headers: { Range: 'bytes=0-0' }, cache: 'no-store' })
-          .then(function (r2) {
-            const range = r2.headers.get('Content-Range'); // e.g. "bytes 0-0/442368"
-            if (r2.body) r2.body.cancel(); // don't download the rest
-            const match = range && range.match(/\/(\d+)$/);
-            return match ? Number(match[1]) : null;
-          });
-      });
-  }
+  // Download counts are kept by bs-backend at /api/downloads on this same site.
+  const API = '/api/downloads';
 
   const links = document.querySelectorAll('a[data-download-id]');
   const state = {}; // id -> { size, count, el }
@@ -65,23 +49,11 @@
     state[id] = { size: null, count: null, el: link.nextElementSibling };
     render(id);
 
-    // File size. Order of attempts:
-    //   1. data-size="1.23" on the link (in MB), if you set one by hand
-    //   2. Content-Length from a HEAD request
-    //   3. Content-Range from a request for just the first byte
-    //      (used when the server leaves out Content-Length, as Cloudflare can)
+    // File size comes from data-size="1.23" on the link (in MB). Set it when adding a file:
+    // size in bytes / 1048576, rounded to two places. A link without it just shows no size.
     if (link.dataset.size) {
       state[id].size = Number(link.dataset.size).toFixed(2);
       render(id);
-    } else {
-      getFileSize(link.href)
-        .then(function (bytes) {
-          if (bytes) {
-            state[id].size = (bytes / 1048576).toFixed(2);
-            render(id);
-          }
-        })
-        .catch(function () {});
     }
 
     // Count the download. Uses fetch rather than sendBeacon, which ad blockers
@@ -104,7 +76,10 @@
 
   // Load all counts in one request
   fetch(API, { cache: 'no-store' })
-    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
     .then(function (counts) {
       Object.keys(state).forEach(function (id) {
         state[id].count = counts[id] || 0;
