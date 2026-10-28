@@ -37,6 +37,7 @@
     full: "You can't carry any more of that.",
     busy: "The server is busy. Try again.",
     unknown_action: "That isn't available.",
+    banned: "This account (or your connection) is banned.", // followed by when it ends and why (see message below)
   };
 
   function call(method, path, body) {
@@ -98,6 +99,12 @@
     message: function (r) {
       if (!r || r.ok) return "";
       var text = MESSAGES[r.error] || "Something went wrong.";
+      if (r.error === "banned") {
+        if (r.until) {
+          try { text += " The ban ends " + new Date(r.until).toLocaleString() + "."; } catch (e) {}
+        } else text += " The ban is permanent.";
+        if (r.reason) text += " Reason: " + r.reason;
+      }
       if (r.error === "locked") {
         var min = Math.ceil((Number(r.retryInMs) || 15 * 60000) / 60000);
         text += " Try again in " + (min <= 1 ? "a minute." : min + " minutes.");

@@ -12,6 +12,13 @@
 </head>
 <body>
 
+<!-- Same login as the English homepage (one login cookie for the whole site), same corner widgets. -->
+<script src="/widget/widget-inventory.js"></script>
+<script src="/widget/widget-quests.js"></script>
+<span id="account-link"></span>
+<script src="/account/site-account.js"></script>
+<script src="/account/site-account-link.js"></script>
+
 <a href="/">
  <img src="/assets/home.jpg" alt="Home" style="width: auto; height: 30px;">
 </a>
@@ -104,7 +111,7 @@ document.getElementById("clickBtn").onclick = function () {
 
 <br>
 
-   <iframe src="https://chat.burgersandwich.jp/" style="width:768px;height:500px;border:0"></iframe>
+   <iframe src="/pages/chat.html" style="width:768px;height:500px;border:0"></iframe>
 
 <style>
   #site-chat {
