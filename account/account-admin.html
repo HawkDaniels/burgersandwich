@@ -19,7 +19,7 @@
 <div id="panel" hidden>
   <p><span id="count"></span> accounts <button id="reload">Reload</button></p>
   <table border="1" cellpadding="3">
-    <thead><tr><th>id</th><th>username</th><th>registered</th><th>last login</th><th></th></tr></thead>
+    <thead><tr><th>id</th><th>username</th><th>registered</th><th>last login</th><th>chat</th><th></th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
   <h2>Reset a password</h2>
@@ -58,7 +58,8 @@
       var tb = $("rows"); tb.textContent = "";
       r.users.forEach(function (u) {
         var tr = document.createElement("tr");
-        [u.id, u.username, day(u.createdAt), day(u.lastLogin)].forEach(function (v) {
+        var chat = [u.admin ? "admin" : "", u.banned ? "banned" : ""].filter(Boolean).join(", "); // set in the chat: /ban, /login <token>
+        [u.id, u.username, day(u.createdAt), day(u.lastLogin), chat].forEach(function (v) {
           var td = document.createElement("td"); td.textContent = v; tr.appendChild(td);   // textContent: never HTML
         });
         var td = document.createElement("td"), b = document.createElement("button");

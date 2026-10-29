@@ -1,8 +1,8 @@
 /* site-inventory.js: how your games read a player's money and items, and ask for them to change.
 
-     <script src="/site-account.js"></script>
-     <script src="/site-progress.js"></script>
-     <script src="/site-inventory.js"></script>
+     <script src="/account/site-account.js"></script>
+     <script src="/account/site-progress.js"></script>
+     <script src="/account/site-inventory.js"></script>
 
    Money and items are kept by the server and can only change through the ACTIONS listed in defs.js.
    A page cannot set them: it can only name an action ("find_the_key", "buy_potion") and the server

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="icon" type="image/png" href="/favicon.png">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BurgerOS 98</title>
+<style>
+  :root {
+    --face: #c0c0c0;
+    --navy: #000080;
+    --desktop: #008080;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--desktop) center / cover no-repeat;
+    font: 12px Tahoma, Verdana, "Segoe UI", sans-serif; color: #000;
+    user-select: none; -webkit-user-select: none; }
+
+  /* 3D bevels */
+  .raised { background: var(--face);
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+  .pressed { background: var(--face);
+    box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
+  .sunken { background: #fff;
+    box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a; }
+  .btn { font: inherit; border: none; padding: 4px 14px; min-width: 75px; cursor: pointer; }
+  .btn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
+  .btn:disabled { color: #808080; text-shadow: 1px 1px #fff; cursor: default; }
+
+  /* Desktop icons */
+  #desktop { position: absolute; left: 0; top: 0; right: 0; bottom: 30px; }
+  .dIcon { position: absolute; width: 76px; display: flex; flex-direction: column; align-items: center;
+    cursor: default; padding-top: 2px; }
+  .dIcon .pic { width: 32px; height: 32px; }
+  .dIcon .pic svg, .dIcon .pic img, .fIcon .pic svg, .fIcon .pic img { width: 32px; height: 32px; }
+  .dIcon .label { margin-top: 4px; padding: 1px 2px; color: #fff; text-align: center; line-height: 1.25;
+    max-width: 74px; word-wrap: break-word; }
+  .selected .pic { filter: brightness(0.55) sepia(1) hue-rotate(190deg) saturate(5); }
+  .selected .label { background: var(--navy); color: #fff; outline: 1px dotted #ff0; }
+
+  /* Windows */
+  .window { position: absolute; padding: 3px; display: flex; flex-direction: column; min-width: 180px; min-height: 90px; }
+  .titlebar { height: 20px; display: flex; align-items: center; gap: 4px; padding: 0 2px 0 3px; color: #fff;
+    font-weight: bold; background: linear-gradient(90deg, #000080, #1084d0); cursor: default; flex: 0 0 auto; }
+  .window:focus { outline: none; }
+  .window.inactive .titlebar { background: linear-gradient(90deg, #808080, #b5b5b5); color: #d4d0c8; }
+  .titlebar .tIcon { width: 16px; height: 16px; flex: 0 0 16px; }
+  .titlebar .tIcon svg, .titlebar .tIcon img { width: 16px; height: 16px; }
+  .titlebar .tText { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tBtn { width: 16px; height: 14px; border: none; padding: 0; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; flex: 0 0 auto; }
+  .tBtn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
+  .tBtn.close { margin-left: 2px; }
+  .menubar { display: flex; padding: 2px 0; flex: 0 0 auto; }
+  .menubar span { padding: 1px 7px; }
+  .menubar span:hover { box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+  .wBody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .statusbar { display: flex; gap: 2px; margin-top: 2px; flex: 0 0 auto; }
+  .statusbar div { padding: 2px 4px; flex: 1;
+    box-shadow: inset -1px -1px #fff, inset 1px 1px #808080; }
+  .resizer { position: absolute; right: 2px; bottom: 2px; width: 13px; height: 13px; cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 45%, #808080 45% 52%, #fff 52% 59%, transparent 59% 70%,
+      #808080 70% 77%, #fff 77% 84%, transparent 84%); }
+  .window.maxed .resizer { display: none; }
+
+  /* Folder contents */
+  .folderView { flex: 1; overflow: auto; padding: 6px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px; }
+  .fIcon { width: 76px; display: flex; flex-direction: column; align-items: center; padding: 4px 0; cursor: default; }
+  .fIcon .label { margin-top: 4px; padding: 1px 2px; text-align: center; max-width: 74px; word-wrap: break-word; }
+  .fIcon.selected .label { color: #fff; }
+
+  /* Folder toolbar: Back / Forward / Address */
+  .fToolbar { display: flex; align-items: center; gap: 2px; padding: 2px 2px 4px; flex: 0 0 auto; }
+  .navBtn { display: flex; align-items: center; gap: 4px; padding: 2px 8px 2px 4px; border: none; background: none;
+    font: inherit; color: #000; cursor: pointer; height: 26px; }
+  .navBtn svg { width: 20px; height: 20px; }
+  .navBtn svg path { fill: #22a822; stroke: #0b5d0b; }
+  .navBtn:hover:not(:disabled) { box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+  .navBtn:active:not(:disabled) { box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+  .navBtn:disabled { color: #808080; text-shadow: 1px 1px #fff; cursor: default; }
+  .navBtn:disabled svg path { fill: #b8b8b8; stroke: #8a8a8a; }
+  .fSep { width: 2px; height: 22px; margin: 0 4px; box-shadow: inset 1px 0 #808080, inset -1px 0 #fff; }
+  .fAddr { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+  .fAddr .field { flex: 1; min-width: 0; padding: 3px 5px; display: flex; align-items: center; gap: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fAddr .field svg, .fAddr .field img { width: 16px; height: 16px; flex: 0 0 16px; }
+  @media (max-width: 600px) { .navBtn span, .fAddr > span { display: none; } }
+
+  /* Notepad */
+  .notepad { flex: 1; resize: none; border: none; outline: none; padding: 4px;
+    font: 13px "Fixedsys", "Lucida Console", "Courier New", monospace; user-select: text; -webkit-user-select: text; }
+  .notepadWrap { flex: 1; display: flex; padding: 2px; }
+
+  /* Message box */
+  .msg { display: flex; gap: 14px; align-items: flex-start; padding: 14px 12px 10px; max-width: 380px; }
+  .msg .pic svg { width: 32px; height: 32px; }
+  .msg p { margin: 6px 0 0; line-height: 1.4; user-select: text; -webkit-user-select: text; }
+  .msgBtns { display: flex; justify-content: center; gap: 8px; padding: 4px 0 10px; }
+
+  /* Image viewer & browser */
+  .imageView { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; background: #808080; }
+  .imageView img { max-width: 100%; max-height: 100%; }
+  .addrBar { display: flex; align-items: center; gap: 6px; padding: 3px 2px; flex: 0 0 auto; }
+  .addrBar .field { flex: 1; padding: 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .browserFrame { flex: 1; border: none; background: #fff; width: 100%; }
+  .frameWrap { flex: 1; display: flex; padding: 2px; }
+
+  /* Music player */
+  .mp { padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+  .mpScreen { display: flex; align-items: center; gap: 8px; height: 46px; padding: 6px 8px; background: #000;
+    box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #0a0a0a; color: #3f3;
+    font: 12px "Lucida Console", "Courier New", monospace; }
+  .mpEq { display: flex; align-items: flex-end; gap: 2px; height: 26px; flex: 0 0 auto; }
+  .mpEq i { width: 4px; height: 4px; background: #3f3; }
+  .mpPlaying .mpEq i { animation: mpBar 0.9s ease-in-out infinite alternate; }
+  .mpPlaying .mpEq i:nth-child(2) { animation-duration: 0.6s; }
+  .mpPlaying .mpEq i:nth-child(3) { animation-duration: 1.1s; }
+  .mpPlaying .mpEq i:nth-child(4) { animation-duration: 0.7s; }
+  .mpPlaying .mpEq i:nth-child(5) { animation-duration: 1.3s; }
+  @keyframes mpBar { from { height: 4px; } to { height: 26px; } }
+  .mpInfo { flex: 1; min-width: 0; }
+  .mpTitle { overflow: hidden; white-space: nowrap; }
+  .mpTitle span { display: inline-block; }
+  .mpPlaying .mpTitle.scroll span { padding-left: 100%; animation: mpScroll 9s linear infinite; }
+  @keyframes mpScroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+  .mpTime { margin-top: 4px; color: #1c1; }
+  .mpCtrls { display: flex; align-items: center; gap: 4px; }
+  .mpBtn { min-width: 0; width: 34px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; }
+  .mpVol { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+  .mpVolume { width: 80px; }
+  .mp input[type=range] { -webkit-appearance: none; appearance: none; background: none; height: 22px; margin: 0; cursor: pointer; }
+  .mpSeek { width: 100%; }
+  .mp input[type=range]::-webkit-slider-runnable-track { height: 4px;
+    box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; background: #c0c0c0; }
+  .mp input[type=range]::-moz-range-track { height: 4px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; background: #c0c0c0; }
+  .mp input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 20px; margin-top: -8px;
+    background: #c0c0c0; border: none;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+  .mp input[type=range]::-moz-range-thumb { width: 11px; height: 20px; border: none; border-radius: 0; background: #c0c0c0;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+
+  /* Run dialog */
+  .runBody { padding: 12px; width: 340px; max-width: 100%; }
+  .runBody .row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; line-height: 1.4; }
+  .runBody label { display: flex; align-items: center; gap: 8px; }
+  .runBody input { flex: 1; font: inherit; border: none; padding: 4px 5px; outline: none; }
+  .runBtns { display: flex; justify-content: flex-end; gap: 6px; margin-top: 14px; }
+
+  /* Taskbar */
+  #taskbar { position: fixed; left: 0; right: 0; bottom: 0; height: 30px; display: flex; align-items: center;
+    gap: 4px; padding: 2px 2px 0; z-index: 100000; box-shadow: inset 0 1px #dfdfdf, inset 0 2px #fff; }
+  #startBtn { height: 24px; display: flex; align-items: center; gap: 4px; padding: 0 6px 0 4px;
+    font: inherit; font-weight: bold; border: none; cursor: pointer; flex: 0 0 auto; }
+  #startBtn svg, #startBtn img { width: 18px; height: 18px; object-fit: contain; }
+  #tasks { flex: 1; display: flex; gap: 3px; min-width: 0; overflow: hidden; }
+  .taskBtn { flex: 0 1 160px; min-width: 40px; height: 24px; display: flex; align-items: center; gap: 4px;
+    padding: 0 6px; border: none; font: inherit; cursor: pointer; text-align: left; }
+  .taskBtn svg, .taskBtn img { width: 16px; height: 16px; flex: 0 0 16px; }
+  .taskBtn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .taskBtn.active { font-weight: bold;
+    background: repeating-conic-gradient(#fff 0% 25%, #c0c0c0 0% 50%) 0 0 / 2px 2px; }
+  #tray { height: 24px; display: flex; align-items: center; padding: 0 10px; flex: 0 0 auto;
+    box-shadow: inset -1px -1px #fff, inset 1px 1px #808080; }
+
+  /* Start menu */
+  #startMenu { position: fixed; left: 2px; bottom: 28px; z-index: 100001; display: none; padding: 3px; }
+  #startMenu.open { display: flex; }
+  #startBanner { width: 22px; background: linear-gradient(0deg, #000080, #1084d0); color: #c0c0c0;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+  #startBanner span { writing-mode: vertical-rl; transform: rotate(180deg); font: bold 17px Arial, sans-serif;
+    letter-spacing: 1px; white-space: nowrap; }
+  #startBanner b { color: #fff; }
+  .menu { list-style: none; margin: 0; padding: 0; min-width: 170px; }
+  .menu > li { position: relative; display: flex; align-items: center; gap: 8px; padding: 4px 22px 4px 6px;
+    cursor: default; white-space: nowrap; }
+  .menu.big > li { padding-top: 7px; padding-bottom: 7px; }
+  .menu > li > .pic svg, .menu > li > .pic img { width: 16px; height: 16px; display: block; }
+  .menu.big > li > .pic svg, .menu.big > li > .pic img { width: 24px; height: 24px; }
+  .menu > li:hover { background: var(--navy); color: #fff; }
+  .menu > li.sep { padding: 0; margin: 3px 2px; height: 2px; box-shadow: inset 0 1px #808080, inset 0 -1px #fff; }
+  .menu > li.sep:hover { background: none; }
+  .menu > li .arrow { position: absolute; right: 6px; font-size: 9px; }
+  .menu > li > .submenu { display: none; position: absolute; left: calc(100% - 3px); top: -3px; padding: 3px; z-index: 2; color: #000; }
+  .menu > li:hover > .submenu { display: block; }
+  .submenu .menu > li { color: #000; }
+  .submenu .menu > li:hover { color: #fff; }
+  .menu u { text-decoration: underline; }
+
+  /* Shut down screen */
+  #shutdown { position: fixed; inset: 0; background: #000; color: #ff8a00; z-index: 200000; display: none;
+    align-items: center; justify-content: center; text-align: center;
+    font: 28px "Lucida Console", "Courier New", monospace; padding: 20px; cursor: pointer; }
+  #shutdown.on { display: flex; }
+
+  @media (max-width: 600px) {
+    .taskBtn { flex-basis: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+/* ============================================================
+   EDIT THESE SETTINGS
+   ============================================================ */
+
+// Text on the blue strip down the side of the Start menu: normal part + bold part.
+var START_BANNER = ["burger", "OS 98"];
+
+// Start button: picture and text. START_ICON is a path to your own image
+// (e.g. "images/start.png"), or "" for the built-in four-square logo.
+// It's shown at 18x18 pixels, so a small square PNG looks best.
+var START_ICON = "/favicon.png";
+var START_TEXT = "Start";
+
+// Desktop color and optional wallpaper image ("" for none).
+var DESKTOP_COLOR = "#008080";
+var WALLPAPER = "";
+
+// Where links open: "top" (whole window), "self" (this frame), "newtab"
+var OPEN_IN = "top";
+
+// The drive folder addresses start from (shown in a folder window's Address field).
+var BASE_DRIVE = "C:\\";
+
+// Title of an item to open automatically when the page loads ("" for none).
+var STARTUP_OPEN = "";
+
+// What "Shut Down" does: "" shows the classic shut-down screen (click it to
+// restart), or put a URL here to send the visitor somewhere instead.
+var SHUTDOWN_LINK = "/index.html";
+
+// ------------------------------------------------------------
+// ITEMS - used for the desktop, folders and the Start menu.
+//
+//   title    - name under the icon
+//   icon     - a built-in icon name (computer, folder, globe, document, notepad,
+//              recycle, image, music, error, info, warning, help) or a path to
+//              your own picture, e.g. "images/myicon.png" (optional)
+//   type     - what double-clicking does:
+//                "link"   - go to  link  (the default when there's a link)
+//                "folder" - open a window showing  children  (a list of items).
+//                           Folders inside it open in the same window, with
+//                           Back/Forward buttons to move around.
+//                "text"   - open a Notepad window showing  text
+//                "dialog" - pop up a message box showing  text
+//                           (set icon to "error", "info" or "warning")
+//                "image"  - open a picture viewer showing  src
+//                "music"  - open a small music player playing  src  (an .mp3
+//                           file). Add  loop: true  to repeat. The music
+//                           stops when the player window is closed.
+//   link     - for "link": where it goes
+//   address  - for "folder": what the Address field shows, e.g. "C:\\Windows" (a \ is written as \\)
+//              (optional - normally worked out from where the folder is)
+//   inWindow - for "link": true opens the page inside a browser window on the
+//              desktop instead of leaving. Only works for your own pages and
+//              sites that allow being framed.
+// ------------------------------------------------------------
+var DESKTOP = [
+  { title: "My Computer", icon: "computer", type: "folder", children: [
+      { title: "(C:)", icon: "computer", type: "folder", children: [
+          { title: "Documents", icon: "folder", type: "folder", children: [
+            { title: "Readme.txt", type: "text",
+              text: "Welcome!\r\n\r\nDouble-click the icons to look around.\r\n\r\nEverything on this desktop leads somewhere on the site." },
+            { title: "Photos", type: "folder", children: [
+              { title: "photo1.jpg", type: "image", src: "images/photo1.jpg" }
+      ]}
+  ]},
+          { title: "Chris's_Corner.txt", type: "link", link: "/pages/chriscorner.html" },
+          { title: "Barak's_Domain.txt", type: "link", link: "/pages/barakdomain.html" }
+      ]}
+  ]},
+  { title: "Internet", icon: "globe", link: "https://burgersandwich.jp", inWindow: "true" },
+  { title: "BS Messenger", icon: "globe", link: "https://chat.burgersandwich.jp", inWindow: "true" },
+//  { title: "Readme.txt", type: "text",
+//    text: "Welcome!\r\n\r\nDouble-click the icons to look around.\r\n\r\nEverything on this desktop leads somewhere on the site." },
+  { title: "Recycle Bin", icon: "recycle", type: "folder", children: [
+      { title: "index.html", icon: "document", type: "link", link: "/homepage/ogburgersandwich.html" }
+  ]},
+  { title: "song.mp3", type: "music", src: "music/song.mp3" },
+  { title: "Do Not Click", icon: "warning", type: "link", link: "/pages/banned.html"}
+];
+
+// Start menu. Items work the same as above. A folder shows a flyout menu.
+// Special entries: { separator: true }, { type: "run" }, { type: "shutdown" }
+var START_MENU = [
+  { title: "Programs", icon: "folder", type: "folder", children: [
+      { title: "Internet", icon: "globe", link: "https://burgersandwich.jp", inWindow: "true" },
+      { title: "BS Messenger", icon: "globe", link: "https://chat.burgersandwich.jp", inWindow: "true" }
+  ]},
+//  { title: "Documents", icon: "folder", type: "folder", children: [
+//      { title: "Readme.txt", type: "text",
+//        text: "Welcome!\r\n\r\nDouble-click the icons to look around." }
+//  ]},
+  { title: "Help", icon: "help", type: "dialog", dialogIcon: "info",
+    text: "Double-click to open files." },
+  { separator: true },
+  { title: "Run...", icon: "run", type: "run" },
+  { separator: true },
+  { title: "Shut Down...", icon: "shutdown", type: "shutdown" }
+];
+
+/* ============================================================
+   PAGE CODE (no need to edit below)
+   ============================================================ */
+</script>
+
+<div id="desktop"></div>
+<div id="startMenu" class="raised">
+  <div id="startBanner"><span></span></div>
+  <ul class="menu big" id="startList"></ul>
+</div>
+<div id="taskbar" class="raised">
+  <button id="startBtn" class="raised"></button>
+  <div id="tasks"></div>
+  <div id="tray"><span id="clock"></span></div>
+</div>
+<div id="shutdown">It's now safe to turn off<br>your computer.</div>
+
+<script>
+// ---------- Built-in icons (drawn as small pixel-style pictures) ----------
+var ICONS = {
+  computer: '<rect x="4" y="3" width="24" height="18" fill="#c0c0c0" stroke="#000"/><rect x="7" y="6" width="18" height="12" fill="#008080"/><rect x="9" y="8" width="8" height="2" fill="#7fd"/><rect x="11" y="21" width="10" height="3" fill="#808080"/><rect x="5" y="24" width="22" height="5" fill="#c0c0c0" stroke="#000"/><rect x="19" y="26" width="5" height="1" fill="#000"/>',
+  folder: '<path d="M2 8h10l3 3h15v17H2z" fill="#fc0" stroke="#000"/><path d="M2 13h28" stroke="#c90"/><path d="M3 12h26" stroke="#ffe680"/>',
+  globe: '<circle cx="16" cy="16" r="13" fill="#1e6fd9" stroke="#000"/><path d="M9 7c3 2 2 5 5 6s1 5-2 6-3 4-1 6M20 5c-1 3 2 4 4 4s3 3 1 5-4 1-4 4 2 5 0 7" fill="none" stroke="#3c3" stroke-width="3"/><circle cx="12" cy="11" r="3" fill="#bdf" opacity=".6"/>',
+  document: '<path d="M6 2h14l6 6v22H6z" fill="#fff" stroke="#000"/><path d="M20 2v6h6" fill="#c0c0c0" stroke="#000"/><path d="M9 13h14M9 17h14M9 21h14M9 25h10" stroke="#000080"/>',
+  notepad: '<path d="M6 5h20v25H6z" fill="#fff" stroke="#000"/><rect x="6" y="3" width="20" height="5" fill="#1084d0" stroke="#000"/><path d="M9 12h14M9 16h14M9 20h14M9 24h9" stroke="#808080"/><path d="M9 2v4M13 2v4M17 2v4M21 2v4" stroke="#000"/>',
+  recycle: '<path d="M8 9h16l-2 20H10z" fill="#e0e0e0" stroke="#000"/><rect x="6" y="6" width="20" height="3" fill="#c0c0c0" stroke="#000"/><path d="M12 12l1 14M16 12v14M20 12l-1 14" stroke="#808080"/><path d="M13 6V4h6v2" fill="none" stroke="#000"/>',
+  image: '<rect x="3" y="5" width="26" height="22" fill="#fff" stroke="#000"/><rect x="5" y="7" width="22" height="18" fill="#9cf"/><circle cx="22" cy="11" r="3" fill="#ff0"/><path d="M5 25l7-9 5 6 4-4 6 7z" fill="#393"/>',
+  music: '<path d="M12 6l14-3v18" fill="none" stroke="#000" stroke-width="2"/><path d="M12 6v19" stroke="#000" stroke-width="2"/><ellipse cx="9" cy="25" rx="4" ry="3" fill="#000080"/><ellipse cx="23" cy="21" rx="4" ry="3" fill="#000080"/>',
+  error: '<circle cx="16" cy="16" r="13" fill="#e00" stroke="#600"/><path d="M10 10l12 12M22 10L10 22" stroke="#fff" stroke-width="3.5"/>',
+  info: '<path d="M16 3C8 3 3 8 3 14c0 5 3 8 7 10l-2 5 7-4h1c8 0 13-5 13-11S24 3 16 3z" fill="#fff" stroke="#000"/><circle cx="16" cy="9" r="2" fill="#00f"/><rect x="14" y="13" width="4" height="9" fill="#00f"/>',
+  warning: '<path d="M16 3l14 25H2z" fill="#ff0" stroke="#000"/><rect x="14.5" y="11" width="3" height="9" fill="#000"/><rect x="14.5" y="22" width="3" height="3" fill="#000"/>',
+  help: '<rect x="5" y="3" width="20" height="26" fill="#008080" stroke="#000"/><rect x="25" y="5" width="3" height="24" fill="#fff" stroke="#000"/><text x="15" y="23" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="18" fill="#ff0">?</text>',
+  run: '<rect x="3" y="7" width="26" height="18" fill="#c0c0c0" stroke="#000"/><rect x="3" y="7" width="26" height="4" fill="#000080"/><rect x="6" y="15" width="16" height="4" fill="#fff" stroke="#808080"/>',
+  shutdown: '<rect x="4" y="3" width="24" height="18" fill="#c0c0c0" stroke="#000"/><rect x="7" y="6" width="18" height="12" fill="#000"/><rect x="11" y="21" width="10" height="3" fill="#808080"/><rect x="5" y="24" width="22" height="5" fill="#c0c0c0" stroke="#000"/><circle cx="16" cy="12" r="4" fill="none" stroke="#f33" stroke-width="2"/><path d="M16 7v5" stroke="#f33" stroke-width="2"/>',
+  start: '<rect x="2" y="3" width="13" height="12" fill="#f33"/><rect x="17" y="3" width="13" height="12" fill="#3c3"/><rect x="2" y="17" width="13" height="12" fill="#36f"/><rect x="17" y="17" width="13" height="12" fill="#fc0"/>'
+};
+
+function esc(t) {
+  return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+function typeOf(item) {
+  return item.type || (item.children ? "folder" : item.link ? "link" : "text");
+}
+
+function iconName(item) {
+  if (item.icon) return item.icon;
+  return { folder: "folder", text: "notepad", dialog: item.dialogIcon || "info",
+           image: "image", music: "music", link: "document", run: "run", shutdown: "shutdown" }[typeOf(item)] || "document";
+}
+
+function iconHtml(name) {
+  if (ICONS[name]) return '<svg viewBox="0 0 32 32" shape-rendering="crispEdges">' + ICONS[name] + '</svg>';
+  return '<img src="' + esc(name) + '" alt="">';
+}
+
+function go(url) {
+  if (!url || url === "#") return;
+  if (OPEN_IN === "newtab") window.open(url, "_blank");
+  else if (OPEN_IN === "self") window.location.href = url;
+  else top.location.href = url;
+}
+
+// Give every item an id so its window can be found again
+var allItems = [];
+(function tag(list) {
+  list.forEach(function (it) {
+    if (it.separator) return;
+    it._id = "i" + allItems.length;
+    allItems.push(it);
+    if (it.children) tag(it.children);
+  });
+})(DESKTOP.concat(START_MENU));
+
+// ---------- Setup ----------
+document.body.style.backgroundColor = DESKTOP_COLOR;
+if (WALLPAPER) document.body.style.backgroundImage = "url('" + WALLPAPER + "')";
+document.querySelector("#startBanner span").innerHTML = esc(START_BANNER[0]) + "<b>" + esc(START_BANNER[1]) + "</b>";
+document.getElementById("startBtn").innerHTML = iconHtml(START_ICON || "start") + esc(START_TEXT);
+
+var desktop = document.getElementById("desktop");
+var lastPointer = "mouse";
+document.addEventListener("pointerdown", function (e) { lastPointer = e.pointerType; }, true);
+
+// ---------- Desktop icons ----------
+DESKTOP.forEach(function (it) {
+  var el = document.createElement("div");
+  el.className = "dIcon";
+  el.innerHTML = '<div class="pic">' + iconHtml(iconName(it)) + '</div><div class="label">' + esc(it.title) + '</div>';
+  el._item = it;
+  desktop.appendChild(el);
+});
+
+function layoutIcons() {
+  var icons = desktop.querySelectorAll(".dIcon");
+  var rowH = 78, colW = 80;
+  var perCol = Math.max(1, Math.floor((desktop.clientHeight - 8) / rowH));
+  for (var i = 0; i < icons.length; i++) {
+    icons[i].style.left = (6 + Math.floor(i / perCol) * colW) + "px";
+    icons[i].style.top = (6 + (i % perCol) * rowH) + "px";
+  }
+}
+layoutIcons();
+window.addEventListener("resize", layoutIcons);
+
+function select(el, scope) {
+  var sel = (scope || document).querySelectorAll(".selected");
+  for (var i = 0; i < sel.length; i++) sel[i].classList.remove("selected");
+  if (el) el.classList.add("selected");
+}
+
+// Single click selects, double click opens (single tap opens on touch screens)
+// onOpen (optional) handles opening instead of openItem - folder windows use it
+// so sub-folders open in the same window.
+function wireIcons(container, cls, onOpen) {
+  var open = onOpen || openItem;
+  container.addEventListener("click", function (e) {
+    var el = e.target.closest("." + cls);
+    select(el, container);
+    if (el && lastPointer === "touch") open(el._item);
+  });
+  container.addEventListener("dblclick", function (e) {
+    var el = e.target.closest("." + cls);
+    if (el && lastPointer !== "touch") open(el._item);
+  });
+}
+wireIcons(desktop, "dIcon");
+desktop.addEventListener("pointerdown", function (e) {
+  if (e.target === desktop) select(null, desktop);
+});
+
+// ---------- Windows ----------
+var zTop = 10;
+var openCount = 0;
+var windows = {};   // id -> { el, task }
+
+function focusWin(id) {
+  for (var k in windows) {
+    windows[k].el.classList.toggle("inactive", k !== id);
+    windows[k].task.classList.toggle("active", k === id && windows[k].el.style.display !== "none");
+    windows[k].task.classList.toggle("pressed", k === id && windows[k].el.style.display !== "none");
+    windows[k].task.classList.toggle("raised", !(k === id && windows[k].el.style.display !== "none"));
+  }
+  if (windows[id]) windows[id].el.style.zIndex = ++zTop;
+}
+
+function activeId() {
+  var best = null, z = -1;
+  for (var k in windows) {
+    var w = windows[k].el;
+    if (w.style.display !== "none" && Number(w.style.zIndex) > z) { z = Number(w.style.zIndex); best = k; }
+  }
+  return best;
+}
+
+function closeWin(id) {
+  if (!windows[id]) return;
+  if (windows[id].onClose) windows[id].onClose();   // e.g. stop music
+  windows[id].el.remove();
+  windows[id].task.remove();
+  delete windows[id];
+  var next = activeId();
+  if (next) focusWin(next);
+}
+
+function minimizeWin(id) {
+  windows[id].el.style.display = "none";
+  var next = activeId();
+  focusWin(next || "");
+}
+
+function toggleMax(id) {
+  var w = windows[id], el = w.el;
+  if (el.classList.contains("maxed")) {
+    el.classList.remove("maxed");
+    el.style.left = w.prev.left; el.style.top = w.prev.top;
+    el.style.width = w.prev.width; el.style.height = w.prev.height;
+  } else {
+    w.prev = { left: el.style.left, top: el.style.top, width: el.style.width, height: el.style.height };
+    el.classList.add("maxed");
+    el.style.left = "0px"; el.style.top = "0px";
+    el.style.width = "100%"; el.style.height = "calc(100% - 30px)";
+  }
+}
+
+var BTN_SVG = {
+  min: '<svg width="8" height="8" viewBox="0 0 8 8"><rect x="1" y="6" width="6" height="2"/></svg>',
+  max: '<svg width="9" height="9" viewBox="0 0 9 9"><path d="M0 0h9v9H0z M1 2v6h7V2z" fill-rule="evenodd"/></svg>',
+  close: '<svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg>'
+};
+
+// opts: { id, title, icon, width, height, menubar, status, noMax, noResize, build(body) }
+function openWindow(opts) {
+  if (windows[opts.id]) {
+    windows[opts.id].el.style.display = "";
+    focusWin(opts.id);
+    return windows[opts.id].el;
+  }
+  var el = document.createElement("div");
+  el.className = "window raised";
+  var vw = window.innerWidth, vh = window.innerHeight - 30;
+  var w = Math.min(opts.width || 420, vw - 8);
+  var h = opts.height ? Math.min(opts.height, vh - 8) : null;
+  var off = (openCount++ % 8) * 26;
+  el.style.width = w + "px";
+  if (h) el.style.height = h + "px";
+  el.style.left = Math.max(0, Math.min(vw - w, (vw - w) / 2 - 80 + off)) + "px";
+  el.style.top = Math.max(0, Math.min(vh - (h || 160), (vh - (h || 160)) / 2 - 60 + off)) + "px";
+
+  el.innerHTML =
+    '<div class="titlebar"><span class="tIcon">' + iconHtml(opts.icon) + '</span><span class="tText">' + esc(opts.title) + '</span>' +
+      (opts.noMax ? "" : '<button class="tBtn raised" data-act="min" title="Minimize">' + BTN_SVG.min + '</button>' +
+                         '<button class="tBtn raised" data-act="max" title="Maximize">' + BTN_SVG.max + '</button>') +
+      '<button class="tBtn raised close" data-act="close" title="Close">' + BTN_SVG.close + '</button></div>' +
+    (opts.menubar ? '<div class="menubar"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>' : "") +
+    '<div class="wBody"></div>' +
+    (opts.status ? '<div class="statusbar"><div>' + esc(opts.status) + '</div></div>' : "") +
+    (opts.noResize ? "" : '<div class="resizer"></div>');
+  document.body.appendChild(el);
+  opts.build(el.querySelector(".wBody"));
+
+  var task = document.createElement("button");
+  task.className = "taskBtn raised";
+  task.innerHTML = iconHtml(opts.icon) + '<span>' + esc(opts.title) + '</span>';
+  document.getElementById("tasks").appendChild(task);
+
+  var id = opts.id;
+  windows[id] = { el: el, task: task };
+  focusWin(id);
+
+  el.addEventListener("pointerdown", function () { focusWin(id); });
+  el.querySelector(".titlebar").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-act]");
+    if (!b) return;
+    var act = b.getAttribute("data-act");
+    if (act === "close") closeWin(id);
+    else if (act === "min") minimizeWin(id);
+    else toggleMax(id);
+  });
+  el.querySelector(".titlebar").addEventListener("dblclick", function (e) {
+    if (!opts.noMax && !e.target.closest("[data-act]")) toggleMax(id);
+  });
+  task.addEventListener("click", function () {
+    if (el.style.display === "none") { el.style.display = ""; focusWin(id); }
+    else if (activeId() === id && !el.classList.contains("inactive")) minimizeWin(id);
+    else focusWin(id);
+  });
+
+  dragWin(el, el.querySelector(".titlebar"), false);
+  if (!opts.noResize) dragWin(el, el.querySelector(".resizer"), true);
+  return el;
+}
+
+// Moving a window by its title bar, or resizing it by the corner
+function dragWin(el, handle, resize) {
+  handle.addEventListener("pointerdown", function (e) {
+    if (e.target.closest("[data-act]") || el.classList.contains("maxed")) return;
+    e.preventDefault();
+    var sx = e.clientX, sy = e.clientY;
+    var r = el.getBoundingClientRect();
+    // Stop iframes from swallowing the mouse while dragging
+    var frames = document.querySelectorAll("iframe");
+    for (var i = 0; i < frames.length; i++) frames[i].style.pointerEvents = "none";
+    function move(ev) {
+      var dx = ev.clientX - sx, dy = ev.clientY - sy;
+      if (resize) {
+        el.style.width = Math.max(180, r.width + dx) + "px";
+        el.style.height = Math.max(90, r.height + dy) + "px";
+      } else {
+        el.style.left = Math.min(window.innerWidth - 40, Math.max(-r.width + 60, r.left + dx)) + "px";
+        el.style.top = Math.min(window.innerHeight - 60, Math.max(0, r.top + dy)) + "px";
+      }
+    }
+    function up() {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", up);
+      for (var i = 0; i < frames.length; i++) frames[i].style.pointerEvents = "";
+    }
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", up);
+  });
+}
+
+// ---------- Opening items ----------
+function openItem(item) {
+  var t = typeOf(item);
+  if (t === "link") {
+    if (item.inWindow) openBrowser(item); else go(item.link);
+  }
+  else if (t === "folder") openFolder(item);
+  else if (t === "text") openNotepad(item);
+  else if (t === "dialog") messageBox(item.title, item.text, item.dialogIcon || iconName(item), item._id);
+  else if (t === "image") openImage(item);
+  else if (t === "music") openMusic(item);
+  else if (t === "run") openRun();
+  else if (t === "shutdown") shutDown();
+}
+
+// ---------- Folder windows (with Back / Forward) ----------
+var ARROW = {
+  back: '<svg viewBox="0 0 20 20"><path d="M1.5 10L9 2.5V7h9.5v6H9v4.5z" stroke-width="1"/></svg>',
+  fwd:  '<svg viewBox="0 0 20 20"><path d="M18.5 10L11 2.5V7H1.5v6H11v4.5z" stroke-width="1"/></svg>'
+};
+var folderCount = 0;
+
+// Opening a folder from the desktop or Start menu: reuse a window already
+// showing it, otherwise open a new folder window.
+function openFolder(item) {
+  for (var k in windows) {
+    var f = windows[k].folder;
+    if (f && f.history[f.index].item === item) {
+      windows[k].el.style.display = "";
+      focusWin(k);
+      return;
+    }
+  }
+  var id = "folder" + (folderCount++);
+  var el = openWindow({
+    id: id, title: item.title, icon: iconName(item), width: 460, height: 320, menubar: true, status: " ",
+    build: function (body) {
+      body.innerHTML =
+        '<div class="fToolbar">' +
+          '<button class="navBtn" data-nav="back" title="Back">' + ARROW.back + '<span>Back</span></button>' +
+          '<button class="navBtn" data-nav="fwd" title="Forward">' + ARROW.fwd + '<span>Forward</span></button>' +
+          '<div class="fSep"></div>' +
+          '<div class="fAddr"><span>Address</span><div class="field sunken"></div></div>' +
+        '</div>' +
+        '<div class="folderView sunken"></div>';
+    }
+  });
+  windows[id].folder = { history: [{ item: item, addr: addressFor(item, null) }], index: 0 };
+
+  var view = el.querySelector(".folderView");
+  view.addEventListener("pointerdown", function (e) { if (e.target === view) select(null, view); });
+  // Sub-folders open here; everything else opens as usual
+  wireIcons(view, "fIcon", function (child) {
+    if (typeOf(child) === "folder") folderGo(id, child);
+    else openItem(child);
+  });
+  el.querySelector(".fToolbar").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-nav]");
+    if (b && !b.disabled) folderStep(id, b.getAttribute("data-nav") === "back" ? -1 : 1);
+  });
+  // Mouse side buttons and Backspace also go back/forward
+  el.addEventListener("mouseup", function (e) {
+    if (e.button === 3) { e.preventDefault(); folderStep(id, -1); }
+    if (e.button === 4) { e.preventDefault(); folderStep(id, 1); }
+  });
+  el.tabIndex = -1;
+  el.addEventListener("keydown", function (e) {
+    if (e.key === "Backspace" && !/input|textarea/i.test(e.target.tagName)) { e.preventDefault(); folderStep(id, -1); }
+  });
+  renderFolder(id);
+}
+
+// What the Address field shows for a folder:
+//  - an item's own  address  setting, if it has one
+//  - drives like "(C:)" become "C:\"
+//  - "My Computer"-style folders (computer icon) just show their name
+//  - anything else is its parent's address plus its name, starting from C:\
+function addressFor(item, parentAddr) {
+  if (item.address) return item.address;
+  var drive = String(item.title).match(/\(?\b([A-Za-z]):\)?/);
+  if (drive && /^\(?[A-Za-z]:\)?$/.test(item.title.trim())) return drive[1].toUpperCase() + ":\\";
+  if (item.icon === "computer") return item.title;
+  var base = (parentAddr && /^[A-Za-z]:\\/.test(parentAddr)) ? parentAddr : BASE_DRIVE;
+  return base + (/\\$/.test(base) ? "" : "\\") + item.title;
+}
+
+// Go into a folder inside the same window
+function folderGo(id, item) {
+  var f = windows[id].folder;
+  var here = f.history[f.index];
+  f.history = f.history.slice(0, f.index + 1);   // going somewhere new clears Forward
+  f.history.push({ item: item, addr: addressFor(item, here.addr) });
+  f.index++;
+  renderFolder(id);
+}
+
+// dir = -1 for Back, 1 for Forward
+function folderStep(id, dir) {
+  var w = windows[id];
+  if (!w || !w.folder) return;
+  var next = w.folder.index + dir;
+  if (next < 0 || next >= w.folder.history.length) return;
+  w.folder.index = next;
+  renderFolder(id);
+}
+
+// Draw the folder the window is currently on
+function renderFolder(id) {
+  var w = windows[id], f = w.folder, entry = f.history[f.index], item = entry.item;
+  var kids = item.children || [];
+  var el = w.el;
+
+  var view = el.querySelector(".folderView");
+  view.innerHTML = "";
+  kids.forEach(function (k) {
+    var icon = document.createElement("div");
+    icon.className = "fIcon";
+    icon.innerHTML = '<div class="pic">' + iconHtml(iconName(k)) + '</div><div class="label">' + esc(k.title) + '</div>';
+    icon._item = k;
+    view.appendChild(icon);
+  });
+  view.scrollTop = 0;
+
+  // Title bar, taskbar button, address and status follow the current folder
+  el.querySelector(".tText").textContent = item.title;
+  el.querySelector(".tIcon").innerHTML = iconHtml(iconName(item));
+  w.task.innerHTML = iconHtml(iconName(item)) + '<span>' + esc(item.title) + '</span>';
+  el.querySelector(".fAddr .field").innerHTML = iconHtml(iconName(item)) + '<span>' + esc(entry.addr) + '</span>';
+  el.querySelector(".statusbar div").textContent = kids.length + " object(s)";
+
+  // Arrows are grey unless there's somewhere to go
+  el.querySelector('[data-nav="back"]').disabled = f.index === 0;
+  el.querySelector('[data-nav="fwd"]').disabled = f.index >= f.history.length - 1;
+}
+
+function openNotepad(item) {
+  openWindow({
+    id: item._id, title: item.title + " - Notepad", icon: "notepad", width: 460, height: 320, menubar: true,
+    build: function (body) {
+      body.innerHTML = '<div class="notepadWrap sunken"><textarea class="notepad" spellcheck="false"></textarea></div>';
+      body.querySelector("textarea").value = item.text || "";
+    }
+  });
+}
+
+function openImage(item) {
+  openWindow({
+    id: item._id, title: item.title, icon: "image", width: 520, height: 420,
+    build: function (body) {
+      body.innerHTML = '<div class="imageView sunken"><img alt=""></div>';
+      body.querySelector("img").src = item.src || "";
+    }
+  });
+}
+
+// ---------- Music player ----------
+var MP_SVG = {
+  play:  '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg>',
+  pause: '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="1" width="3" height="10"/><rect x="7" y="1" width="3" height="10"/></svg>',
+  stop:  '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8"/></svg>',
+  vol:   '<svg width="14" height="12" viewBox="0 0 14 12"><path d="M1 4h3l4-3v10L4 8H1z"/><path d="M10 3.5a3.5 3.5 0 010 5M11.5 1.5a6 6 0 010 9" fill="none" stroke="#000"/></svg>'
+};
+
+function mmss(t) {
+  if (!isFinite(t) || t < 0) t = 0;
+  var m = Math.floor(t / 60), s = Math.floor(t % 60);
+  return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+function openMusic(item) {
+  var id = item._id;
+  if (windows[id]) { windows[id].el.style.display = ""; focusWin(id); return; }
+
+  var audio = new Audio();
+  audio.preload = "auto";
+  audio.loop = !!item.loop;
+  audio.src = item.src || "";
+
+  var el = openWindow({
+    id: id, title: item.title + " - Media Player", icon: "music", width: 300, noMax: true, noResize: true,
+    status: "Opening...",
+    build: function (body) {
+      body.innerHTML =
+        '<div class="mp">' +
+          '<div class="mpScreen">' +
+            '<div class="mpEq"><i></i><i></i><i></i><i></i><i></i></div>' +
+            '<div class="mpInfo"><div class="mpTitle"><span></span></div><div class="mpTime">00:00 / 00:00</div></div>' +
+          '</div>' +
+          '<input class="mpSeek" type="range" min="0" max="1000" value="0" title="Seek">' +
+          '<div class="mpCtrls">' +
+            '<button class="btn raised mpBtn" data-mp="play" title="Play">' + MP_SVG.play + '</button>' +
+            '<button class="btn raised mpBtn" data-mp="stop" title="Stop">' + MP_SVG.stop + '</button>' +
+            '<span class="mpVol">' + MP_SVG.vol + '<input class="mpVolume" type="range" min="0" max="100" value="80" title="Volume"></span>' +
+          '</div>' +
+        '</div>';
+    }
+  });
+
+  var playBtn = el.querySelector('[data-mp="play"]');
+  var seek = el.querySelector(".mpSeek");
+  var timeEl = el.querySelector(".mpTime");
+  var titleBox = el.querySelector(".mpTitle"), titleSpan = titleBox.querySelector("span");
+  var status = el.querySelector(".statusbar div");
+  var seeking = false;
+  titleSpan.textContent = item.title;
+  if (titleSpan.scrollWidth > titleBox.clientWidth) titleBox.classList.add("scroll");
+  audio.volume = 0.8;
+
+  function refresh() {
+    var playing = !audio.paused && !audio.ended;
+    el.classList.toggle("mpPlaying", playing);
+    playBtn.innerHTML = playing ? MP_SVG.pause : MP_SVG.play;
+    playBtn.title = playing ? "Pause" : "Play";
+    timeEl.textContent = mmss(audio.currentTime) + " / " + mmss(audio.duration);
+    if (!seeking && audio.duration) seek.value = Math.round(audio.currentTime / audio.duration * 1000);
+  }
+  function play() {
+    var p = audio.play();
+    if (p && p.catch) p.catch(function () { status.textContent = "Cannot play this file"; });
+  }
+
+  audio.addEventListener("play", function () { status.textContent = "Playing"; refresh(); });
+  audio.addEventListener("pause", function () { if (!audio.ended) status.textContent = "Paused"; refresh(); });
+  audio.addEventListener("timeupdate", refresh);
+  audio.addEventListener("loadedmetadata", refresh);
+  audio.addEventListener("ended", function () {
+    audio.currentTime = 0;
+    status.textContent = "Stopped";
+    refresh();
+  });
+  audio.addEventListener("error", function () {
+    status.textContent = "File not found";
+    timeEl.textContent = "--:-- / --:--";
+    el.classList.remove("mpPlaying");
+  });
+
+  el.querySelector(".mpCtrls").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-mp]");
+    if (!b) return;
+    if (b.getAttribute("data-mp") === "play") { if (audio.paused) play(); else audio.pause(); }
+    else { audio.pause(); audio.currentTime = 0; status.textContent = "Stopped"; refresh(); }
+  });
+  seek.addEventListener("input", function () { seeking = true; });
+  seek.addEventListener("change", function () {
+    if (audio.duration) audio.currentTime = seek.value / 1000 * audio.duration;
+    seeking = false;
+    refresh();
+  });
+  el.querySelector(".mpVolume").addEventListener("input", function () { audio.volume = this.value / 100; });
+
+  // Closing the window stops the music for good
+  windows[id].onClose = function () {
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+  };
+
+  play();   // starts right away (allowed because the visitor just double-clicked)
+}
+
+function openBrowser(item) {
+  openWindow({
+    id: item._id, title: item.title, icon: iconName(item), width: 1440, height: 810, menubar: true,
+    build: function (body) {
+      body.innerHTML =
+        '<div class="addrBar"><span>Address</span><div class="field sunken"></div>' +
+        '<button class="btn raised" style="min-width:0;padding:3px 8px">Go</button></div>' +
+        '<div class="frameWrap sunken"><iframe class="browserFrame"></iframe></div>';
+      body.querySelector(".field").textContent = item.link;
+      body.querySelector("iframe").src = item.link;
+      body.querySelector("button").addEventListener("click", function () { go(item.link); });
+    }
+  });
+}
+
+var msgCount = 0;
+function messageBox(title, text, icon, id) {
+  var wid = id || ("msg" + (msgCount++));
+  var el = openWindow({
+    id: wid, title: title, icon: icon, width: 360, noMax: true, noResize: true,
+    build: function (body) {
+      body.innerHTML = '<div class="msg"><div class="pic">' + iconHtml(icon) + '</div><p></p></div>' +
+        '<div class="msgBtns"><button class="btn raised">OK</button></div>';
+      body.querySelector("p").textContent = text || "";
+      body.querySelector("button").addEventListener("click", function () { closeWin(wid); });
+    }
+  });
+  el.style.width = "auto";
+  el.style.left = Math.max(0, (window.innerWidth - el.offsetWidth) / 2) + "px";
+  el.style.top = Math.max(0, (window.innerHeight - 30 - el.offsetHeight) / 2) + "px";
+  var ok = el.querySelector(".msgBtns button");
+  if (ok) ok.focus();
+}
+
+// ---------- Run dialog ----------
+function findByTitle(name) {
+  var n = name.trim().toLowerCase();
+  for (var i = 0; i < allItems.length; i++) {
+    var t = allItems[i].title.toLowerCase();
+    if (t === n || t.replace(/\.[a-z0-9]+$/, "") === n) {
+      var ty = typeOf(allItems[i]);
+      if (ty !== "run" && ty !== "shutdown") return allItems[i];
+    }
+  }
+  return null;
+}
+
+function openRun() {
+  var el = openWindow({
+    id: "run", title: "Run", icon: "run", width: 380, noMax: true, noResize: true,
+    build: function (body) {
+      body.innerHTML =
+        '<div class="runBody"><div class="row"><div class="pic">' + iconHtml("run") + '</div>' +
+        '<div>Type the name of a program, folder, document, or Internet resource, and it will be opened for you.</div></div>' +
+        '<label><span><u>O</u>pen:</span><input class="sunken" type="text" spellcheck="false" autocomplete="off"></label>' +
+        '<div class="runBtns"><button class="btn raised" data-r="ok">OK</button>' +
+        '<button class="btn raised" data-r="cancel">Cancel</button>' +
+        '<button class="btn raised" disabled>Browse...</button></div></div>';
+      var input = body.querySelector("input");
+      function run() {
+        var v = input.value.trim();
+        if (!v) return;
+        closeWin("run");
+        if (/^(https?:\/\/|www\.)/i.test(v)) { go(/^www\./i.test(v) ? "https://" + v : v); return; }
+        var hit = findByTitle(v);
+        if (hit) openItem(hit);
+        else messageBox(v, "Cannot find the file '" + v + "' (or one of its components). Make sure the path and filename are correct.", "error");
+      }
+      body.querySelector('[data-r="ok"]').addEventListener("click", run);
+      body.querySelector('[data-r="cancel"]').addEventListener("click", function () { closeWin("run"); });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); run(); }
+        if (e.key === "Escape") closeWin("run");
+      });
+    }
+  });
+  el.querySelector("input").focus();
+}
+
+function shutDown() {
+  if (SHUTDOWN_LINK) { go(SHUTDOWN_LINK); return; }
+  var s = document.getElementById("shutdown");
+  s.classList.add("on");
+  s.onclick = function () { location.reload(); };
+}
+
+// ---------- Start menu ----------
+var startMenu = document.getElementById("startMenu");
+var startBtn = document.getElementById("startBtn");
+
+function menuHtml(list) {
+  return list.map(function (it) {
+    if (it.separator) return '<li class="sep"></li>';
+    var isFolder = typeOf(it) === "folder" && it.children && it.children.length;
+    return '<li data-id="' + it._id + '"><span class="pic">' + iconHtml(iconName(it)) + '</span>' + esc(it.title) +
+      (isFolder ? '<span class="arrow">&#9654;</span><div class="submenu raised"><ul class="menu">' +
+        menuHtml(it.children) + '</ul></div>' : "") + '</li>';
+  }).join("");
+}
+document.getElementById("startList").innerHTML = menuHtml(START_MENU);
+
+function itemById(id) {
+  for (var i = 0; i < allItems.length; i++) if (allItems[i]._id === id) return allItems[i];
+  return null;
+}
+
+function toggleStart(open) {
+  startMenu.classList.toggle("open", open);
+  startBtn.classList.toggle("pressed", open);
+  startBtn.classList.toggle("raised", !open);
+}
+startBtn.addEventListener("click", function (e) {
+  e.stopPropagation();
+  toggleStart(!startMenu.classList.contains("open"));
+});
+startMenu.addEventListener("click", function (e) {
+  e.stopPropagation();
+  var li = e.target.closest("li[data-id]");
+  if (!li) return;
+  var it = itemById(li.getAttribute("data-id"));
+  if (!it) return;
+  // On a touch screen, tapping a folder opens its flyout's contents as a window
+  if (typeOf(it) === "folder" && lastPointer !== "touch" && it.children && it.children.length) return;
+  toggleStart(false);
+  openItem(it);
+});
+document.addEventListener("click", function () { toggleStart(false); });
+
+// ---------- Clock ----------
+function tick() {
+  var d = new Date();
+  var h = d.getHours(), m = d.getMinutes();
+  document.getElementById("clock").textContent =
+    ((h % 12) || 12) + ":" + (m < 10 ? "0" : "") + m + " " + (h < 12 ? "AM" : "PM");
+  document.getElementById("tray").title = d.toDateString();
+}
+tick();
+setInterval(tick, 5000);
+
+// ---------- Open something at startup ----------
+if (STARTUP_OPEN) {
+  var first = null;
+  for (var i = 0; i < DESKTOP.length; i++) if (DESKTOP[i].title === STARTUP_OPEN) { first = DESKTOP[i]; break; }
+  first = first || findByTitle(STARTUP_OPEN);
+  if (first) openItem(first);
+}
+</script>
+</body>
+</html>

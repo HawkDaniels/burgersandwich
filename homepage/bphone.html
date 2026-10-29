@@ -328,6 +328,9 @@
   #callPill.on { display: block; }
   @media (min-width: 600px) and (min-height: 600px) { #callPill { top: 15px; left: 24px; } }
 </style>
+<!-- Which conversations were heard is saved with the visitor's account when logged in (quest "bphone_calls"). -->
+<script src="/account/site-account.js"></script>
+<script src="/account/site-progress.js"></script>
 </head>
 <body>
 
@@ -432,7 +435,7 @@ var PAGES = [
 // The bar at the bottom (up to 4 apps, no labels).
 var DOCK = [
   { name: "Phone", glyph: "phone", color: ["#65e07b", "#34c759"], action: "phone", missedCalls: true },
-  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "https://chat.burgersandwich.jp" },
+  { name: "Messages", glyph: "messages", color: ["#65e07b", "#34c759"], link: "/pages/chat.html" },
   { name: "Browser", glyph: "globe", color: ["#5ac8fa", "#0a6cff"], link: "/index.html", landscape: true },
   { name: "Camera", glyph: "camera", color: ["#c7c7cc", "#8e8e93"], action: "camera" }
 ];
@@ -578,6 +581,7 @@ var INCOMING_CALLS = [
 // ------------------------------------------------------------
 var SHOW_CAPTIONS = true;            // show what the caller says as text
 var REMEMBER_PROGRESS = true;        // true = which conversations were heard is remembered between visits
+                                     // (on the account when logged in, otherwise in this browser)
 var RESET_CODE = "*#0#";             // dial this on the keypad to reset everyone's conversations
 var VOICEMAIL_RECORD_SECONDS = 8;    // how long voicemail "records" after the beep before hanging up
 // What plays when someone dials a number that isn't a contact:
@@ -1455,11 +1459,37 @@ function startTimer() {
 }
 
 // ----- Outgoing -----
-var PROG_KEY = "bphone:calls";
+// Progress is { contact name: conversations heard }. It is kept by SiteProgress as the quest "bphone_calls"
+// (defined in bs-backend's defs.js): on the account when logged in, in this browser when not. Logging out
+// erases the browser copy, and creating an account carries it over, like every other quest.
+var QUEST_ID = "bphone_calls";
+var OLD_KEY = "bphone:calls";        // where progress was kept before it moved to SiteProgress
 var progress = {};
-if (REMEMBER_PROGRESS) { try { progress = JSON.parse(localStorage.getItem(PROG_KEY)) || {}; } catch (e) {} }
-function saveProgress() { if (REMEMBER_PROGRESS) { try { localStorage.setItem(PROG_KEY, JSON.stringify(progress)); } catch (e) {} } }
-function resetProgress() { progress = {}; try { localStorage.removeItem(PROG_KEY); } catch (e) {} }
+function cleanProgress(p) {
+  var out = {};
+  if (p && typeof p === "object") for (var k in p) { var n = Number(p[k]); if (n > 0 && n === Math.floor(n)) out[k] = n; }
+  return out;
+}
+function loadProgress() {
+  if (!REMEMBER_PROGRESS || !window.SiteProgress) return;
+  var old = null;
+  try { old = JSON.parse(localStorage.getItem(OLD_KEY)); localStorage.removeItem(OLD_KEY); } catch (e) {}
+  window.SiteProgress.load(QUEST_ID).then(function (saved) {
+    var heard = cleanProgress(saved && saved.calls);
+    // Keep the higher count from the old browser copy, then save once so it isn't lost.
+    var moved = false;
+    if (old) for (var k in cleanProgress(old)) { if ((old[k] | 0) > (heard[k] || 0)) { heard[k] = old[k] | 0; moved = true; } }
+    // Anything heard during this visit before the saved progress arrived wins too.
+    for (var c in progress) if (progress[c] > (heard[c] || 0)) { heard[c] = progress[c]; moved = true; }
+    progress = heard;
+    if (moved) saveProgress();
+  }, function () {});
+}
+function saveProgress() {
+  if (REMEMBER_PROGRESS && window.SiteProgress) window.SiteProgress.save(QUEST_ID, { calls: progress }).catch(function () {});
+}
+function resetProgress() { progress = {}; saveProgress(); }
+loadProgress();
 
 function callContact(c) {
   if (callState !== "idle") return;

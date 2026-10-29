@@ -19,7 +19,7 @@
 <span id="elapsed">...</span>
 
 <script>
-var STATUS_URL = "https://click-counter.oksohi.workers.dev/status";
+var STATUS_URL = "/api/status"; // bs-backend, same site
 var ts = 0;
 
 function unit(n, name) {
@@ -48,7 +48,10 @@ function render() {
 }
 
 fetch(STATUS_URL)
-  .then(function (r) { return r.json(); })
+  .then(function (r) {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  })
   .then(function (d) {
     ts = d.ts;
     render();

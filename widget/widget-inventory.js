@@ -1,9 +1,9 @@
 /* widget-inventory.js: a corner button that opens an inventory panel (key items, quest items, money).
    Add ONE line to the end of any page, just before </body>:
 
-     <script src="/widget-inventory.js"></script>
+     <script src="/widget/widget-inventory.js"></script>
 
-   It loads site-account.js and site-progress.js from the same folder if the page has not already.
+   It loads /account/site-account.js and /account/site-progress.js if the page has not already.
    It draws inside its own isolated box, so it does not take on the page's styles and does not change them.
 
    Optional settings, written on the script tag (all of them are optional):
@@ -34,7 +34,8 @@
   window.__widgetInventory = true;
 
   var me = document.currentScript;
-  var base = me && me.src ? me.src.replace(/[^\/]*$/, "") : "/";
+  // site-account.js and site-progress.js live in the account folder next to this widget's folder.
+  var base = me && me.src ? new URL("../account/", me.src).href : "/account/";
   function opt(name, fallback) { var v = me && me.getAttribute("data-" + name); return v ? v.trim() : fallback; }
   // Only plain lengths, colours and addresses are accepted from the tag; anything else falls back to the default.
   var LEN = /^\d{1,4}(px|rem|em|vh|vw|%)$/, HEX = /^#[0-9a-fA-F]{3,8}$/;
@@ -225,7 +226,7 @@
     var mine = ++state.seq;
     window.__siteDeps.then(function () {
       if (!window.SiteAccount) { state.error = true; render(); return; }
-      return Promise.all([window.SiteAccount.defs(), window.SiteAccount.me()]).then(function (res) {
+      return Promise.all([window.SiteAccount.defs(), (window.SiteAccount.current ? window.SiteAccount.current() : window.SiteAccount.me())]).then(function (res) {
         var defs = res[0], who = res[1];
         if (!defs || !defs.ok) { if (mine === state.seq) { state.error = true; render(); } return; }
         var signedIn = !!(who && who.ok && who.user);

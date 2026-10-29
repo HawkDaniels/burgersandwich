@@ -1,4 +1,12 @@
+# Files that are in the repo but must not be served on the website (same syntax as .gitignore).
 .git
 node_modules
 .DS_Store
 .wrangler
+.vscode
+.assetsignore
+wrangler.jsonc
+README.md
+New Text Document.txt
+*.bak
+*.bak*

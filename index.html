@@ -44,28 +44,36 @@ fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=JPY")
 </style>
 
 <script>
-var API = "https://click-counter.oksohi.workers.dev/";
+var API = "/api/counter";
 var clicks = 0;
 
 function show(n) {
   document.getElementById("count").textContent = n + " burgersandwiches";
 }
 
+// The counter lives on bs-backend at /api/counter on this same site.
+function load(r) {
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
 fetch(API)
-  .then(function (r) { return r.json(); })
-  .then(function (d) { show(d.count); });
+  .then(load)
+  .then(function (d) { show(d.count); })
+  .catch(function () { document.getElementById("count").textContent = "? burgersandwiches"; });
 
 document.getElementById("clickBtn").onclick = function () {
   clicks++;
 
   if (clicks === 1) {
     fetch(API, { method: "POST" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { show(d.count); });
+      .then(load)
+      .then(function (d) { show(d.count); })
+      .catch(function () {});
   } else if (clicks === 2) {
     alert("Please do not artifically inflate our visitor count :,(");
   } else {
-    window.top.location.href = "banned.html";
+    window.top.location.href = "/pages/banned.html";
   }
 };
 </script>
@@ -80,12 +88,12 @@ document.getElementById("clickBtn").onclick = function () {
 <script>
 // Add or remove links here.
 var randomLinks = [
-  ["/homepage/terminal.html", 1],
-  ["/homepage/bmail.html", 1],
+//  ["/homepage/terminal.html", 1],
+//  ["/homepage/bmail.html", 1],
   ["/homepage/burgeros.html", 1],
   ["/homepage/ogburgersandwich.html", 1],
   ["/homepage/bphone.html", 1],
-  ["/homepage/burgerfin.html", 1]
+//  ["/homepage/burgerfin.html", 1]
   //["/homepage/.html", 1],
 ];
 
@@ -106,7 +114,7 @@ document.getElementById('enterBtn').addEventListener('click', function () {
 
 <br>
 
-   <iframe src="https://chat.burgersandwich.jp/" style="width:768px;height:500px;border:0"></iframe>
+   <iframe src="/pages/chat.html" style="width:768px;height:500px;border:0"></iframe>
 
 <style>
   #site-chat {
@@ -138,7 +146,8 @@ document.getElementById('enterBtn').addEventListener('click', function () {
 <h2 style="font-size:20px;">##Developer Links</h2>
 <p>These are the links accessible through the enter burgersandwich button</p>
 <p>
-  <a href="/homepage/terminal.html">Terminal</a> | <a href="/homepage/bmail.html">bMail</a> | <a href="/homepage/burgeros.html">BurgerOS</a> | <a href="/homepage/ogburgersandwich.html">OG Burgersandwich</a> | <a href="/homepage/bphone.html">bPhone</a> | <a href="/homepage/burgerfin.html">Burgerfin</a>
+  <a href="/homepage/burgeros.html">BurgerOS</a> | <a href="/homepage/ogburgersandwich.html">OG Burgersandwich</a> | <a href="/homepage/bphone.html">bPhone</a> 
+<!--<a href="/homepage/terminal.html">Terminal</a> | <a href="/homepage/bmail.html">bMail</a> | <a href="/homepage/burgerfin.html">Burgerfin</a>-->
 </p>
 
 <br>
@@ -219,7 +228,8 @@ document.getElementById('enterBtn').addEventListener('click', function () {
   //NOTE: This will attempt to serve every ad at least once (based on probability without repeats) until all bypass (false) ads have been served. Then all ads are eligible and served randomly.
 var ads = [
   { src: "/ads/ad-ramranch.jpg", link: "https://18nakedcowboys.com", alt: "Failed to load ad", newTab: true,  weight: 1, bypass: false },
-  { src: "/ads/ad-munancho.jpg", link: "/pages/merch.html",          alt: "Failed to load ad", newTab: false, weight: 1, bypass: false }
+  { src: "/ads/ad-munancho.jpg", link: "/pages/merch.html",          alt: "Failed to load ad", newTab: false, weight: 1, bypass: false },
+  { src: "/ads/ad-noose.jpg",    link: "/pages/knot.html",           alt: "Failed to load ad", newTab: false, weight: 1, bypass: false }
 ];
 
 var KEY = "adsSeen";
@@ -289,6 +299,9 @@ document.getElementById("adClose").onclick = function () {
   document.getElementById("ad").style.display = "none";
 };
 </script>
+
+<div data-captcha></div>
+<script src="/script/captcha.js"></script>
 
 </body>
 
