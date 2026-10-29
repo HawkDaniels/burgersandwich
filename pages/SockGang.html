@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Below</title>
+  <link rel="icon" href="/favicon(1).png">
+  <link rel="stylesheet" href="../SockGang/css/Style.css">
+</head>
+<body>
+  <!-- 1. HUD: depth counter + sound toggle -->
+  <div id="depth" class="depth">0 ft</div>
+  <button id="soundBtn" class="sound-btn" type="button">Sound: off</button>
+
+  <!-- 2. Surface (way back up to Agartha) -->
+  <section class="surface">
+    <p>Watch your step.</p>
+    <a href="Agartha.html"
+       style="position:absolute;top:44px;left:14px;color:#2f3a22;text-decoration:none">▲ Agartha</a>
+  </section>
+
+  <!-- 3. Ladder -->
+  <section class="ladder"><div class="rails"></div></section>
+
+  <!-- 4. Cave (placeholder: mural, Cowboys' table, and subsidiaries come later) -->
+  <section class="cave" id="cave"><h1>You made it down.</h1></section>
+
+  <audio id="ladderTheme" src="../SockGang/assets/ladder-theme.mp3" loop preload="none"></audio>
+  <script src="../SockGang/js/script.js"></script>
+</body>
+</html>

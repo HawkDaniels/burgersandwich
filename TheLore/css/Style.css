@@ -20,6 +20,8 @@ body {
   font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   font-size: 1.2rem; line-height: 1.6; overflow-x: hidden;
 }
+body { opacity: 0; }
+body.ready { opacity: 1; transition: opacity 0.6s ease; }
 h1, h2 {
   font-family: "Cinzel", Georgia, serif; font-weight: 700;
   color: var(--gold); text-shadow: var(--bloom-gold); letter-spacing: 0.04em;
@@ -93,8 +95,6 @@ h1, h2 {
 }
 .home:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 50%; }
 @keyframes bob { from { translate: 0 -3px; } to { translate: 0 4px; } }
-@media (prefers-reduced-motion: reduce) { .home { animation: none; transition: none; } }
-@media (max-width: 720px) { .home { width: 46px; height: 46px; } }
 
 /* 5. THE CLIMB (column-reverse: first item in the HTML sits at the bottom) */
 .climb {
@@ -158,8 +158,13 @@ h1, h2 {
 
 /* 9. THE VAN */
 .van { text-align: center; margin-bottom: 14vh; }
-.van-icon { display: block; font-size: 4rem; filter: drop-shadow(0 0 16px rgba(255, 214, 150, 0.8)); }
-.van p { display: inline-block; margin: 0.4em 0 0; padding: 6px 14px; background: var(--stone); border-radius: 6px; font-style: italic; }
+.van img {
+  display: block; margin: 0 auto; width: min(340px, 72vw); aspect-ratio: 4 / 3;
+  object-fit: cover; object-position: 50% 40%;
+  border: 3px solid #17142a; border-radius: 10px; transform: rotate(-2deg);
+  box-shadow: 0 0 40px rgba(255, 214, 150, 0.45), 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+.van p { display: inline-block; margin: 0.9em 0 0; padding: 6px 14px; background: var(--stone); border-radius: 6px; font-style: italic; }
 
 /* 10. HIROSHI ABE */
 /* 10A. Rare popup */
@@ -171,8 +176,24 @@ h1, h2 {
   opacity: 0; transition: opacity 1.2s ease;
 }
 .hiroshi.show { opacity: 1; }
-/* 10B. Sky face: invisible until near the top, sharp only when you stop moving */
+
+/* 10B. Sky face: appears with the popup, JS fades the wrapper as you climb away */
+.abe-wrap {
+  position: fixed; top: 7vh; left: 50%; transform: translateX(-50%);
+  width: min(62vw, 340px); z-index: 19; pointer-events: none;
+  mix-blend-mode: screen; opacity: 0;
+}
 .abe {
+  display: block; width: 100%; height: auto;
+  opacity: 0; filter: blur(22px) brightness(2);
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  transition: opacity 2.5s ease, filter 3s ease;
+}
+.abe.on { opacity: 0.65; filter: blur(0) brightness(1.15) contrast(1.1); }
+
+/* 10C. Summit face (Giga): faint near the top, sharp only when you stop moving */
+.giga {
   position: absolute; top: 3vh; left: 50%; transform: translateX(-50%);
   width: min(78vw, 560px); z-index: -1; pointer-events: none;
   mix-blend-mode: screen; opacity: 0; filter: blur(22px) brightness(2.2);
@@ -180,8 +201,8 @@ h1, h2 {
   mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
   transition: opacity 3s ease, filter 3s ease;
 }
-.abe.near { opacity: 0.18; }
-.abe.focus { opacity: 0.6; filter: blur(0) brightness(1.15); }
+.giga.near { opacity: 0.18; }
+.giga.focus { opacity: 0.6; filter: blur(0) brightness(1.15); }
 
 /* 11. SUMMIT */
 .summit { text-align: center; padding-top: 58vh; padding-bottom: 6vh; }
@@ -194,6 +215,7 @@ h1, h2 {
 }
 .neutral { max-width: 34rem; margin: 0 auto; padding: 16px 20px; background: var(--stone); border-radius: 10px; }
 .n-line { margin: 0.5em 0; }
+
 /* 11A. Neutrality meter */
 .meter { margin-top: 1.4em; }
 .meter-title { font-family: "Cinzel", Georgia, serif; color: var(--gold); margin: 0 0 0.5em; }
@@ -209,14 +231,15 @@ h1, h2 {
 
 /* 12. FOCUS AND MOTION */
 @media (prefers-reduced-motion: reduce) {
-  .fog-a, .fog-b, .aurora i, .mote { animation: none; }
+  .fog-a, .fog-b, .aurora i, .mote, .home { animation: none; }
   .tablet { opacity: 1; filter: none; transform: none; transition: none; }
-  .meter-track i, .abe { transition: none; }
+  .meter-track i, .abe, .giga, .home { transition: none; }
 }
 
 /* 13. MOBILE */
 @media (max-width: 720px) {
   body { font-size: 1.1rem; }
+  .home { width: 46px; height: 46px; }
   .tablet { width: 94%; margin: 0 auto 12vh !important; padding-top: 44px; border-radius: 70px 70px 8px 8px / 50px 50px 8px 8px; }
   .stairs { width: 66%; margin-bottom: 12vh; }
   .mountain { clip-path: polygon(50% 1%, 62% 4%, 78% 8%, 100% 13%, 100% 100%, 0 100%, 0 13%, 22% 8%, 38% 4%); }

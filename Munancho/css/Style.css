@@ -59,32 +59,30 @@ SECTION GUIDE:
    ========================================================== */
 
 :root {
-    color-scheme: dark;
-
+    /* Colors */
     --background: #080b14;
-    --panel: #111827;
-    --panel-light: #17243a;
-
-    --text: #f3f6ff;
-    --muted: #8994ad;
-
-    --blue: #78aaff;
-    --blue-bright: #5294ff;
+    --text: #f4f7ff;
+    --muted: #9aa8c4;
     --cyan: #73f5ff;
+    --blue: #83aaff;
 
-    --border: rgba(160, 190, 255, 0.17);
-    --border-strong: rgba(120, 170, 255, 0.48);
-    --glass: rgba(10, 16, 30, 0.84);
+    /* Lines and glass */
+    --border: rgba(120, 170, 255, 0.16);
+    --border-strong: rgba(115, 245, 255, 0.32);
+    --glass: rgba(8, 11, 20, 0.88);
 
-    --glow: 0 0 24px rgba(82, 148, 255, 0.14);
-    --glow-cyan: 0 0 22px rgba(115, 245, 255, 0.18);
+    /* Glows */
+    --glow: 0 0 40px rgba(61, 117, 209, 0.12);
+    --glow-cyan: 0 0 24px rgba(115, 245, 255, 0.28);
 
-    --radius-small: 7px;
-    --radius-medium: 12px;
-    --radius-large: 18px;
+    /* Corners */
+    --radius-small: 8px;
+    --radius-medium: 14px;
+    --radius-large: 22px;
 
-    --transition-fast: 180ms ease;
-    --transition-smooth: 260ms ease;
+    /* Motion */
+    --transition-fast: 0.18s ease;
+    --transition-smooth: 0.35s ease;
 }
 
 

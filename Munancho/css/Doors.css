@@ -1,0 +1,69 @@
+/* ==========================================================
+   MUNANCHO DOORS (For education)
+   Doors, RGB neon, codec popup, color-cycling Bing Dingy view.
+   Loaded after Style.css.
+   ========================================================== */
+
+/* 1. Doors (only visible on the Bing Dingy view) */
+.doors { display:none; flex-direction:column; align-items:center; gap:18px; padding:32px 0; }
+body:has(#view-bing-dingy:not([hidden])) .doors { display:flex; }
+
+/* 2. RGB neon */
+@property --neon-a { syntax:"<angle>"; initial-value:0deg; inherits:false; }
+@keyframes rgbSpin { to { --neon-a: 360deg; } }
+@keyframes rgbHue {
+  from { filter: drop-shadow(0 0 8px #2df0ff) hue-rotate(0deg); }
+  to   { filter: drop-shadow(0 0 8px #2df0ff) hue-rotate(360deg); }
+}
+.neon-panel, .neon-door {
+  position:relative; isolation:isolate; display:inline-block;
+  padding:14px 40px; background:transparent; color:#fff; border:0;
+  border-radius:8px; letter-spacing:.3em; font-weight:600;
+  text-decoration:none; cursor:pointer;
+  animation: rgbSpin 6s linear infinite, rgbHue 6s linear infinite;
+}
+.neon-panel::before, .neon-door::before {
+  content:""; position:absolute; inset:-2px; z-index:-2; border-radius:10px;
+  background: conic-gradient(from var(--neon-a),
+    #ff2d2d, #ffd500, #2dff5a, #2df0ff, #3d5aff, #ff2dd8, #ff2d2d);
+}
+.neon-panel::after, .neon-door::after {
+  content:""; position:absolute; inset:0; z-index:-1; border-radius:8px; background:#0a0d14;
+}
+
+/* 3. TheLore door (hidden until ~1 second of hovering) */
+.lore-zone { width:220px; height:64px; display:grid; place-items:center; }
+.neon-door { opacity:0; transition:opacity .8s; padding:10px 28px; letter-spacing:.2em; }
+.lore-zone.show .neon-door { opacity:1; }
+
+/* 4. Codec (sits above the fixed player bar) */
+.codec { position:fixed; left:12px; bottom:110px; z-index:50; display:flex; gap:12px;
+  max-width:360px; padding:12px; background:#06130f; color:#7dffb0;
+  border:2px solid #2f8f5f; font-family:monospace; }
+.codec[hidden] { display:none; }
+.codec-face { font-size:34px; }
+.codec-name { font-size:11px; letter-spacing:.2em; margin-bottom:4px; }
+.codec p { margin:0 0 6px; }
+.codec button { background:none; color:inherit; border:0; cursor:pointer; }
+
+/* 5. Color-cycling Bing Dingy view (white is one stop) */
+@property --cyc-bg { syntax:"<color>"; initial-value:#ffffff; inherits:true; }
+@property --cyc-fg { syntax:"<color>"; initial-value:#111111; inherits:true; }
+@keyframes pageCycle {
+  0%   { --cyc-bg:#ffffff; --cyc-fg:#111111; }
+  20%  { --cyc-bg:#2a0a3a; --cyc-fg:#f4e9ff; }
+  40%  { --cyc-bg:#0a2a3a; --cyc-fg:#e6faff; }
+  60%  { --cyc-bg:#3a0a1a; --cyc-fg:#ffe9ef; }
+  80%  { --cyc-bg:#0a3a1a; --cyc-fg:#eaffee; }
+  100% { --cyc-bg:#ffffff; --cyc-fg:#111111; }
+}
+#view-bing-dingy {
+  background: var(--cyc-bg);
+  color: var(--cyc-fg);
+  min-height: calc(100vh - 96px);
+  animation: pageCycle 30s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-panel, .neon-door, #view-bing-dingy { animation:none; }
+}

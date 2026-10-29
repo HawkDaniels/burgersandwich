@@ -64,6 +64,56 @@
 // The first song is track 01, the second is track 02, etc.
 // ============================================================
 
+
+// 1. Doors + codec (For education)
+// 1A. Elements
+const agarthaPanel = document.getElementById("agarthaPanel");
+const loreZone = document.getElementById("loreZone");
+const loreDoor = document.getElementById("loreDoor");
+const codec = document.getElementById("codec");
+const codecText = document.getElementById("codecText");
+const codecClose = document.getElementById("codecClose");
+
+// 1B. Codec (typewriter text)
+let codecTimer;
+function openCodec(msg, onClose) {
+  clearInterval(codecTimer);
+  codec.hidden = false;
+  codecText.textContent = "";
+  let i = 0;
+  codecTimer = setInterval(() => {
+    codecText.textContent += msg[i++];
+    if (i >= msg.length) clearInterval(codecTimer);
+  }, 28);
+  codecClose.onclick = () => { clearInterval(codecTimer); codec.hidden = true; if (onClose) onClose(); };
+}
+
+// 1C. Agartha panel: click = hint, double click = enter
+agarthaPanel.addEventListener("click", () => {
+  openCodec("This door won't open for a single knock. Try twice, fast.");
+});
+agarthaPanel.addEventListener("dblclick", () => { window.location.href = "/pages/Agartha.html"; });
+
+// 1D. TheLore door appears after ~1 second of hovering (or holding on touch)
+let hoverTimer;
+const startHover = () => { hoverTimer = setTimeout(() => loreZone.classList.add("show"), 1000); };
+const stopHover = () => clearTimeout(hoverTimer);
+loreZone.addEventListener("mouseenter", startHover);
+loreZone.addEventListener("mouseleave", stopHover);
+loreZone.addEventListener("touchstart", startHover, { passive: true });
+loreZone.addEventListener("touchend", stopHover);
+
+// 1E. TheLore codec call only if Agartha was already visited
+loreDoor.addEventListener("click", (e) => {
+  let seen = false;
+  try { seen = localStorage.getItem("agarthaVisited") === "1"; } catch (err) {}
+  if (!seen) return; // plain link, opens normally
+  e.preventDefault();
+  openCodec("You found the way down first. Good. The tablets remember what they were told, not what happened.",
+    () => { window.location.href = "/pages/TheLore.html"; });
+});
+
+
 const albums = [
     {
         id: "album1",

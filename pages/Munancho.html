@@ -14,7 +14,10 @@ Munancho/
         cues/       Navigation sound cues (lore.mp3,
                     archive.mp3, merch.mp3, bing-dingy.mp3).
     css/Style.css   Colors, layout, typography, and effects.
+    css/Doors.css   Doors, RGB neon, codec popup, and the
+                    color-cycling Bing Dingy view.
     js/script.js    Album data, tracklists, and playback logic.
+                    Also the doors and codec behavior.
 
 SECTION GUIDE
 ------------------------------------------------------------
@@ -33,10 +36,12 @@ SECTION GUIDE
 06. Track manifest
 07. Merch
 08. The Bing Dingy page
+    08A. Doors (Agartha panel and TheLore door)
 09. Persistent music player
     09A. Now playing
     09B. Audio controls
     09C. Player label
+10. Codec popup
 
 PAGE VIEWS
 ------------------------------------------------------------
@@ -56,8 +61,9 @@ EDITING GUIDE
 ------------------------------------------------------------
 Change text and page sections in this file.
 Change appearance in Munancho/css/Style.css.
-Change music data, about text, sound cues, and playback
-behavior in Munancho/js/script.js.
+Change doors and codec appearance in Munancho/css/Doors.css.
+Change music data, about text, sound cues, doors, and
+playback behavior in Munancho/js/script.js.
 
 FILE PATH NOTE
 ------------------------------------------------------------
@@ -80,7 +86,7 @@ File and folder names must match their actual spelling.
          WHAT YOU CAN CHANGE:
          <title>       Browser tab title.
          description   Search-engine summary.
-         stylesheet    Location of the CSS file.
+         stylesheet    Location of the CSS files.
          script        Location of the JavaScript file.
          ================================================== -->
 
@@ -97,8 +103,14 @@ File and folder names must match their actual spelling.
     <!-- Visual styling: colors, layout, and effects. -->
     <link rel="stylesheet" href="../Munancho/css/Style.css">
 
+    <!-- Doors, neon, codec, and color cycle (For education).
+         Must load AFTER Style.css. -->
+    <link rel="stylesheet" href="../Munancho/css/Doors.css">
+    <link rel="stylesheet" href="../Munancho/css/Player.css">
+
     <!-- Website behavior: album selection and audio playback. -->
     <script src="../Munancho/js/Script.js" defer></script>
+    <script src="../Munancho/js/Player.js" defer></script>
 </head>
 
 <body>
@@ -113,7 +125,7 @@ File and folder names must match their actual spelling.
 
          IMPORTANT HOOKS:
          .logo         Brand styling.
-        .logo-icon    Round home icon. Plays the "logo" cue.
+         .logo-icon    Round home icon. Plays the "logo" cue.
          .status       Archive status styling.
          data-view     Which page view a link opens
                        ("home" or "bing-dingy").
@@ -135,7 +147,7 @@ File and folder names must match their actual spelling.
             <a class="logo-icon"
                href="../index.html"
                data-view="home"
-               data-cue="logo"      
+               data-cue="logo"
                aria-label="Munancho home">
                 <img src="/favicon(1).png" alt="Munancho logo">
             </a>
@@ -573,6 +585,32 @@ File and folder names must match their actual spelling.
 
         </section>
 
+        <!-- ==================================================
+             SECTION 08A — DOORS (For education)
+
+             PURPOSE:
+             Hidden way into the deeper pages. Only visible on
+             this view (Doors.css hides it elsewhere).
+
+             #agarthaPanel  Always visible. Click = codec hint.
+                            Double click = opens Agartha.html.
+             #loreZone      Invisible hover area. After about a
+                            second of hovering it gets "show".
+             #loreDoor      Door to TheLore.html. Plays a codec
+                            call first, only if Agartha has
+                            already been visited.
+
+             Behavior lives in script.js (doors + codec).
+             Appearance lives in Doors.css.
+             ================================================== -->
+
+        <div class="doors">
+            <button id="agarthaPanel" class="neon-panel" type="button">AGARTHA</button>
+            <div id="loreZone" class="lore-zone">
+                <a id="loreDoor" class="neon-door" href="TheLore.html">THE LORE</a>
+            </div>
+        </div>
+
         </div>
         <!-- END PAGE VIEW: THE BING DINGY -->
 
@@ -617,19 +655,42 @@ File and folder names must match their actual spelling.
 
         </div>
 
-        <!-- 09B — Audio controls.
-             JavaScript assigns the source when a track is selected. -->
-        <audio id="audio-player"
-               controls
-               preload="metadata">
-        </audio>
+    <!-- 09B — Audio controls (For education).
+        The <audio> element stays (script.js still uses it) but its
+         default controls are hidden; these custom controls drive it. -->
+    <div class="player-controls">
+        <button id="pc-play" class="pc-btn" type="button" aria-label="Play">▶</button>
+        <span id="pc-current" class="pc-time">0:00</span>
+        <input id="pc-seek" class="pc-seek" type="range"
+               min="0" max="100" value="0" step="0.1" aria-label="Seek">
+        <span id="pc-duration" class="pc-time">0:00</span>
+        <input id="pc-volume" class="pc-volume" type="range"
+               min="0" max="1" step="0.01" value="1" aria-label="Volume">
+    </div>
 
-        <!-- 09C — Player label -->
-        <span class="player-label">
-            MUNANCHO MACHINE / NANO-TECHNOLOGY
-        </span>
+    <audio id="audio-player" preload="metadata"></audio>
 
-    </footer>
+
+    <!-- ==================================================
+         SECTION 10 — CODEC POPUP (For education)
+
+         PURPOSE:
+         Metal Gear style call box used by the doors.
+         Kept at the bottom of the page, outside the header,
+         so it is never clipped by the pinned header.
+
+         #codecText   Typed out one letter at a time.
+         #codecClose  Closes the popup.
+         ================================================== -->
+
+    <div id="codec" class="codec" hidden>
+        <div class="codec-face">◉</div>
+        <div class="codec-body">
+            <div class="codec-name">JOHN ANIME</div>
+            <p id="codecText"></p>
+            <button id="codecClose" type="button">[ close ]</button>
+        </div>
+    </div>
 
 </body>
 </html>

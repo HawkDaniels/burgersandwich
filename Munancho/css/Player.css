@@ -1,0 +1,65 @@
+/* ==========================================================
+   MUNANCHO CUSTOM PLAYER (For education)
+   ========================================================== */
+
+/* 1. Hide the browser's default audio UI (script.js still uses the element) */
+#audio-player { display:none; }
+
+/* 2. Control row */
+.player-controls {
+    display:flex; align-items:center; gap:12px;
+    width:100%; max-width:560px; min-width:0;
+}
+
+/* 3. Play / pause button (album accent color) */
+.pc-btn {
+    flex-shrink:0; width:44px; height:44px;
+    display:grid; place-items:center;
+    border:0; border-radius:50%; cursor:pointer;
+    background: rgb(var(--accent)); color:#080b14; font-size:15px;
+    box-shadow: 0 0 18px rgba(var(--accent), 0.35);
+    transition: transform .18s ease, box-shadow .35s ease, background .35s ease;
+}
+.pc-btn:hover { transform:scale(1.06); box-shadow:0 0 26px rgba(var(--accent), 0.55); }
+
+/* 4. Time labels */
+.pc-time {
+    min-width:34px; text-align:center;
+    color: var(--muted, #9aa8c4); font-size:.72rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 5. Seek + volume sliders (filled part uses --pct, set by Player.js) */
+.pc-seek, .pc-volume {
+    -webkit-appearance:none; appearance:none;
+    height:6px; border-radius:3px; cursor:pointer; outline:none;
+    background: linear-gradient(to right,
+        rgb(var(--accent)) var(--pct, 0%),
+        rgba(255,255,255,0.14) var(--pct, 0%));
+}
+.pc-seek { flex:1; min-width:60px; }
+.pc-volume { width:80px; flex-shrink:0; }
+
+.pc-seek::-webkit-slider-thumb, .pc-volume::-webkit-slider-thumb {
+    -webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+    background:#fff; border:0; box-shadow:0 0 0 3px rgba(var(--accent), 0.35);
+}
+.pc-seek::-moz-range-thumb, .pc-volume::-moz-range-thumb {
+    width:14px; height:14px; border-radius:50%;
+    background:#fff; border:0; box-shadow:0 0 0 3px rgba(var(--accent), 0.35);
+}
+.pc-seek::-moz-range-track, .pc-volume::-moz-range-track { background:transparent; }
+
+.pc-btn:focus-visible, .pc-seek:focus-visible, .pc-volume:focus-visible {
+    outline:2px solid var(--cyan, #73f5ff); outline-offset:4px;
+}
+
+/* 6. Small screens */
+@media (max-width: 700px) {
+    .pc-volume { display:none; }
+    .pc-btn { width:38px; height:38px; }
+    .pc-time { min-width:28px; font-size:.65rem; }
+}
+@media (max-width: 380px) {
+    .pc-time { display:none; }
+}
